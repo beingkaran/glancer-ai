@@ -1,5 +1,5 @@
 /* ============================================================
-   ObservaPedia — User Comments (local-only)
+   Glancer.ai — User Comments (local-only)
    Storage: IndexedDB (the right local DB for structured, indexed,
    per-term records), with a localStorage fallback.
    Comments never leave the user's browser.

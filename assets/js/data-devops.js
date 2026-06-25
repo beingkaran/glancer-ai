@@ -1,4 +1,4 @@
-/* ObservaPedia — DevOps, CI/CD, deployment & release engineering */
+/* Glancer.ai — DevOps, CI/CD, deployment & release engineering */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "DevOps", category: "DevOps & CI/CD", definition: "A culture and set of practices that unite software development and IT operations to shorten the delivery lifecycle through automation, collaboration and continuous feedback.", related: ["DevSecOps", "Continuous Integration", "Site Reliability Engineering"] },
   { term: "Continuous Integration", abbr: "CI", category: "DevOps & CI/CD", definition: "The practice of frequently merging code changes into a shared repository, where each change is automatically built and tested to catch integration problems early.", related: ["Continuous Delivery", "Pipeline (CI/CD)", "Build", "Shift Left"] },

@@ -1,5 +1,5 @@
 /* ============================================================
-   ObservaPedia — Application Logic
+   Glancer.ai — Application Logic
    ============================================================ */
 (function () {
   "use strict";

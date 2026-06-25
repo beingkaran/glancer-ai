@@ -5,4 +5,4 @@ Allow: /
 User-agent: Mediapartners-Google
 Allow: /
 
-Sitemap: https://www.observapedia.com/sitemap.xml
+Sitemap: https://www.glancer.ai/sitemap.xml

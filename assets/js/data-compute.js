@@ -1,4 +1,4 @@
-/* ObservaPedia — Compute, runtime, OS & performance internals */
+/* Glancer.ai — Compute, runtime, OS & performance internals */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Runtime", category: "Compute & Runtime", definition: "The environment in which a program executes, providing services like memory management, scheduling and libraries; also the period during which a program runs.", related: ["JVM", "Garbage Collection", "Interpreter"] },
   { term: "JVM", abbr: "JVM", category: "Compute & Runtime", definition: "Java Virtual Machine — the runtime that executes Java bytecode, providing portability, JIT compilation and garbage collection; a common APM instrumentation target.", related: ["Bytecode", "Garbage Collection", "JIT Compilation", "Heap"] },

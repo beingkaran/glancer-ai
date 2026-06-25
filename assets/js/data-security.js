@@ -1,4 +1,4 @@
-/* ObservaPedia — Security, SIEM, SOAR & threat detection */
+/* Glancer.ai — Security, SIEM, SOAR & threat detection */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "SIEM", abbr: "SIEM", category: "Security & SIEM", definition: "Security Information and Event Management — a platform that aggregates and correlates security logs and events across an organization to detect, investigate and report threats.", related: ["SOAR", "Log Aggregation", "Threat Detection", "Correlation"] },
   { term: "SOAR", abbr: "SOAR", category: "Security & SIEM", definition: "Security Orchestration, Automation and Response — tools that automate and coordinate incident-response workflows and playbooks across security tools.", related: ["SIEM", "Playbook", "Auto-Remediation", "Incident Response"] },

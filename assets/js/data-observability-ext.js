@@ -1,4 +1,4 @@
-/* ObservaPedia — Observability tooling, signals & modern concepts */
+/* Glancer.ai — Observability tooling, signals & modern concepts */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   /* ---- Prometheus / metrics ecosystem ---- */
   { term: "Alertmanager", category: "Standards & Tools", definition: "The Prometheus component that handles alerts sent by the server — deduplicating, grouping, silencing, inhibiting and routing them to receivers like email, Slack or PagerDuty.", related: ["Prometheus", "Alerting", "Silence", "Deduplication"] },

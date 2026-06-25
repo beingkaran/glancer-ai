@@ -1,4 +1,4 @@
-/* ObservaPedia — Vendor platforms, cloud services, data engineering, AI/ML & advanced */
+/* Glancer.ai — Vendor platforms, cloud services, data engineering, AI/ML & advanced */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   /* ---- Observability platforms & tools ---- */
   { term: "Datadog", category: "Standards & Tools", definition: "A SaaS observability and security platform unifying metrics, traces, logs, RUM, synthetics and more, known for broad integrations and its tagging model.", related: ["Watchdog", "Agent", "Single Pane of Glass"], vendors: ["Datadog"] },

@@ -1,4 +1,4 @@
-/* ObservaPedia — Web, data formats, storage & general computing */
+/* Glancer.ai — Web, data formats, storage & general computing */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   /* data formats */
   { term: "JSON", abbr: "JSON", category: "Data Formats", definition: "JavaScript Object Notation — a lightweight, human-readable text format for structured data, ubiquitous in APIs, configuration and structured logging.", related: ["YAML", "XML", "Structured Logging", "Serialization"] },

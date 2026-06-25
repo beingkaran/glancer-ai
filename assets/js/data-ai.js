@@ -1,5 +1,5 @@
 /*
- * ObservaPedia — AI & Machine Learning Glossary Database
+ * Glancer.ai — AI & Machine Learning Glossary Database
  * AI and ML terminology covering foundations, architectures, techniques, and applications
  * Each entry: { term, abbr?, category, definition, related?[], vendors?[] }
  */

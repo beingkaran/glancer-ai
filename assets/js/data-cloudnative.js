@@ -1,4 +1,4 @@
-/* ObservaPedia — Cloud Native, Containers, Service Mesh & GitOps */
+/* Glancer.ai — Cloud Native, Containers, Service Mesh & GitOps */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Cloud Native", category: "Cloud Native", definition: "An approach to building and running applications that fully exploits the cloud model — using containers, microservices, dynamic orchestration and declarative automation to deliver scalable, resilient, frequently updated systems.", related: ["Microservices", "Containers", "Kubernetes", "CNCF"] },
   { term: "CNCF", abbr: "CNCF", category: "Cloud Native", definition: "The Cloud Native Computing Foundation — a Linux Foundation project that hosts and governs key open-source cloud-native technologies such as Kubernetes, Prometheus, Envoy and OpenTelemetry.", related: ["Cloud Native", "Kubernetes", "OpenTelemetry"] },

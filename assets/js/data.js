@@ -1,5 +1,5 @@
 /*
- * ObservaPedia — AIOps, Observability & APM Glossary Database
+ * Glancer.ai — AIOps, Observability & APM Glossary Database
  * Each entry: { term, abbr?, category, definition, related?[], vendors?[] }
  * Definitions are written in plain English and reflect terminology used across
  * Datadog, Dynatrace, New Relic, Splunk, AppDynamics and Broadcom (DX) APM.

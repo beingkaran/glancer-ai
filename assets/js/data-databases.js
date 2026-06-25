@@ -1,4 +1,4 @@
-/* ObservaPedia — Databases, storage, data & streaming */
+/* Glancer.ai — Databases, storage, data & streaming */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Database", category: "Databases", definition: "An organized, persistent collection of structured data managed by a database management system (DBMS), supporting storage, querying and transactions.", related: ["Relational Database", "NoSQL", "Query", "Schema"] },
   { term: "Relational Database", abbr: "RDBMS", category: "Databases", definition: "A database that stores data in tables of rows and columns with defined relationships, queried with SQL and offering strong consistency and transactions.", related: ["SQL", "NoSQL", "ACID", "Normalization"] },

@@ -1,4 +1,4 @@
-/* ObservaPedia — Distributed systems & architecture */
+/* Glancer.ai — Distributed systems & architecture */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Distributed System", category: "Distributed Systems", definition: "A system whose components run on multiple networked machines and coordinate by passing messages, appearing to users as a single coherent system.", related: ["Microservices Architecture", "CAP Theorem", "Consensus", "Fault Tolerance"] },
   { term: "Consensus", category: "Distributed Systems", definition: "The problem of getting multiple distributed nodes to agree on a single value or state despite failures, solved by algorithms like Raft and Paxos.", related: ["Raft", "Paxos", "Quorum", "etcd"] },

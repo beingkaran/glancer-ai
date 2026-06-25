@@ -1,4 +1,4 @@
-/* ObservaPedia — Cloud computing concepts & provider services */
+/* Glancer.ai — Cloud computing concepts & provider services */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Cloud Computing", category: "Cloud Providers", definition: "The on-demand delivery of computing resources — servers, storage, databases, networking and software — over the internet with pay-as-you-go pricing.", related: ["IaaS", "PaaS", "SaaS", "Public Cloud"] },
   { term: "IaaS", abbr: "IaaS", category: "Cloud Providers", definition: "Infrastructure as a Service — cloud delivery of fundamental compute, storage and networking resources that customers manage and build on (e.g., EC2).", related: ["PaaS", "SaaS", "Virtual Machine"] },

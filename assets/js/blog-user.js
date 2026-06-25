@@ -1,4 +1,4 @@
-/* ObservaPedia — Blog User & Community Posts (localStorage) */
+/* Glancer.ai — Blog User & Community Posts (localStorage) */
 window.BlogUser = (function () {
   var POSTS_KEY = 'observapedia_blog_posts';
   var NAME_KEY  = 'observapedia_blog_username';

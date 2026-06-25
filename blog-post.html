@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="pageTitle">Article — ObservaPedia</title>
-  <meta name="description" id="pageDesc" content="Read in-depth observability and AIOps articles on ObservaPedia." />
+  <title id="pageTitle">Article — Glancer.ai</title>
+  <meta name="description" id="pageDesc" content="Read in-depth observability and AIOps articles on Glancer.ai." />
   <link rel="canonical" href="/blog-post.html" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <script type="application/ld+json" id="articleSchema"></script>
 </head>
 <body>
   <header class="site-header">
     <nav class="nav">
-      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <a class="logo" href="index.html"><span class="logo-mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 3C4.5 3 1.5 6 1.5 8C1.5 10 4.5 13 8 13C11.5 13 14.5 10 14.5 8C14.5 6 11.5 3 8 3Z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg></span> <b>Glancer</b><span class="logo-dot">.ai</span></a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
       <div class="nav-links" id="navLinks">
         <a href="index.html">Home</a>
@@ -36,7 +36,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-about">
-          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <a class="logo" href="index.html"><span class="logo-mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 3C4.5 3 1.5 6 1.5 8C1.5 10 4.5 13 8 13C11.5 13 14.5 10 14.5 8C14.5 6 11.5 3 8 3Z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="currentColor"/></svg></span> <b>Glancer</b><span class="logo-dot">.ai</span></a>
           <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
         </div>
         <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
@@ -44,8 +44,8 @@
         <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
       </div>
       <div class="footer-bottom">
-        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
-        <span>Made for the observability community.</span>
+        <span>© <span id="year">2026</span> Glancer.ai. All rights reserved.</span>
+        <span>Made with ♥ by Karan Shah.</span>
       </div>
     </div>
   </footer>
@@ -107,15 +107,15 @@
     }
 
     // Update meta
-    document.getElementById('pageTitle').textContent = post.title + ' — ObservaPedia';
+    document.getElementById('pageTitle').textContent = post.title + ' — Glancer.ai';
     document.getElementById('pageDesc').setAttribute('content', post.subtitle || post.title);
     document.getElementById('articleSchema').textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Article',
       'headline': post.title,
       'description': post.subtitle || '',
-      'author': { '@type': 'Person', 'name': post.author || 'ObservaPedia Team' },
-      'publisher': { '@type': 'Organization', 'name': 'ObservaPedia' },
+      'author': { '@type': 'Person', 'name': post.author || 'Glancer.ai Team' },
+      'publisher': { '@type': 'Organization', 'name': 'Glancer.ai' },
       'datePublished': post.date || post.createdAt || ''
     });
 
@@ -187,7 +187,7 @@
             '<h1>' + escHTML(post.title) + '</h1>' +
             '<p class="post-sub">' + escHTML(post.subtitle || '') + '</p>' +
             '<div class="post-meta">' +
-              '<span>' + (post.avatar || '📡') + ' <strong>' + escHTML(post.author || 'ObservaPedia Team') + '</strong></span>' +
+              '<span>' + (post.avatar || '📡') + ' <strong>' + escHTML(post.author || 'Glancer.ai Team') + '</strong></span>' +
               '<span>📅 ' + formatDate(post.date || post.createdAt || new Date().toISOString()) + '</span>' +
               '<span>⏱ ' + (post.readTime || '5') + ' min read</span>' +
               (isUserPost ? '<span><span class="user-article-badge">✍️ Community</span></span>' : '') +
@@ -204,8 +204,8 @@
           '<div class="author-box">' +
             '<div class="author-avatar">' + (post.avatar || '📡') + '</div>' +
             '<div class="author-info">' +
-              '<h4>' + escHTML(post.author || 'ObservaPedia Team') + ' <span class="author-badge">' + escHTML(post.category || 'Editor') + '</span></h4>' +
-              '<p>ObservaPedia curates vendor-neutral definitions and guides for the observability and AIOps community.</p>' +
+              '<h4>' + escHTML(post.author || 'Glancer.ai Team') + ' <span class="author-badge">' + escHTML(post.category || 'Editor') + '</span></h4>' +
+              '<p>Glancer.ai curates vendor-neutral definitions and guides for the observability and AIOps community.</p>' +
               (deleteBtn ? '<div style="margin-top:12px">' + deleteBtn + '</div>' : '') +
             '</div>' +
           '</div>' +

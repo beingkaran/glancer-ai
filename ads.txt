@@ -1,4 +1,4 @@
-# ObservaPedia ads.txt
+# Glancer.ai ads.txt
 # After your Google AdSense account is approved, replace pub-0000000000000000
 # with your own Publisher ID (found in AdSense > Account > Settings).
 # This file MUST live at the site root (https://yourdomain.com/ads.txt).

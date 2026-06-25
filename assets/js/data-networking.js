@@ -1,4 +1,4 @@
-/* ObservaPedia — Networking, web protocols, CDN & traffic */
+/* Glancer.ai — Networking, web protocols, CDN & traffic */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "DNS", abbr: "DNS", category: "Networking", definition: "The Domain Name System — the internet's directory that translates human-readable domain names into the IP addresses machines use to locate each other.", related: ["IP Address", "DNS Record", "Resolver", "TTL"] },
   { term: "DNS Record", category: "Networking", definition: "An entry in a DNS zone that maps a name to data — A/AAAA records to IPs, CNAME to aliases, MX to mail servers, TXT to arbitrary text.", related: ["DNS", "CNAME", "A Record"] },

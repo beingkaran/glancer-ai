@@ -1,4 +1,4 @@
-/* ObservaPedia — Supplement: fills common references & rounds out coverage */
+/* Glancer.ai — Supplement: fills common references & rounds out coverage */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Microservices", category: "Cloud Native", definition: "Small, independently deployable services that each handle one capability and communicate over the network; the plural shorthand for a microservices architecture.", related: ["Microservices Architecture", "Service", "Distributed System"] },
   { term: "Child Span", category: "Tracing", definition: "A span whose parent is another span, representing a sub-operation nested within it; child spans form the tree structure of a trace.", related: ["Span", "Root Span", "Trace"] },

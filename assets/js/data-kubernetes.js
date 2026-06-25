@@ -1,4 +1,4 @@
-/* ObservaPedia — Kubernetes objects, concepts & ecosystem */
+/* Glancer.ai — Kubernetes objects, concepts & ecosystem */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "Kubernetes", abbr: "K8s", category: "Kubernetes", definition: "An open-source container-orchestration platform that automates deployment, scaling, networking and management of containerized applications across a cluster of machines.", related: ["Cluster", "Pod", "Control Plane (K8s)", "kubelet"] },
   { term: "Cluster", category: "Kubernetes", definition: "A set of worker machines (nodes) that run containerized applications, managed together by a Kubernetes control plane. The fundamental unit of a Kubernetes deployment.", related: ["Node", "Control Plane (K8s)", "Kubernetes"] },

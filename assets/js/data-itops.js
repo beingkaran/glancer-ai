@@ -1,4 +1,4 @@
-/* ObservaPedia — IT operations, ITSM & infrastructure */
+/* Glancer.ai — IT operations, ITSM & infrastructure */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   { term: "ITOps", category: "IT Operations", definition: "IT Operations — the people, processes and tools that run, maintain and support an organization's IT infrastructure and services day to day.", related: ["AIOps", "ITSM", "NOC"] },
   { term: "ITSM", abbr: "ITSM", category: "IT Operations", definition: "IT Service Management — the practices for designing, delivering, operating and improving IT services to meet business needs, often guided by ITIL.", related: ["ITIL", "Service Desk", "Change Management"] },

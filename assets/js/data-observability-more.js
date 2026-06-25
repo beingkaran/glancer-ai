@@ -1,4 +1,4 @@
-/* ObservaPedia — Deeper observability: metrics, logs, traces, RUM, APM, AIOps */
+/* Glancer.ai — Deeper observability: metrics, logs, traces, RUM, APM, AIOps */
 window.OBSERVA_TERMS = (window.OBSERVA_TERMS || []).concat([
   /* metrics depth */
   { term: "Data Point", category: "Metrics", definition: "A single timestamped value in a time series, the atomic unit of metric data.", related: ["Time Series", "Metric", "Sample"] },
