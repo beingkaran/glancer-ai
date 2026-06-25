@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write an Article — ObservaPedia</title>
+  <meta name="description" content="Share your observability, AIOps or SRE knowledge with the ObservaPedia community." />
+  <link rel="canonical" href="/blog-write.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Sticky write topbar -->
+  <div class="write-topbar">
+    <div class="write-topbar-inner">
+      <span class="wt-left">✍️ New Article</span>
+      <span class="wt-status" id="saveStatus">Unsaved</span>
+      <span class="spacer"></span>
+      <button class="write-btn draft" id="saveDraftBtn">Save Draft</button>
+      <button class="write-btn preview-btn" id="previewBtn">Preview</button>
+      <button class="write-btn publish" id="publishBtn">Publish →</button>
+    </div>
+  </div>
+
+  <!-- Cover selector -->
+  <div class="write-layout">
+    <div class="cover-selector" id="coverSelector">
+      <div class="bc-pattern" style="position:absolute;inset:0;opacity:.12;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:24px 24px"></div>
+      <span class="cs-icon" id="coverIcon">📝</span>
+      <span class="cs-label">Click to change cover</span>
+    </div>
+
+    <!-- Cover options panel -->
+    <div class="cover-options" id="coverOptions">
+      <div style="width:100%;font-size:.82rem;font-weight:700;color:var(--text-soft);margin-bottom:4px">Background</div>
+      <div id="swatchRow"></div>
+      <div style="width:100%;font-size:.82rem;font-weight:700;color:var(--text-soft);margin:10px 0 4px">Icon</div>
+      <div class="cover-emoji-row" id="emojiRow"></div>
+    </div>
+
+    <!-- Category + author row -->
+    <div class="write-author-row">
+      <input type="text" id="authorInput" placeholder="Your name" autocomplete="off" />
+      <select id="categorySelect" style="flex:0 0 180px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;font-size:.95rem;padding:9px 14px;outline:none">
+        <option value="Observability">Observability</option>
+        <option value="SRE">SRE</option>
+        <option value="AIOps">AIOps</option>
+        <option value="DevOps">DevOps</option>
+        <option value="Tutorials">Tutorials</option>
+      </select>
+    </div>
+
+    <!-- Title & subtitle -->
+    <input class="write-title" id="titleInput" type="text" placeholder="Article title…" autocomplete="off" />
+    <input class="write-subtitle" id="subtitleInput" type="text" placeholder="A short subtitle or summary…" autocomplete="off" />
+
+    <!-- Toolbar + editor -->
+    <div class="editor-toolbar" id="toolbar">
+      <button class="ed-btn" data-cmd="bold" title="Bold">B</button>
+      <button class="ed-btn" data-cmd="italic" title="Italic"><em>I</em></button>
+      <button class="ed-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+      <span class="ed-sep"></span>
+      <button class="ed-btn" data-cmd="h2" title="Heading 2">H2</button>
+      <button class="ed-btn" data-cmd="h3" title="Heading 3">H3</button>
+      <span class="ed-sep"></span>
+      <button class="ed-btn" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+      <button class="ed-btn" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+      <span class="ed-sep"></span>
+      <button class="ed-btn" data-cmd="blockquote" title="Blockquote">" Quote</button>
+      <button class="ed-btn" data-cmd="callout" title="Callout box">💡 Callout</button>
+      <span class="ed-sep"></span>
+      <button class="ed-btn" data-cmd="createLink" title="Link">🔗 Link</button>
+      <button class="ed-btn" data-cmd="removeFormat" title="Clear formatting">✕ Clear</button>
+    </div>
+    <div class="write-editor" id="editor" contenteditable="true"
+         data-placeholder="Start writing your article… Use the toolbar above to format headings, lists, and quotes."></div>
+    <div class="write-char-count" id="charCount">0 words</div>
+
+    <!-- Tags -->
+    <div class="write-tags-row">
+      <label for="tagsInput">Tags:</label>
+      <input class="write-tags-input" id="tagsInput" type="text" placeholder="observability, SRE, metrics  (comma-separated)" />
+    </div>
+
+    <!-- Read time estimate -->
+    <div style="margin-top:12px;font-size:.82rem;color:var(--text-faint)" id="readTimeEstimate">Estimated read time: — min</div>
+  </div>
+
+  <!-- Submitted-for-review success screen -->
+  <div class="preview-overlay" id="submitOverlay" style="display:none">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px">
+      <div style="max-width:480px;width:100%;text-align:center">
+        <div style="font-size:4rem;margin-bottom:20px">🎉</div>
+        <h1 style="font-size:2rem;font-weight:800;color:var(--text);margin:0 0 12px">Article Submitted!</h1>
+        <p style="font-size:1.05rem;color:var(--text-soft);margin:0 0 28px;line-height:1.6">
+          Your article is now pending review. It will appear publicly once an admin approves it — usually within 24 hours.
+        </p>
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:28px;text-align:left">
+          <div style="font-size:.8rem;font-weight:700;color:var(--text-soft);letter-spacing:.05em;margin-bottom:10px">SUBMITTED ARTICLE</div>
+          <div id="submitPreviewTitle" style="font-weight:800;font-size:1.1rem;color:var(--text)"></div>
+          <div id="submitPreviewMeta" style="font-size:.85rem;color:var(--text-faint);margin-top:6px"></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="profile.html" style="background:var(--brand);color:#fff;font-weight:700;padding:12px 24px;border-radius:var(--radius-sm);text-decoration:none;font-size:.95rem">👤 My Profile →</a>
+          <a href="blog.html" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text-soft);font-weight:700;padding:12px 24px;border-radius:var(--radius-sm);text-decoration:none;font-size:.95rem">Browse Blog</a>
+          <a href="blog-write.html" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text-soft);font-weight:700;padding:12px 24px;border-radius:var(--radius-sm);text-decoration:none;font-size:.95rem">Write Another</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview overlay -->
+  <div class="preview-overlay" id="previewOverlay">
+    <div class="preview-close-bar">
+      <strong>Preview</strong>
+      <span style="font-size:.85rem;color:var(--text-faint)">This is how your article will look to readers.</span>
+      <button class="preview-close-btn" id="previewCloseBtn">✕ Close Preview</button>
+    </div>
+    <div id="previewContent"></div>
+  </div>
+
+  <script src="assets/js/blog-user.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    var COVERS = [
+      { gradient: 'linear-gradient(135deg,#0a1628 0%,#1e3a8a 60%,#2563eb 100%)', label: 'Blue' },
+      { gradient: 'linear-gradient(135deg,#1e1b4b 0%,#4c1d95 60%,#7c3aed 100%)', label: 'Purple' },
+      { gradient: 'linear-gradient(135deg,#042f2e 0%,#115e59 60%,#0d9488 100%)', label: 'Teal' },
+      { gradient: 'linear-gradient(135deg,#052e16 0%,#166534 60%,#16a34a 100%)', label: 'Green' },
+      { gradient: 'linear-gradient(135deg,#431407 0%,#9a3412 60%,#ea580c 100%)', label: 'Orange' },
+      { gradient: 'linear-gradient(135deg,#0c0a09 0%,#292524 60%,#57534e 100%)', label: 'Dark' },
+      { gradient: 'linear-gradient(135deg,#450a0a 0%,#991b1b 60%,#ef4444 100%)', label: 'Red' },
+    ];
+    var EMOJIS = ['📝','🔭','📊','🕸️','🤖','🎯','⚙️','🔬','🛡️','🚀','💡','📡','🔍','⚡','🌐'];
+
+    var selectedCover = COVERS[0];
+    var selectedIcon = '📝';
+    var autoSaveTimer = null;
+
+    // Build swatch row
+    var swatchRow = document.getElementById('swatchRow');
+    swatchRow.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap';
+    COVERS.forEach(function (c, i) {
+      var s = document.createElement('button');
+      s.className = 'cover-swatch' + (i === 0 ? ' active' : '');
+      s.style.background = c.gradient;
+      s.title = c.label;
+      s.addEventListener('click', function () {
+        document.querySelectorAll('.cover-swatch').forEach(function (x) { x.classList.remove('active'); });
+        s.classList.add('active');
+        selectedCover = c;
+        updateCoverPreview();
+      });
+      swatchRow.appendChild(s);
+    });
+
+    // Build emoji row
+    var emojiRow = document.getElementById('emojiRow');
+    EMOJIS.forEach(function (e, i) {
+      var b = document.createElement('button');
+      b.className = 'cover-emoji-btn' + (i === 0 ? ' active' : '');
+      b.textContent = e;
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.cover-emoji-btn').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        selectedIcon = e;
+        document.getElementById('coverIcon').textContent = e;
+      });
+      emojiRow.appendChild(b);
+    });
+
+    function updateCoverPreview() {
+      var cs = document.getElementById('coverSelector');
+      cs.style.background = selectedCover.gradient;
+    }
+    updateCoverPreview();
+
+    // Toggle cover options panel
+    document.getElementById('coverSelector').addEventListener('click', function () {
+      document.getElementById('coverOptions').classList.toggle('open');
+    });
+
+    // Restore author name
+    var authorInput = document.getElementById('authorInput');
+    authorInput.value = window.BlogUser ? window.BlogUser.getName() : '';
+
+    // Toolbar actions
+    document.getElementById('toolbar').addEventListener('click', function (e) {
+      var btn = e.target.closest('.ed-btn');
+      if (!btn) return;
+      var cmd = btn.dataset.cmd;
+      var editor = document.getElementById('editor');
+      editor.focus();
+      if (cmd === 'h2') {
+        document.execCommand('formatBlock', false, 'H2');
+      } else if (cmd === 'h3') {
+        document.execCommand('formatBlock', false, 'H3');
+      } else if (cmd === 'blockquote') {
+        document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+      } else if (cmd === 'callout') {
+        var sel = window.getSelection();
+        var text = sel && sel.toString() ? sel.toString() : 'Add your callout text here…';
+        document.execCommand('insertHTML', false,
+          '<div class="callout"><div class="callout-title">💡 Note</div><p>' + text + '</p></div><p><br></p>');
+      } else if (cmd === 'createLink') {
+        var url = prompt('Enter URL:');
+        if (url) document.execCommand('createLink', false, url);
+      } else {
+        document.execCommand(cmd, false, null);
+      }
+    });
+
+    // Word count + read time
+    var editor = document.getElementById('editor');
+    editor.addEventListener('input', function () {
+      var text = editor.innerText || '';
+      var words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      document.getElementById('charCount').textContent = words + ' word' + (words !== 1 ? 's' : '');
+      var mins = Math.max(1, Math.round(words / 200));
+      document.getElementById('readTimeEstimate').textContent = 'Estimated read time: ' + mins + ' min' + (mins !== 1 ? 's' : '');
+      scheduleAutoSave();
+    });
+
+    document.getElementById('titleInput').addEventListener('input', scheduleAutoSave);
+    document.getElementById('subtitleInput').addEventListener('input', scheduleAutoSave);
+
+    function scheduleAutoSave() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(saveDraft, 2000);
+    }
+
+    function buildPost(publish) {
+      var title = document.getElementById('titleInput').value.trim();
+      var subtitle = document.getElementById('subtitleInput').value.trim();
+      var author = authorInput.value.trim() || 'Anonymous';
+      var category = document.getElementById('categorySelect').value;
+      var body = editor.innerHTML;
+      var tagsRaw = document.getElementById('tagsInput').value;
+      var tags = tagsRaw.split(',').map(function (t) { return t.trim(); }).filter(Boolean);
+      var words = (editor.innerText || '').trim().split(/\s+/).length;
+      var readTime = Math.max(1, Math.round(words / 200));
+      var id = window.BlogUser.generateId(title);
+
+      if (window.BlogUser) window.BlogUser.setName(author);
+
+      return {
+        id: id,
+        title: title || 'Untitled',
+        subtitle: subtitle,
+        category: category,
+        icon: selectedIcon,
+        bgGradient: selectedCover.gradient,
+        author: author,
+        avatar: selectedIcon,
+        date: new Date().toISOString(),
+        readTime: readTime,
+        tags: tags,
+        featured: false,
+        body: body,
+        draft: !publish,
+        status: publish ? 'pending' : 'draft'
+      };
+    }
+
+    function saveDraft() {
+      if (!window.BlogUser) return;
+      var title = document.getElementById('titleInput').value.trim();
+      if (!title && !editor.textContent.trim()) return;
+      var post = buildPost(false);
+      window.BlogUser.savePost(post);
+      document.getElementById('saveStatus').textContent = 'Draft saved · ' + new Date().toLocaleTimeString();
+    }
+
+    document.getElementById('saveDraftBtn').addEventListener('click', function () {
+      saveDraft();
+    });
+
+    document.getElementById('publishBtn').addEventListener('click', function () {
+      var title = document.getElementById('titleInput').value.trim();
+      if (!title) { alert('Please add a title before publishing.'); document.getElementById('titleInput').focus(); return; }
+      if (!(editor.textContent || '').trim()) { alert('Please write some content before publishing.'); editor.focus(); return; }
+      var post = buildPost(true);
+      if (window.BlogUser) window.BlogUser.savePost(post);
+      // Show "submitted for review" screen instead of redirecting
+      document.getElementById('submitPreviewTitle').textContent = post.title;
+      document.getElementById('submitPreviewMeta').textContent =
+        post.category + ' · ' + (post.readTime || 1) + ' min read · by ' + post.author;
+      var overlay = document.getElementById('submitOverlay');
+      overlay.style.display = '';
+      overlay.classList.add('active');
+    });
+
+    // Preview
+    function renderPreview() {
+      var post = buildPost(false);
+      var bodyDiv = document.createElement('div');
+      bodyDiv.innerHTML = post.body;
+      var h2s = bodyDiv.querySelectorAll('h2');
+      h2s.forEach(function (h, i) { h.id = 'section-' + i; });
+
+      document.getElementById('previewContent').innerHTML =
+        '<section class="post-hero">' +
+          '<div class="post-hero-bg" style="background:' + post.bgGradient + '"></div>' +
+          '<div class="post-hero-dots"></div>' +
+          '<div class="post-hero-overlay"></div>' +
+          '<div class="container" style="position:relative;z-index:2">' +
+            '<div class="post-hero-content">' +
+              '<span class="post-cat">' + post.category + '</span>' +
+              '<h1>' + (post.title || 'Untitled') + '</h1>' +
+              (post.subtitle ? '<p class="post-sub">' + post.subtitle + '</p>' : '') +
+              '<div class="post-meta">' +
+                '<span>' + post.icon + ' <strong>' + post.author + '</strong></span>' +
+                '<span>⏱ ' + post.readTime + ' min read</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+        '<div class="post-body" style="max-width:760px;margin:0 auto;padding:48px 24px 80px">' +
+          bodyDiv.innerHTML +
+        '</div>';
+    }
+
+    document.getElementById('previewBtn').addEventListener('click', function () {
+      renderPreview();
+      document.getElementById('previewOverlay').classList.add('active');
+    });
+
+    document.getElementById('previewCloseBtn').addEventListener('click', function () {
+      document.getElementById('previewOverlay').classList.remove('active');
+    });
+
+    // Load draft from URL ?edit=id
+    var editId = new URLSearchParams(window.location.search).get('edit');
+    if (editId && window.BlogUser) {
+      var draft = window.BlogUser.getPost(editId);
+      if (draft) {
+        document.getElementById('titleInput').value = draft.title || '';
+        document.getElementById('subtitleInput').value = draft.subtitle || '';
+        authorInput.value = draft.author || '';
+        document.getElementById('tagsInput').value = (draft.tags || []).join(', ');
+        editor.innerHTML = draft.body || '';
+        var catSel = document.getElementById('categorySelect');
+        if (draft.category) catSel.value = draft.category;
+        if (draft.bgGradient) {
+          var match = COVERS.findIndex(function (c) { return c.gradient === draft.bgGradient; });
+          if (match >= 0) {
+            selectedCover = COVERS[match];
+            document.querySelectorAll('.cover-swatch')[match].classList.add('active');
+            updateCoverPreview();
+          }
+        }
+        if (draft.icon) {
+          selectedIcon = draft.icon;
+          document.getElementById('coverIcon').textContent = draft.icon;
+        }
+        document.getElementById('saveStatus').textContent = 'Editing draft';
+      }
+    }
+  })();
+  </script>
+</body>
+</html>

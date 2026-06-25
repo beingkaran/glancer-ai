@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Article — ObservaPedia</title>
+  <meta name="description" id="pageDesc" content="Read in-depth observability and AIOps articles on ObservaPedia." />
+  <link rel="canonical" href="/blog-post.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script type="application/ld+json" id="articleSchema"></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html" class="active">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <div id="postRoot"></div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
+        </div>
+        <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
+        <div><h4>Site</h4><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+
+  <script src="assets/js/blog-data.js"></script>
+  <script src="assets/js/blog-user.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function formatDate(iso) {
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function escHTML(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    var id = getParam('id');
+    var allPosts = (window.BLOG_POSTS || []);
+    var userPosts = (window.BlogUser ? window.BlogUser.getPosts() : []);
+    var post = allPosts.find(function (p) { return p.id === id; })
+             || userPosts.find(function (p) { return p.id === id; });
+    var isUserPost = post && post.isUserPost;
+
+    var root = document.getElementById('postRoot');
+
+    if (!post) {
+      root.innerHTML =
+        '<div class="container" style="padding:80px 24px;text-align:center">' +
+          '<div style="font-size:3rem;margin-bottom:16px">🔍</div>' +
+          '<h2>Article not found</h2>' +
+          '<p style="color:var(--text-soft);margin:12px 0 24px">This post may have been removed or the link is incorrect.</p>' +
+          '<a href="blog.html" class="btn">← Back to Blog</a>' +
+        '</div>';
+      return;
+    }
+
+    // Block access to pending/rejected user posts (only the author or admin can preview)
+    var isAdmin = sessionStorage.getItem('observapedia_admin') === 'true';
+    if (post.isUserPost && post.hidden && !isAdmin) {
+      var statusLabel = post.status === 'rejected' ? 'was rejected' : 'is pending review';
+      root.innerHTML =
+        '<div class="container" style="padding:80px 24px;text-align:center;max-width:520px">' +
+          '<div style="font-size:3rem;margin-bottom:16px">' + (post.status === 'rejected' ? '✕' : '⏳') + '</div>' +
+          '<h2 style="margin:0 0 12px">Article ' + statusLabel + '</h2>' +
+          '<p style="color:var(--text-soft);margin:0 0 8px">This article ' + statusLabel + ' and is not publicly visible yet.</p>' +
+          (post.rejectReason ? '<p style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;color:#dc2626;font-size:.9rem;margin:16px 0">' + escHTML(post.rejectReason) + '</p>' : '') +
+          '<a href="blog.html" class="btn" style="margin-top:20px;display:inline-block">← Back to Blog</a>' +
+          '<a href="profile.html" class="btn" style="margin-top:20px;margin-left:12px;display:inline-block;background:var(--surface-2);color:var(--text-soft);border:1px solid var(--border)">My Profile</a>' +
+        '</div>';
+      return;
+    }
+
+    // Update meta
+    document.getElementById('pageTitle').textContent = post.title + ' — ObservaPedia';
+    document.getElementById('pageDesc').setAttribute('content', post.subtitle || post.title);
+    document.getElementById('articleSchema').textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      'headline': post.title,
+      'description': post.subtitle || '',
+      'author': { '@type': 'Person', 'name': post.author || 'ObservaPedia Team' },
+      'publisher': { '@type': 'Organization', 'name': 'ObservaPedia' },
+      'datePublished': post.date || post.createdAt || ''
+    });
+
+    // Build TOC from body H2s
+    var bodyDiv = document.createElement('div');
+    bodyDiv.innerHTML = post.body || '';
+    var h2s = bodyDiv.querySelectorAll('h2');
+    var tocItems = [];
+    h2s.forEach(function (h, i) {
+      var anchor = 'section-' + i;
+      h.id = anchor;
+      tocItems.push({ anchor: anchor, text: h.textContent });
+    });
+    var postBodyHTML = bodyDiv.innerHTML;
+
+    var tocHTML = tocItems.length
+      ? '<div class="sidebar-toc"><h4>📋 Table of Contents</h4><ol>' +
+          tocItems.map(function (t) {
+            return '<li><a href="#' + t.anchor + '">' + escHTML(t.text) + '</a></li>';
+          }).join('') +
+        '</ol></div>'
+      : '';
+
+    // Related posts (same category, excluding current)
+    var relatedPosts = allPosts.filter(function (p) {
+      return p.id !== post.id && p.category === post.category;
+    }).slice(0, 3);
+
+    var relatedHTML = '';
+    if (relatedPosts.length) {
+      relatedHTML = '<div class="related-posts"><h3>Related Articles</h3>' +
+        '<div class="related-grid">' +
+          relatedPosts.map(function (p) {
+            return '<a class="blog-card" href="blog-post.html?id=' + encodeURIComponent(p.id) + '">' +
+              '<div class="blog-card-hero" style="background:' + (p.bgGradient || 'linear-gradient(135deg,#1e3a8a,#2563eb)') + ';height:120px">' +
+                '<div class="bc-pattern"></div>' +
+                '<span class="bc-icon" style="font-size:2rem">' + (p.icon || '📝') + '</span>' +
+              '</div>' +
+              '<div class="blog-card-body" style="padding:14px 16px">' +
+                '<h3 style="font-size:.92rem">' + p.title + '</h3>' +
+                '<div class="blog-card-meta" style="padding-top:8px;margin-top:6px">' +
+                  '<span>' + (p.readTime || '5') + ' min</span>' +
+                '</div>' +
+              '</div>' +
+            '</a>';
+          }).join('') +
+        '</div></div>';
+    }
+
+    // Tags
+    var tagsHTML = (post.tags || []).map(function (t) {
+      return '<span class="blog-tag">' + escHTML(t) + '</span>';
+    }).join('');
+
+    // User post delete button
+    var deleteBtn = isUserPost
+      ? '<button id="deletePostBtn" style="border:none;background:var(--surface-2);color:var(--text-soft);cursor:pointer;font-family:inherit;font-size:.85rem;padding:7px 14px;border-radius:8px;border:1px solid var(--border)">🗑 Delete Article</button>'
+      : '';
+
+    root.innerHTML =
+      // Hero
+      '<section class="post-hero">' +
+        '<div class="post-hero-bg" style="background:' + (post.bgGradient || 'linear-gradient(135deg,#0a1628,#2563eb)') + '"></div>' +
+        '<div class="post-hero-dots"></div>' +
+        '<div class="post-hero-overlay"></div>' +
+        '<div class="container" style="position:relative;z-index:2">' +
+          '<div class="post-hero-content">' +
+            '<a href="blog.html?cat=' + encodeURIComponent(post.category || '') + '" class="post-cat">' + escHTML(post.category || 'Article') + '</a>' +
+            '<h1>' + escHTML(post.title) + '</h1>' +
+            '<p class="post-sub">' + escHTML(post.subtitle || '') + '</p>' +
+            '<div class="post-meta">' +
+              '<span>' + (post.avatar || '📡') + ' <strong>' + escHTML(post.author || 'ObservaPedia Team') + '</strong></span>' +
+              '<span>📅 ' + formatDate(post.date || post.createdAt || new Date().toISOString()) + '</span>' +
+              '<span>⏱ ' + (post.readTime || '5') + ' min read</span>' +
+              (isUserPost ? '<span><span class="user-article-badge">✍️ Community</span></span>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>' +
+
+      // Body + sidebar
+      '<div class="post-layout">' +
+        '<article>' +
+          '<div class="post-body" id="postBody">' + postBodyHTML + '</div>' +
+          (tagsHTML ? '<div class="post-tags">' + tagsHTML + '</div>' : '') +
+          '<div class="author-box">' +
+            '<div class="author-avatar">' + (post.avatar || '📡') + '</div>' +
+            '<div class="author-info">' +
+              '<h4>' + escHTML(post.author || 'ObservaPedia Team') + ' <span class="author-badge">' + escHTML(post.category || 'Editor') + '</span></h4>' +
+              '<p>ObservaPedia curates vendor-neutral definitions and guides for the observability and AIOps community.</p>' +
+              (deleteBtn ? '<div style="margin-top:12px">' + deleteBtn + '</div>' : '') +
+            '</div>' +
+          '</div>' +
+          relatedHTML +
+          '<div style="margin-top:32px"><a href="blog.html" style="color:var(--brand);font-weight:600;text-decoration:none">← Back to Blog</a></div>' +
+        '</article>' +
+        '<aside class="post-sidebar">' +
+          tocHTML +
+          '<div class="sidebar-toc">' +
+            '<h4>✍️ Contribute</h4>' +
+            '<p style="font-size:.88rem;color:var(--text-soft);margin:0 0 12px">Have insights to share? Write your own observability article.</p>' +
+            '<a href="blog-write.html" class="btn" style="display:block;text-align:center;font-size:.9rem">Write an Article →</a>' +
+          '</div>' +
+        '</aside>' +
+      '</div>';
+
+    // Delete handler for user posts
+    if (isUserPost) {
+      var btn = document.getElementById('deletePostBtn');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          if (confirm('Delete this article? This cannot be undone.')) {
+            window.BlogUser.deletePost(post.id);
+            window.location.href = 'blog.html';
+          }
+        });
+      }
+    }
+
+    // Smooth scroll for TOC
+    document.querySelectorAll('.sidebar-toc a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.getElementById(a.getAttribute('href').slice(1));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

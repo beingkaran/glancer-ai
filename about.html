@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About ObservaPedia — Our Mission &amp; How the Glossary Is Built</title>
+  <meta name="description" content="Learn about ObservaPedia, a free independent glossary of AIOps, Observability and APM terms, who builds it, and how definitions are researched and curated." />
+  <link rel="canonical" href="/about.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html" class="active">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="page-head">
+    <div class="container">
+      <h1>About ObservaPedia</h1>
+      <p>A free, independent reference for the language of modern monitoring.</p>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="prose">
+      <h2>Our mission</h2>
+      <p>Observability, AIOps and Application Performance Monitoring have become essential to running reliable software — but the vocabulary is sprawling, overlapping, and often defined differently by every vendor and blog post. <strong>ObservaPedia exists to fix that.</strong> We bring the terminology of these disciplines into one clean, searchable place so that engineers, students, product managers and curious readers can find a clear definition in seconds.</p>
+
+      <h2>Who it's for</h2>
+      <ul>
+        <li><strong>Engineers and SREs</strong> who want a quick, reliable reference while building dashboards, writing alerts or debugging incidents.</li>
+        <li><strong>Newcomers and students</strong> learning observability for the first time and trying to make sense of the jargon.</li>
+        <li><strong>DevOps, platform and product teams</strong> who need a shared vocabulary across roles.</li>
+        <li><strong>Anyone evaluating monitoring tools</strong> who keeps running into unfamiliar terms.</li>
+      </ul>
+
+      <h2>How our definitions are researched</h2>
+      <p>Each entry is written in plain English and aims to describe how a term is actually used across the industry. We study how leading observability and APM platforms — including Datadog, Dynatrace, New Relic, Splunk, AppDynamics and Broadcom — describe these concepts in their public documentation, and then distill that into a vendor-neutral explanation. Where a term originates from or is strongly associated with a specific platform (for example, Dynatrace's <em>PurePath</em> or AppDynamics' <em>Business Transaction</em>), we note that context.</p>
+
+      <div class="callout">
+        <strong>Independence note:</strong> ObservaPedia is an independent educational project. It is not affiliated with, endorsed by, or sponsored by any monitoring vendor. Product and company names are trademarks of their respective owners and are referenced only for identification and education.
+      </div>
+
+      <h2>How the search works</h2>
+      <p>The search box on the home page uses a ranked, typo-tolerant matching engine that runs entirely in your browser — no data is sent anywhere. It checks exact matches, abbreviations, word boundaries, related terms and even definition text, and offers "did you mean" suggestions when you mistype. Everything is instant because the entire glossary loads with the page.</p>
+
+      <h2>Help us improve</h2>
+      <p>Spotted a term we're missing, or a definition you'd refine? We'd genuinely like to hear from you. Please reach out via our <a href="contact.html">contact page</a> — community feedback is how this glossary grows and stays accurate.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
+        </div>
+        <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
+        <div><h4>Site</h4><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

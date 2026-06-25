@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — ObservaPedia | AIOps, Observability &amp; SRE Articles</title>
+  <meta name="description" content="In-depth articles on AIOps, observability, distributed tracing, SRE practices, and application performance monitoring from the ObservaPedia team." />
+  <meta name="keywords" content="AIOps blog, observability articles, SRE guide, distributed tracing tutorial, SLO SLA SLI explained" />
+  <meta name="author" content="ObservaPedia" />
+  <link rel="canonical" href="/blog.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog — ObservaPedia" />
+  <meta property="og:description" content="In-depth articles on AIOps, observability, SRE, and APM." />
+  <meta property="og:site_name" content="ObservaPedia" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html" class="active">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="blog-hero">
+    <div class="container">
+      <h1>📝 The ObservaPedia Blog</h1>
+      <p>In-depth guides on observability, AIOps, SRE practices, and the tools that keep modern software running.</p>
+      <a class="btn-write" href="blog-write.html">✍️ Write an Article</a>
+    </div>
+  </section>
+
+  <main class="container">
+    <!-- Filters -->
+    <div class="blog-filters" id="blogFilters">
+      <button class="blog-filter-btn active" data-cat="All">All</button>
+      <button class="blog-filter-btn" data-cat="Observability">Observability</button>
+      <button class="blog-filter-btn" data-cat="SRE">SRE</button>
+      <button class="blog-filter-btn" data-cat="AIOps">AIOps</button>
+      <button class="blog-filter-btn" data-cat="APM">APM</button>
+      <button class="blog-filter-btn" data-cat="Comparison">Comparison</button>
+      <button class="blog-filter-btn" data-cat="AI Observability">AI &amp; Observability</button>
+      <button class="blog-filter-btn" data-cat="DevOps">DevOps</button>
+      <button class="blog-filter-btn" data-cat="Tutorials">Tutorials</button>
+    </div>
+
+    <!-- Featured post -->
+    <div id="featuredWrap"></div>
+
+    <!-- All posts grid -->
+    <h2 class="blog-section-title" id="allPostsTitle">
+      All Articles <span class="bs-badge" id="postCount">20</span>
+    </h2>
+    <div class="blog-grid" id="blogGrid"></div>
+
+    <!-- Community posts -->
+    <div id="communitySection"></div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
+        </div>
+        <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
+        <div><h4>Site</h4><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
+        <div><h4 style="opacity:.5">Admin</h4><a href="admin.html" style="opacity:.4;font-size:.82rem">Admin Panel</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+
+  <script src="assets/js/blog-data.js"></script>
+  <script src="assets/js/blog-user.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    var activeCat = 'All';
+
+    function formatDate(iso) {
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function escHTML(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function cardHTML(post, isUser) {
+      var featuredBadge = post.featured ? '<span class="bc-featured">★ Featured</span>' : '';
+      var userBadge = isUser ? '<span class="user-article-badge">✍️ Community</span>' : '';
+      var tagsHTML = (post.tags || []).slice(0, 3).map(function (t) {
+        return '<span class="blog-tag">' + escHTML(t) + '</span>';
+      }).join('');
+      return '<a class="blog-card" href="blog-post.html?id=' + encodeURIComponent(post.id) + '">' +
+        '<div class="blog-card-hero" style="background:' + (post.bgGradient || 'linear-gradient(135deg,#1e3a8a,#2563eb)') + '">' +
+          '<div class="bc-pattern"></div>' +
+          '<span class="bc-icon">' + (post.icon || '📝') + '</span>' +
+          '<span class="bc-badge">' + escHTML(post.category || 'Article') + '</span>' +
+          featuredBadge +
+        '</div>' +
+        '<div class="blog-card-body">' +
+          '<h3>' + escHTML(post.title) + '</h3>' +
+          '<p>' + escHTML(post.subtitle || '') + '</p>' +
+          '<div style="margin-bottom:10px">' + tagsHTML + '</div>' +
+          '<div class="blog-card-meta">' +
+            '<span>' + (post.avatar || '👤') + '</span>' +
+            '<span class="bc-author">' + escHTML(post.author || 'Anonymous') + '</span>' +
+            '<span>·</span>' +
+            '<span>' + formatDate(post.date || post.createdAt || new Date().toISOString()) + '</span>' +
+            '<span>·</span>' +
+            '<span>' + (post.readTime || '5') + ' min read</span>' +
+            (userBadge ? '<span style="margin-left:auto">' + userBadge + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+      '</a>';
+    }
+
+    function render(cat) {
+      activeCat = cat;
+      // Exclude posts hidden in-object or by admin at runtime
+      var adminHidden = JSON.parse(localStorage.getItem('observapedia_admin_hidden') || '[]');
+      var posts = (window.BLOG_POSTS || []).filter(function (p) {
+        return !p.hidden && adminHidden.indexOf(p.id) === -1;
+      });
+      var filtered = cat === 'All' ? posts : posts.filter(function (p) { return p.category === cat; });
+
+      // Featured (only on "All")
+      var featuredWrap = document.getElementById('featuredWrap');
+      var featured = cat === 'All' ? filtered.find(function (p) { return p.featured; }) : null;
+      if (featured) {
+        featuredWrap.innerHTML =
+          '<h2 class="blog-section-title">Featured <span class="bs-badge">Editor\'s Pick</span></h2>' +
+          '<div class="blog-grid" style="margin-bottom:0">' + cardHTML(featured, false) + '</div>';
+      } else {
+        featuredWrap.innerHTML = '';
+      }
+
+      // Grid (exclude featured from main grid on "All")
+      var grid = document.getElementById('blogGrid');
+      var gridPosts = featured ? filtered.filter(function (p) { return p.id !== featured.id; }) : filtered;
+      document.getElementById('postCount').textContent = filtered.length;
+      document.getElementById('allPostsTitle').style.display = gridPosts.length ? '' : 'none';
+      grid.innerHTML = gridPosts.length
+        ? gridPosts.map(function (p) { return cardHTML(p, false); }).join('')
+        : (cat !== 'All' ? '<div class="empty-blog-state"><div class="ebs-icon">🔍</div><h3>No ' + cat + ' articles yet</h3><p>Check back soon, or browse all articles.</p></div>' : '');
+
+      // Community posts — only approved (or legacy posts with no status)
+      var userPosts = (window.BlogUser ? window.BlogUser.getApprovedPosts() : []);
+      var filteredUser = cat === 'All' ? userPosts : userPosts.filter(function (p) { return p.category === cat; });
+      var communitySection = document.getElementById('communitySection');
+      if (filteredUser.length) {
+        communitySection.innerHTML =
+          '<h2 class="blog-section-title">Community Articles <span class="bs-badge">' + filteredUser.length + '</span></h2>' +
+          '<div class="blog-grid">' + filteredUser.map(function (p) { return cardHTML(p, true); }).join('') + '</div>';
+      } else if (cat === 'All') {
+        communitySection.innerHTML =
+          '<div class="empty-blog-state">' +
+            '<div class="ebs-icon">✍️</div>' +
+            '<h3>No community articles yet</h3>' +
+            '<p>Be the first to share your observability knowledge.</p>' +
+            '<a href="blog-write.html" class="btn" style="display:inline-block;margin-top:4px">Write an Article →</a>' +
+          '</div>';
+      } else {
+        communitySection.innerHTML = '';
+      }
+    }
+
+    // Filter buttons
+    document.getElementById('blogFilters').addEventListener('click', function (e) {
+      var btn = e.target.closest('.blog-filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.blog-filter-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      render(btn.dataset.cat);
+    });
+
+    render('All');
+  })();
+  </script>
+</body>
+</html>

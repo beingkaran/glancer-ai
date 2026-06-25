@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — ObservaPedia</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ── Profile page styles ── */
+    .profile-hero {
+      background: linear-gradient(135deg, #0a1628 0%, #1e3a8a 60%, #2563eb 100%);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero-dots {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,.15) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+    .profile-hero-inner {
+      position: relative; z-index: 2;
+      max-width: 860px; margin: 0 auto;
+      padding: 56px 24px 0;
+    }
+
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: -32px 0 0;
+      padding: 32px 32px 28px;
+      position: relative;
+    }
+
+    .profile-avatar-wrap {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      border: 4px solid var(--surface);
+      margin-top: -56px;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+    }
+    .profile-avatar-wrap:hover::after {
+      content: '✏️';
+      position: absolute; bottom: -2px; right: -2px;
+      font-size: 1rem;
+      background: var(--surface);
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+    }
+
+    .profile-name {
+      font-size: 1.7rem; font-weight: 800; color: var(--text); margin: 0 0 4px;
+    }
+    .profile-handle {
+      font-size: .9rem; color: var(--text-faint); margin: 0 0 10px;
+    }
+    .profile-bio {
+      font-size: .97rem; color: var(--text-soft); margin: 0 0 16px;
+      line-height: 1.6; max-width: 560px;
+    }
+    .profile-meta-row {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      font-size: .85rem; color: var(--text-faint); margin-bottom: 20px;
+      align-items: center;
+    }
+    .profile-meta-row span { display: flex; align-items: center; gap: 5px; }
+    .profile-meta-row a { color: var(--brand); text-decoration: none; }
+    .profile-meta-row a:hover { text-decoration: underline; }
+
+    .profile-stats {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      padding: 16px 0 0;
+      border-top: 1px solid var(--border);
+    }
+    .pstat { text-align: center; }
+    .pstat-num { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+    .pstat-lbl { font-size: .75rem; color: var(--text-faint); font-weight: 600; letter-spacing: .04em; margin-top: 2px; }
+
+    .profile-actions {
+      position: absolute; top: 24px; right: 24px;
+      display: flex; gap: 10px;
+    }
+
+    /* Edit panel */
+    .edit-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 24px;
+    }
+    .edit-overlay.hidden { display: none; }
+    .edit-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 28px;
+      width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+    }
+    .edit-card h2 { margin: 0 0 24px; font-size: 1.2rem; color: var(--text); }
+    .edit-field { margin-bottom: 18px; }
+    .edit-field label { display: block; font-size: .8rem; font-weight: 700; color: var(--text-soft); letter-spacing: .04em; margin-bottom: 6px; }
+    .edit-field input, .edit-field textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); color: var(--text); font-family: inherit;
+      font-size: .95rem; padding: 10px 13px; outline: none;
+      box-sizing: border-box; transition: border-color .15s;
+    }
+    .edit-field input:focus, .edit-field textarea:focus { border-color: var(--brand); }
+    .edit-field textarea { resize: vertical; min-height: 72px; }
+    .avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .avatar-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent;
+      background: var(--surface-2); font-size: 1.3rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s;
+    }
+    .avatar-btn.active { border-color: var(--brand); background: var(--brand-soft); }
+    .edit-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+
+    /* Tabs */
+    .profile-tabs {
+      display: flex; gap: 4px; border-bottom: 2px solid var(--border);
+      margin-bottom: 28px; overflow-x: auto;
+    }
+    .ptab {
+      background: transparent; border: none; font-family: inherit;
+      font-size: .93rem; font-weight: 600; color: var(--text-faint);
+      padding: 12px 18px; cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -2px; white-space: nowrap; transition: color .15s;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .ptab:hover { color: var(--text-soft); }
+    .ptab.active { color: var(--brand); border-bottom-color: var(--brand); }
+    .ptab-count {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 50px; font-size: .7rem; font-weight: 700;
+      padding: 1px 7px; color: var(--text-faint);
+    }
+    .ptab.active .ptab-count { background: var(--brand-soft); color: var(--brand); border-color: transparent; }
+
+    /* Article list */
+    .profile-article-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 18px 20px;
+      margin-bottom: 12px; transition: border-color .15s;
+      text-decoration: none;
+    }
+    .profile-article-row:hover { border-color: var(--brand); }
+    .par-icon { font-size: 2rem; flex-shrink: 0; }
+    .par-body { flex: 1; min-width: 0; }
+    .par-title { font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 4px; }
+    .par-sub { font-size: .85rem; color: var(--text-soft); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .par-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .par-tag { font-size: .72rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 50px; padding: 2px 8px; color: var(--text-faint); }
+    .par-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; align-items: flex-end; }
+
+    .status-pill {
+      font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 50px;
+    }
+    .status-approved { background: #dcfce7; color: #166534; }
+    .status-pending  { background: #fef3c7; color: #92400e; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .status-draft    { background: var(--surface-2); color: var(--text-faint); border: 1px solid var(--border); }
+
+    .empty-state {
+      text-align: center; padding: 48px 24px; color: var(--text-faint);
+    }
+    .empty-state .es-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 1.1rem; color: var(--text-soft); margin: 0 0 8px; }
+
+    /* Btn helpers */
+    .btn-sm {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-soft); font-family: inherit;
+      font-size: .78rem; font-weight: 600; padding: 5px 12px; cursor: pointer;
+      text-decoration: none; display: inline-block; line-height: 1.5;
+    }
+    .btn-sm:hover { background: var(--surface); }
+    .btn-sm.danger { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+    .btn-sm.danger:hover { background: #fee2e2; }
+
+    @media (max-width: 600px) {
+      .profile-card { padding: 20px 16px; }
+      .profile-actions { position: static; margin-top: 16px; }
+      .par-actions { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero strip -->
+  <div class="profile-hero">
+    <div class="profile-hero-dots"></div>
+    <div class="profile-hero-inner">
+      <div style="height:88px"></div>
+    </div>
+  </div>
+
+  <main style="max-width:860px;margin:0 auto;padding:0 24px 80px">
+    <!-- Profile card -->
+    <div class="profile-card" id="profileCard">
+      <div id="profileAvatarWrap" class="profile-avatar-wrap" title="Click to edit profile">
+        <span id="profileAvatarEmoji">✍️</span>
+      </div>
+      <h1 class="profile-name" id="profileName">Anonymous</h1>
+      <p class="profile-handle" id="profileHandle">ObservaPedia Community Member</p>
+      <p class="profile-bio" id="profileBio"></p>
+      <div class="profile-meta-row" id="profileMetaRow"></div>
+      <div class="profile-stats" id="profileStats"></div>
+      <div class="profile-actions">
+        <button class="btn-sm" id="editProfileBtn">✏️ Edit Profile</button>
+        <a href="blog-write.html" class="btn-sm" style="background:var(--brand);color:#fff;border-color:transparent">✍️ Write Article</a>
+      </div>
+    </div>
+
+    <!-- Tabs + posts -->
+    <div style="margin-top:32px">
+      <div class="profile-tabs" id="profileTabs">
+        <button class="ptab active" data-tab="all">All <span class="ptab-count" id="cnt-all">0</span></button>
+        <button class="ptab" data-tab="approved">Published <span class="ptab-count" id="cnt-approved">0</span></button>
+        <button class="ptab" data-tab="pending">Pending Review <span class="ptab-count" id="cnt-pending">0</span></button>
+        <button class="ptab" data-tab="draft">Drafts <span class="ptab-count" id="cnt-draft">0</span></button>
+        <button class="ptab" data-tab="rejected">Rejected <span class="ptab-count" id="cnt-rejected">0</span></button>
+      </div>
+      <div id="articleList"></div>
+    </div>
+  </main>
+
+  <!-- Edit profile overlay -->
+  <div class="edit-overlay hidden" id="editOverlay">
+    <div class="edit-card">
+      <h2>Edit Profile</h2>
+      <div class="edit-field">
+        <label>DISPLAY NAME</label>
+        <input type="text" id="editName" placeholder="Your name" maxlength="60" />
+      </div>
+      <div class="edit-field">
+        <label>BIO</label>
+        <textarea id="editBio" placeholder="Tell the community about yourself…" maxlength="200" rows="3"></textarea>
+      </div>
+      <div class="edit-field">
+        <label>LOCATION</label>
+        <input type="text" id="editLocation" placeholder="San Francisco, CA" maxlength="60" />
+      </div>
+      <div class="edit-field">
+        <label>WEBSITE</label>
+        <input type="url" id="editWebsite" placeholder="https://yoursite.com" maxlength="120" />
+      </div>
+      <div class="edit-field">
+        <label>X / TWITTER HANDLE</label>
+        <input type="text" id="editTwitter" placeholder="@yourhandle" maxlength="50" />
+      </div>
+      <div class="edit-field">
+        <label>AVATAR</label>
+        <div class="avatar-picker" id="avatarPicker"></div>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-sm" id="editCancelBtn">Cancel</button>
+        <button class="btn-sm" id="editSaveBtn" style="background:var(--brand);color:#fff;border-color:transparent">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
+        </div>
+        <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
+        <div><h4>Site</h4><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+
+  <script src="assets/js/blog-user.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    var PROFILE_KEY = 'observapedia_profile';
+    var AVATARS = ['✍️','🚀','🔭','📡','⚡','🤖','🎯','💡','🔬','🛡️','🌐','📊','🏔️','🦅','🌟','🎓','🔥','🧠','💎','🌊'];
+
+    function getProfile() {
+      try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null') || {}; }
+      catch (e) { return {}; }
+    }
+
+    function saveProfile(p) { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+
+    function escHTML(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    }
+
+    function statusPill(status) {
+      if (!status || status === 'approved') return '<span class="status-pill status-approved">✓ Published</span>';
+      if (status === 'pending')  return '<span class="status-pill status-pending">⏳ Pending</span>';
+      if (status === 'rejected') return '<span class="status-pill status-rejected">✕ Rejected</span>';
+      return '<span class="status-pill status-draft">Draft</span>';
+    }
+
+    var activeTab = 'all';
+
+    /* ── Render profile header ── */
+    function renderProfile() {
+      var p = getProfile();
+      var posts = window.BlogUser ? window.BlogUser.getPosts() : [];
+      var name = p.name || window.BlogUser && window.BlogUser.getName() || 'Anonymous';
+
+      document.getElementById('profileAvatarEmoji').textContent = p.avatar || '✍️';
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileHandle').textContent = 'ObservaPedia Community Member';
+
+      var bioEl = document.getElementById('profileBio');
+      bioEl.textContent = p.bio || '';
+      bioEl.style.display = p.bio ? '' : 'none';
+
+      var meta = [];
+      if (p.location) meta.push('<span>📍 ' + escHTML(p.location) + '</span>');
+      if (p.website) meta.push('<span>🔗 <a href="' + escHTML(p.website) + '" target="_blank" rel="noopener">' + escHTML(p.website.replace(/^https?:\/\//, '')) + '</a></span>');
+      if (p.twitter) meta.push('<span>𝕏 ' + escHTML(p.twitter) + '</span>');
+      var joined = p.joinedAt || (posts.length ? posts[posts.length - 1].createdAt : null);
+      if (joined) meta.push('<span>📅 Joined ' + formatDate(joined) + '</span>');
+      document.getElementById('profileMetaRow').innerHTML = meta.join('');
+
+      // Stats
+      var approved = posts.filter(function (x) { return !x.status || x.status === 'approved'; }).length;
+      var pending  = posts.filter(function (x) { return x.status === 'pending'; }).length;
+      var drafts   = posts.filter(function (x) { return x.status === 'draft'; }).length;
+      document.getElementById('profileStats').innerHTML =
+        '<div class="pstat"><div class="pstat-num">' + posts.length + '</div><div class="pstat-lbl">ARTICLES</div></div>' +
+        '<div class="pstat"><div class="pstat-num" style="color:#22c55e">' + approved + '</div><div class="pstat-lbl">PUBLISHED</div></div>' +
+        '<div class="pstat"><div class="pstat-num" style="color:#f97316">' + pending + '</div><div class="pstat-lbl">PENDING</div></div>' +
+        '<div class="pstat"><div class="pstat-num" style="color:var(--text-faint)">' + drafts + '</div><div class="pstat-lbl">DRAFTS</div></div>';
+
+      // Tab counts
+      document.getElementById('cnt-all').textContent      = posts.length;
+      document.getElementById('cnt-approved').textContent = approved;
+      document.getElementById('cnt-pending').textContent  = pending;
+      document.getElementById('cnt-draft').textContent    = drafts;
+      document.getElementById('cnt-rejected').textContent = posts.filter(function (x) { return x.status === 'rejected'; }).length;
+    }
+
+    /* ── Render article list ── */
+    function renderArticles(tab) {
+      activeTab = tab;
+      var posts = window.BlogUser ? window.BlogUser.getPosts() : [];
+
+      var filtered = posts.filter(function (p) {
+        if (tab === 'all')      return true;
+        if (tab === 'approved') return !p.status || p.status === 'approved';
+        if (tab === 'pending')  return p.status === 'pending';
+        if (tab === 'draft')    return p.status === 'draft';
+        if (tab === 'rejected') return p.status === 'rejected';
+        return true;
+      });
+
+      var list = document.getElementById('articleList');
+
+      if (!filtered.length) {
+        var msgs = {
+          all: { icon:'✍️', title:'No articles yet', sub:'Start writing your first article.' },
+          approved: { icon:'✅', title:'No published articles', sub:'Articles appear here once an admin approves them.' },
+          pending: { icon:'⏳', title:'Nothing pending', sub:'Submitted articles awaiting review appear here.' },
+          draft: { icon:'📝', title:'No drafts saved', sub:'Your unfinished articles appear here.' },
+          rejected: { icon:'✕', title:'No rejected articles', sub:'Great news — nothing has been rejected.' },
+        };
+        var m = msgs[tab] || msgs.all;
+        list.innerHTML =
+          '<div class="empty-state">' +
+            '<div class="es-icon">' + m.icon + '</div>' +
+            '<h3>' + m.title + '</h3>' +
+            '<p>' + m.sub + '</p>' +
+            (tab === 'all' || tab === 'draft' ? '<a href="blog-write.html" class="btn" style="display:inline-block;margin-top:12px">✍️ Write an Article</a>' : '') +
+          '</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(function (p) {
+        var canEdit   = p.status === 'draft' || !p.status;
+        var canView   = !p.status || p.status === 'approved';
+        var canDelete = true;
+        var date = formatDate(p.date || p.createdAt || '');
+        var tagsHTML = (p.tags || []).slice(0,3).map(function (t) {
+          return '<span class="par-tag">' + escHTML(t) + '</span>';
+        }).join('');
+
+        return '<div class="profile-article-row" data-id="' + escHTML(p.id) + '">' +
+          '<div class="par-icon">' + (p.icon || '📝') + '</div>' +
+          '<div class="par-body">' +
+            '<div class="par-title">' + escHTML(p.title || 'Untitled') + '</div>' +
+            '<div class="par-sub">' + escHTML(p.subtitle || '') + '</div>' +
+            '<div class="par-meta">' +
+              statusPill(p.status) +
+              '<span class="par-tag">' + escHTML(p.category || 'Article') + '</span>' +
+              (date ? '<span class="par-tag">📅 ' + date + '</span>' : '') +
+              '<span class="par-tag">⏱ ' + (p.readTime || 1) + ' min</span>' +
+              tagsHTML +
+            '</div>' +
+            (p.rejectReason ? '<div style="margin-top:8px;font-size:.82rem;color:#dc2626;background:#fef2f2;border:1px solid #fca5a5;padding:6px 10px;border-radius:6px">✕ ' + escHTML(p.rejectReason) + '</div>' : '') +
+          '</div>' +
+          '<div class="par-actions">' +
+            (canView ? '<a href="blog-post.html?id=' + encodeURIComponent(p.id) + '" class="btn-sm">View</a>' : '') +
+            (canEdit ? '<a href="blog-write.html?edit=' + encodeURIComponent(p.id) + '" class="btn-sm">✏️ Edit</a>' : '') +
+            (canDelete ? '<button class="btn-sm danger del-btn" data-id="' + escHTML(p.id) + '">🗑</button>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      list.querySelectorAll('.del-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var row = btn.closest('[data-id]');
+          var title = row ? row.querySelector('.par-title').textContent : 'this article';
+          if (!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+          window.BlogUser.deletePost(btn.dataset.id);
+          renderProfile();
+          renderArticles(activeTab);
+        });
+      });
+    }
+
+    /* ── Tabs ── */
+    document.getElementById('profileTabs').addEventListener('click', function (e) {
+      var btn = e.target.closest('.ptab');
+      if (!btn) return;
+      document.querySelectorAll('.ptab').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderArticles(btn.dataset.tab);
+    });
+
+    /* ── Edit profile overlay ── */
+    var AVATAR_LIST = AVATARS;
+    var editAvatar = '✍️';
+
+    function openEditPanel() {
+      var p = getProfile();
+      editAvatar = p.avatar || window.BlogUser.getAvatar() || '✍️';
+      document.getElementById('editName').value     = p.name || window.BlogUser.getName() || '';
+      document.getElementById('editBio').value      = p.bio || '';
+      document.getElementById('editLocation').value = p.location || '';
+      document.getElementById('editWebsite').value  = p.website || '';
+      document.getElementById('editTwitter').value  = p.twitter || '';
+
+      var picker = document.getElementById('avatarPicker');
+      picker.innerHTML = AVATAR_LIST.map(function (emoji) {
+        return '<button class="avatar-btn' + (emoji === editAvatar ? ' active' : '') + '" data-emoji="' + emoji + '">' + emoji + '</button>';
+      }).join('');
+      picker.querySelectorAll('.avatar-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          picker.querySelectorAll('.avatar-btn').forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          editAvatar = btn.dataset.emoji;
+        });
+      });
+
+      document.getElementById('editOverlay').classList.remove('hidden');
+      document.getElementById('editName').focus();
+    }
+
+    function closeEditPanel() {
+      document.getElementById('editOverlay').classList.add('hidden');
+    }
+
+    document.getElementById('editProfileBtn').addEventListener('click', openEditPanel);
+    document.getElementById('profileAvatarWrap').addEventListener('click', openEditPanel);
+    document.getElementById('editCancelBtn').addEventListener('click', closeEditPanel);
+    document.getElementById('editOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeEditPanel();
+    });
+
+    document.getElementById('editSaveBtn').addEventListener('click', function () {
+      var existing = getProfile();
+      var name = document.getElementById('editName').value.trim();
+      var p = {
+        name:     name || 'Anonymous',
+        bio:      document.getElementById('editBio').value.trim(),
+        location: document.getElementById('editLocation').value.trim(),
+        website:  document.getElementById('editWebsite').value.trim(),
+        twitter:  document.getElementById('editTwitter').value.trim(),
+        avatar:   editAvatar,
+        joinedAt: existing.joinedAt || new Date().toISOString(),
+      };
+      saveProfile(p);
+      if (name && window.BlogUser) window.BlogUser.setName(name);
+      closeEditPanel();
+      renderProfile();
+    });
+
+    /* ── Init ── */
+    // Ensure joinedAt is set if user has posts
+    var existing = getProfile();
+    if (!existing.joinedAt) {
+      var posts = window.BlogUser ? window.BlogUser.getPosts() : [];
+      if (posts.length) {
+        existing.joinedAt = posts[posts.length - 1].createdAt || new Date().toISOString();
+        saveProfile(existing);
+      }
+    }
+
+    renderProfile();
+    renderArticles('all');
+  })();
+  </script>
+</body>
+</html>

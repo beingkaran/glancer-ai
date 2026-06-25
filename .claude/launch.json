@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "observapedia",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "${PORT}"],
+      "cwd": "/Users/karshah2/Documents/Claude_Code/observapedia",
+      "autoPort": true
+    }
+  ]
+}

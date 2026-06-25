@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ObservaPedia — AIOps, Observability &amp; APM Glossary | Search Any Term</title>
+  <meta name="description" content="ObservaPedia is a free, searchable glossary of AIOps, Observability and Application Performance Monitoring (APM) terms. Instantly find clear definitions for metrics, logs, traces, SLOs, anomaly detection and more." />
+  <meta name="keywords" content="AIOps, observability, APM, application performance monitoring, metrics, logs, traces, distributed tracing, SLO, anomaly detection, glossary, definitions" />
+  <meta name="author" content="ObservaPedia" />
+  <link rel="canonical" href="/index.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ObservaPedia — AIOps, Observability &amp; APM Glossary" />
+  <meta property="og:description" content="Search 1,700+ AIOps, Observability, APM and AI/ML terms and get instant, clear definitions." />
+  <meta property="og:site_name" content="ObservaPedia" />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <!-- ===== Google AdSense loader (placeholder) =====
+       After approval, replace ca-pub-XXXXXXXXXXXXXXXX with your Publisher ID
+       and uncomment the script tag below.
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  -->
+
+  <!-- Structured data: site + search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ObservaPedia",
+    "description": "A searchable glossary of AIOps, Observability and APM terminology.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "/index.html#{search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- ===================== HEADER ===================== -->
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">📡</span> Observa<b>Pedia</b>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html">Categories</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===================== HERO + SEARCH ===================== -->
+  <section class="hero">
+    <canvas id="webgl-hero"></canvas>
+    <div class="hero-content">
+    <div class="container">
+      <h1>The <span class="grad">AIOps &amp; Observability</span><br />Glossary You Can Search</h1>
+      <p class="lead">Type any AIOps, Observability or Application Performance Monitoring term and get a clear, instant definition — curated from how the industry actually uses it.</p>
+
+      <div class="search-wrap">
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input id="searchInput" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Search a term… e.g. observability, MTTR, span, anomaly detection" aria-label="Search terms" />
+          <button class="clear-btn" id="clearBtn" aria-label="Clear">✕</button>
+          <button class="go-btn" id="goBtn">Define</button>
+        </div>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+
+      <div class="chip-row">
+        <span class="chip" data-term="Observability">Observability</span>
+        <span class="chip" data-term="AIOps">AIOps</span>
+        <span class="chip" data-term="Distributed Tracing">Distributed Tracing</span>
+        <span class="chip" data-term="SLO">SLO</span>
+        <span class="chip" data-term="MTTR">MTTR</span>
+        <span class="chip" data-term="OpenTelemetry">OpenTelemetry</span>
+        <span class="chip" data-term="Anomaly Detection">Anomaly Detection</span>
+      </div>
+
+      <div class="result-panel hidden" id="resultPanel"></div>
+
+      <div class="stats">
+        <div class="stat"><b id="statTerms">1,700+</b><span>Terms</span></div>
+        <div class="stat"><b id="statCats">28</b><span>Categories</span></div>
+        <div class="stat"><b>100%</b><span>Free</span></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ===== Ad slot (placeholder) ===== -->
+  <div class="container"><div class="ad-slot" aria-hidden="true"></div></div>
+
+  <!-- ===================== CATEGORIES ===================== -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Browse by Category</h2>
+      <p class="section-sub">1,700+ terms across 28 categories — from core observability, AIOps and APM to cloud, Kubernetes, networking, data, security and AI/ML. Jump straight into your area.</p>
+      <div class="cat-grid" id="catGrid"></div>
+      <p style="text-align:center; margin-top:26px;"><a href="categories.html" class="chip" style="display:inline-block;">View all categories →</a></p>
+    </div>
+  </section>
+
+  <!-- ===================== WHY ===================== -->
+  <section class="section alt">
+    <div class="container">
+      <h2 class="section-title">Why ObservaPedia?</h2>
+      <p class="section-sub">A focused reference for engineers, SREs, DevOps practitioners and anyone learning modern monitoring.</p>
+      <div class="feature-grid">
+        <div class="feature"><div class="f-icon">⚡</div><h3>Instant Search</h3><p>Smart, typo-tolerant search with autocomplete returns a definition the moment you stop typing.</p></div>
+        <div class="feature"><div class="f-icon">🔗</div><h3>Connected Terms</h3><p>Every definition links to related concepts so you can follow a topic end to end.</p></div>
+        <div class="feature"><div class="f-icon">🏢</div><h3>Industry-Grounded</h3><p>Terminology reflects how leading platforms describe these concepts in the real world.</p></div>
+        <div class="feature"><div class="f-icon">🌗</div><h3>Light &amp; Dark</h3><p>A clean, fast, mobile-friendly experience that's easy on the eyes, day or night.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Ad slot (placeholder) ===== -->
+  <div class="container"><div class="ad-slot" aria-hidden="true"></div></div>
+
+  <!-- ===================== INTRO PROSE (SEO/AdSense content) ===================== -->
+  <section class="section">
+    <div class="container">
+      <div class="prose">
+        <h2>What is AIOps and Observability?</h2>
+        <p><strong>Observability</strong> is the practice of understanding the internal state of a software system from the data it emits — primarily <a href="index.html#metrics">metrics</a>, <a href="index.html#logs">logs</a> and <a href="index.html#traces">traces</a>. As applications moved from monoliths to distributed microservices running on containers and serverless platforms, traditional monitoring — which only answers questions you knew to ask in advance — stopped being enough. Observability lets engineers ask new questions about unexpected behavior without shipping new code.</p>
+        <p><strong>AIOps</strong> (Artificial Intelligence for IT Operations) builds on top of observability data. It applies machine learning and analytics to the enormous volume of events, metrics, logs and traces that modern systems produce, automating tasks such as <a href="index.html#anomaly-detection">anomaly detection</a>, <a href="index.html#event-correlation">event correlation</a>, <a href="index.html#root-cause-analysis">root cause analysis</a> and even <a href="index.html#auto-remediation">automated remediation</a>. The goal is to reduce noise, shorten the time to detect and resolve incidents, and let teams operate at a scale humans cannot manage manually.</p>
+        <p><strong>Application Performance Monitoring (APM)</strong> sits at the intersection of the two: it focuses specifically on the performance, availability and user experience of applications — tracing transactions across services, surfacing slow code, and tying technical metrics to business outcomes.</p>
+        <p>This glossary brings the vocabulary of all three disciplines together in one searchable place. Use the search box at the top of the page to look up any term instantly, or browse the <a href="glossary.html">full A–Z glossary</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology — built to help engineers and learners speak the language of modern monitoring.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <a href="index.html">Home</a>
+          <a href="glossary.html">A–Z Glossary</a>
+          <a href="categories.html">Categories</a>
+          <a href="blog.html">Blog</a>
+        </div>
+        <div>
+          <h4>Site</h4>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/data-cloudnative.js"></script>
+  <script src="assets/js/data-kubernetes.js"></script>
+  <script src="assets/js/data-devops.js"></script>
+  <script src="assets/js/data-networking.js"></script>
+  <script src="assets/js/data-databases.js"></script>
+  <script src="assets/js/data-security.js"></script>
+  <script src="assets/js/data-cloud.js"></script>
+  <script src="assets/js/data-distributed.js"></script>
+  <script src="assets/js/data-observability-ext.js"></script>
+  <script src="assets/js/data-compute.js"></script>
+  <script src="assets/js/data-itops.js"></script>
+  <script src="assets/js/data-observability-more.js"></script>
+  <script src="assets/js/data-general.js"></script>
+  <script src="assets/js/data-extra.js"></script>
+  <script src="assets/js/data-supplement.js"></script>
+  <script src="assets/js/data-ai.js"></script>
+  <script src="assets/js/comments.js"></script>
+  <script src="assets/js/webgl-hero.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

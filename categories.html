@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories — AIOps &amp; Observability Topics | ObservaPedia</title>
+  <meta name="description" content="Explore AIOps, Observability and APM terminology organized by category: fundamentals, metrics, logs, tracing, APM, AIOps, reliability, incident management and more." />
+  <link rel="canonical" href="/categories.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;850&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="categories.html" class="active">Categories</a>
+        <a href="blog.html">Blog</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="page-head">
+    <div class="container">
+      <h1>Categories</h1>
+      <p>Twenty-eight focused areas covering the full landscape of observability, AIOps, APM and AI/ML. Click any category to browse its terms.</p>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="container">
+      <div class="cat-grid" id="catGridFull"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="logo" href="index.html"><span class="logo-mark">📡</span> Observa<b>Pedia</b></a>
+          <p>A free, independent glossary of AIOps, Observability and APM terminology.</p>
+        </div>
+        <div><h4>Explore</h4><a href="index.html">Home</a><a href="glossary.html">A–Z Glossary</a><a href="categories.html">Categories</a><a href="blog.html">Blog</a></div>
+        <div><h4>Site</h4><a href="about.html">About</a><a href="contact.html">Contact</a></div>
+        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> ObservaPedia. All rights reserved.</span>
+        <span>Made for the observability community.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/data-cloudnative.js"></script>
+  <script src="assets/js/data-kubernetes.js"></script>
+  <script src="assets/js/data-devops.js"></script>
+  <script src="assets/js/data-networking.js"></script>
+  <script src="assets/js/data-databases.js"></script>
+  <script src="assets/js/data-security.js"></script>
+  <script src="assets/js/data-cloud.js"></script>
+  <script src="assets/js/data-distributed.js"></script>
+  <script src="assets/js/data-observability-ext.js"></script>
+  <script src="assets/js/data-compute.js"></script>
+  <script src="assets/js/data-itops.js"></script>
+  <script src="assets/js/data-observability-more.js"></script>
+  <script src="assets/js/data-general.js"></script>
+  <script src="assets/js/data-extra.js"></script>
+  <script src="assets/js/data-supplement.js"></script>
+  <script src="assets/js/data-ai.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    if (window.OBSERVA) window.OBSERVA.renderCategoryGrid("catGridFull");
+  </script>
+</body>
+</html>

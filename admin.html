@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — ObservaPedia</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ── Admin-only styles ── */
+    .admin-wrap { min-height: 100vh; background: var(--bg); }
+
+    /* Login */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .login-icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .login-card h1 { font-size: 1.6rem; font-weight: 800; margin: 0 0 6px; color: var(--text); }
+    .login-card p  { color: var(--text-soft); margin: 0 0 32px; font-size: .93rem; }
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .login-field label { font-size: .8rem; font-weight: 700; color: var(--text-soft); letter-spacing: .04em; }
+    .login-field input {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: .97rem;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .login-field input:focus { border-color: var(--brand); }
+    .login-btn {
+      width: 100%;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity .15s;
+    }
+    .login-btn:hover { opacity: .88; }
+    .login-error {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #dc2626;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* Dashboard */
+    .admin-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .admin-header .logo { font-size: 1rem; font-weight: 800; color: var(--text); text-decoration: none; }
+    .admin-badge {
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: .72rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 50px;
+      letter-spacing: .05em;
+    }
+    .admin-header .spacer { flex: 1; }
+    .admin-header a { color: var(--text-soft); font-size: .88rem; text-decoration: none; }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-soft);
+      font-family: inherit;
+      font-size: .83rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+    .logout-btn:hover { background: var(--surface-2); }
+
+    .admin-body { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .admin-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .admin-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .admin-section-header h2 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0;
+    }
+    .admin-count {
+      background: var(--brand);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 50px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .admin-count.orange { background: #f97316; }
+    .admin-count.green  { background: #22c55e; }
+    .admin-count.gray   { background: var(--text-faint); }
+
+    .admin-empty {
+      padding: 32px 24px;
+      color: var(--text-faint);
+      font-size: .93rem;
+      text-align: center;
+    }
+
+    /* Post row */
+    .post-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .post-row:last-child { border-bottom: none; }
+    .post-row-icon { font-size: 1.8rem; flex-shrink: 0; margin-top: 2px; }
+    .post-row-info { flex: 1; min-width: 0; }
+    .post-row-title {
+      font-weight: 700;
+      font-size: .97rem;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .post-row-meta { font-size: .8rem; color: var(--text-faint); }
+    .post-row-meta b { color: var(--text-soft); }
+    .post-row-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+    .btn-approve {
+      background: #dcfce7; border: 1px solid #86efac; color: #166534;
+      font-family: inherit; font-size: .82rem; font-weight: 700;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-approve:hover { background: #bbf7d0; }
+    .btn-reject {
+      background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
+      font-family: inherit; font-size: .82rem; font-weight: 700;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-reject:hover { background: #fecaca; }
+    .btn-delete {
+      background: transparent; border: 1px solid #fca5a5; color: #dc2626;
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-delete:hover { background: #fef2f2; }
+    .btn-view {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text-soft);
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer; text-decoration: none;
+      display: inline-block;
+    }
+    .btn-view:hover { background: var(--surface); }
+    .btn-toggle-hide {
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--text-soft);
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .btn-toggle-hide.is-hidden {
+      background: #fef3c7; border-color: #fcd34d; color: #92400e;
+    }
+    .btn-toggle-hide:hover { opacity: .8; }
+
+    .reject-dialog {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 24px;
+    }
+    .reject-dialog.hidden { display: none; }
+    .reject-dialog-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 28px;
+      width: 100%; max-width: 440px;
+    }
+    .reject-dialog-card h3 { margin: 0 0 12px; font-size: 1.1rem; color: var(--text); }
+    .reject-dialog-card p { margin: 0 0 16px; color: var(--text-soft); font-size: .9rem; }
+    .reject-dialog-card textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--bg); color: var(--text); font-family: inherit;
+      font-size: .92rem; padding: 10px 12px; resize: vertical;
+      min-height: 80px; outline: none; box-sizing: border-box;
+    }
+    .reject-dialog-card textarea:focus { border-color: #ef4444; }
+    .reject-dialog-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+
+    /* Stats bar */
+    .admin-stats {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 24px; flex: 1; min-width: 140px;
+    }
+    .stat-card .stat-num { font-size: 2rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-card .stat-lbl { font-size: .8rem; color: var(--text-faint); margin-top: 4px; font-weight: 600; }
+    .stat-card.pending .stat-num { color: #f97316; }
+    .stat-card.approved .stat-num { color: #22c55e; }
+    .stat-card.rejected .stat-num { color: #ef4444; }
+  </style>
+</head>
+<body class="admin-wrap">
+
+  <!-- ── LOGIN SCREEN ── -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-icon">🔐</div>
+      <h1>Admin Panel</h1>
+      <p>Sign in to manage blog submissions and content.</p>
+      <div class="login-error" id="loginError">Incorrect username or password.</div>
+      <form id="loginForm" onsubmit="return false">
+        <div class="login-field">
+          <label for="usernameInput">USERNAME</label>
+          <input type="text" id="usernameInput" autocomplete="username" placeholder="admin" />
+        </div>
+        <div class="login-field">
+          <label for="passwordInput">PASSWORD</label>
+          <input type="password" id="passwordInput" autocomplete="current-password" placeholder="••••••••••••" />
+        </div>
+        <button class="login-btn" id="loginBtn">Sign In →</button>
+      </form>
+      <p style="margin:20px 0 0;font-size:.8rem;color:var(--text-faint)">
+        <a href="blog.html" style="color:var(--text-faint)">← Back to Blog</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard" style="display:none">
+    <div class="admin-header">
+      <a class="logo" href="index.html">📡 ObservaPedia</a>
+      <span class="admin-badge">ADMIN</span>
+      <span class="spacer"></span>
+      <a href="blog.html">View Blog</a>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
+    </div>
+
+    <div class="admin-body">
+      <h1 style="font-size:1.8rem;font-weight:800;color:var(--text);margin:0 0 6px">Blog Dashboard</h1>
+      <p style="color:var(--text-soft);margin:0 0 28px">Review community submissions and manage published content.</p>
+
+      <!-- Stats -->
+      <div class="admin-stats" id="adminStats"></div>
+
+      <!-- ── PENDING POSTS ── -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2>⏳ Pending Review</h2>
+          <span class="admin-count orange" id="pendingCount">0</span>
+          <span style="flex:1"></span>
+          <span style="font-size:.8rem;color:var(--text-faint)">Approve or reject community submissions</span>
+        </div>
+        <div id="pendingList"></div>
+      </div>
+
+      <!-- ── APPROVED COMMUNITY POSTS ── -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2>✅ Approved Community Posts</h2>
+          <span class="admin-count green" id="approvedCount">0</span>
+          <span style="flex:1"></span>
+          <span style="font-size:.8rem;color:var(--text-faint)">Delete approved posts if needed</span>
+        </div>
+        <div id="approvedList"></div>
+      </div>
+
+      <!-- ── CURATED POSTS ── -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2>📋 Curated Posts</h2>
+          <span class="admin-count gray" id="curatedCount">0</span>
+          <span style="flex:1"></span>
+          <span style="font-size:.8rem;color:var(--text-faint)">Toggle visibility without editing files</span>
+        </div>
+        <div id="curatedList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject reason dialog -->
+  <div class="reject-dialog hidden" id="rejectDialog">
+    <div class="reject-dialog-card">
+      <h3>Reject Article</h3>
+      <p>Optionally provide a reason. The author can see this in their manage section.</p>
+      <textarea id="rejectReasonInput" placeholder="e.g. Content doesn't meet our quality guidelines…"></textarea>
+      <div class="reject-dialog-actions">
+        <button class="btn-view" id="rejectCancelBtn">Cancel</button>
+        <button class="btn-reject" id="rejectConfirmBtn">Reject Article</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/blog-data.js"></script>
+  <script src="assets/js/blog-user.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    var ADMIN_HASH = '37b24cef8313da38a2ba2dcc48d83a94157c0c2cd186b464325730af481afb72';
+    var SESSION_KEY = 'observapedia_admin';
+    var HIDDEN_KEY  = 'observapedia_admin_hidden';
+
+    /* ── Auth helpers ── */
+    async function sha256(str) {
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(function (b) {
+        return b.toString(16).padStart(2, '0');
+      }).join('');
+    }
+
+    function isLoggedIn() { return sessionStorage.getItem(SESSION_KEY) === 'true'; }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = '';
+      renderDashboard();
+    }
+
+    function showLogin() {
+      document.getElementById('loginScreen').style.display = '';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    /* ── Login flow ── */
+    document.getElementById('loginBtn').addEventListener('click', async function () {
+      var user = document.getElementById('usernameInput').value.trim();
+      var pass = document.getElementById('passwordInput').value;
+      var errorEl = document.getElementById('loginError');
+      errorEl.style.display = 'none';
+      if (!user || !pass) { errorEl.style.display = ''; return; }
+      var hash = await sha256(pass);
+      if (user === 'admin' && hash === ADMIN_HASH) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
+        showDashboard();
+      } else {
+        errorEl.style.display = '';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    });
+
+    /* Allow Enter key in password field */
+    document.getElementById('passwordInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+    document.getElementById('usernameInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('passwordInput').focus();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+      sessionStorage.removeItem(SESSION_KEY);
+      showLogin();
+    });
+
+    /* ── Helpers ── */
+    function escHTML(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function getHidden() {
+      try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+
+    function setHidden(arr) {
+      localStorage.setItem(HIDDEN_KEY, JSON.stringify(arr));
+    }
+
+    /* ── Reject dialog ── */
+    var rejectTargetId = null;
+
+    function openRejectDialog(id) {
+      rejectTargetId = id;
+      document.getElementById('rejectReasonInput').value = '';
+      document.getElementById('rejectDialog').classList.remove('hidden');
+      document.getElementById('rejectReasonInput').focus();
+    }
+
+    document.getElementById('rejectCancelBtn').addEventListener('click', function () {
+      document.getElementById('rejectDialog').classList.add('hidden');
+      rejectTargetId = null;
+    });
+
+    document.getElementById('rejectConfirmBtn').addEventListener('click', function () {
+      if (!rejectTargetId) return;
+      var reason = document.getElementById('rejectReasonInput').value.trim();
+      window.BlogUser.rejectPost(rejectTargetId, reason || null);
+      document.getElementById('rejectDialog').classList.add('hidden');
+      rejectTargetId = null;
+      renderDashboard();
+    });
+
+    /* ── Dashboard render ── */
+    function renderDashboard() {
+      var pending  = window.BlogUser ? window.BlogUser.getPendingPosts() : [];
+      var approved = window.BlogUser ? window.BlogUser.getApprovedPosts().filter(function (p) { return p.isUserPost; }) : [];
+      var curated  = window.BLOG_POSTS || [];
+      var hidden   = getHidden();
+
+      /* Stats */
+      document.getElementById('adminStats').innerHTML =
+        '<div class="stat-card pending"><div class="stat-num">' + pending.length + '</div><div class="stat-lbl">Pending</div></div>' +
+        '<div class="stat-card approved"><div class="stat-num">' + approved.length + '</div><div class="stat-lbl">Approved Community</div></div>' +
+        '<div class="stat-card"><div class="stat-num">' + curated.length + '</div><div class="stat-lbl">Curated Posts</div></div>' +
+        '<div class="stat-card rejected"><div class="stat-num">' + hidden.length + '</div><div class="stat-lbl">Hidden Curated</div></div>';
+
+      /* Counts */
+      document.getElementById('pendingCount').textContent  = pending.length;
+      document.getElementById('approvedCount').textContent = approved.length;
+      document.getElementById('curatedCount').textContent  = curated.length;
+
+      /* Pending */
+      var pendingList = document.getElementById('pendingList');
+      if (!pending.length) {
+        pendingList.innerHTML = '<div class="admin-empty">No submissions awaiting review. 🎉</div>';
+      } else {
+        pendingList.innerHTML = pending.map(function (p) {
+          return '<div class="post-row">' +
+            '<div class="post-row-icon">' + (p.icon || '📝') + '</div>' +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escHTML(p.title || 'Untitled') + '</div>' +
+              '<div class="post-row-meta">' +
+                '<b>' + escHTML(p.author || 'Anonymous') + '</b> · ' +
+                escHTML(p.category || 'Article') + ' · Submitted ' + formatDate(p.createdAt) +
+              '</div>' +
+            '</div>' +
+            '<div class="post-row-actions">' +
+              '<a class="btn-view" href="blog-post.html?id=' + encodeURIComponent(p.id) + '&preview=1" target="_blank">Preview</a>' +
+              '<button class="btn-approve" data-approve="' + escHTML(p.id) + '">✓ Approve</button>' +
+              '<button class="btn-reject-open" data-id="' + escHTML(p.id) + '" class="btn-reject">✕ Reject</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        pendingList.querySelectorAll('[data-approve]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            window.BlogUser.approvePost(btn.dataset.approve);
+            renderDashboard();
+          });
+        });
+
+        pendingList.querySelectorAll('.btn-reject-open').forEach(function (btn) {
+          btn.style.cssText = 'background:#fee2e2;border:1px solid #fca5a5;color:#dc2626;font-family:inherit;font-size:.82rem;font-weight:700;padding:7px 14px;border-radius:8px;cursor:pointer';
+          btn.addEventListener('click', function () {
+            openRejectDialog(btn.dataset.id);
+          });
+        });
+      }
+
+      /* Approved community */
+      var approvedList = document.getElementById('approvedList');
+      if (!approved.length) {
+        approvedList.innerHTML = '<div class="admin-empty">No approved community posts yet.</div>';
+      } else {
+        approvedList.innerHTML = approved.map(function (p) {
+          return '<div class="post-row">' +
+            '<div class="post-row-icon">' + (p.icon || '📝') + '</div>' +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escHTML(p.title || 'Untitled') + '</div>' +
+              '<div class="post-row-meta">' +
+                '<b>' + escHTML(p.author || 'Anonymous') + '</b> · ' +
+                escHTML(p.category || 'Article') + ' · ' + formatDate(p.approvedAt || p.createdAt) +
+              '</div>' +
+            '</div>' +
+            '<div class="post-row-actions">' +
+              '<a class="btn-view" href="blog-post.html?id=' + encodeURIComponent(p.id) + '" target="_blank">View</a>' +
+              '<button class="btn-delete" data-del="' + escHTML(p.id) + '">🗑 Delete</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        approvedList.querySelectorAll('[data-del]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var title = btn.closest('.post-row').querySelector('.post-row-title').textContent;
+            if (!confirm('Permanently delete "' + title + '"?')) return;
+            window.BlogUser.deletePost(btn.dataset.del);
+            renderDashboard();
+          });
+        });
+      }
+
+      /* Curated posts */
+      var curatedList = document.getElementById('curatedList');
+      if (!curated.length) {
+        curatedList.innerHTML = '<div class="admin-empty">No curated posts found.</div>';
+      } else {
+        curatedList.innerHTML = curated.map(function (p) {
+          var isHidden = hidden.indexOf(p.id) !== -1;
+          return '<div class="post-row">' +
+            '<div class="post-row-icon">' + (p.icon || '📝') + '</div>' +
+            '<div class="post-row-info">' +
+              '<div class="post-row-title">' + escHTML(p.title) +
+                (isHidden ? ' <span style="font-size:.7rem;background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:50px;vertical-align:middle;font-weight:700">HIDDEN</span>' : '') +
+              '</div>' +
+              '<div class="post-row-meta">' +
+                escHTML(p.category || '') + ' · <code style="font-size:.78rem">' + escHTML(p.id) + '</code>' +
+              '</div>' +
+            '</div>' +
+            '<div class="post-row-actions">' +
+              '<a class="btn-view" href="blog-post.html?id=' + encodeURIComponent(p.id) + '" target="_blank">View</a>' +
+              '<button class="btn-toggle-hide' + (isHidden ? ' is-hidden' : '') + '" data-curated="' + escHTML(p.id) + '">' +
+                (isHidden ? '👁 Show' : '🙈 Hide') +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        curatedList.querySelectorAll('[data-curated]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.dataset.curated;
+            var list = getHidden();
+            var idx = list.indexOf(id);
+            if (idx === -1) { list.push(id); } else { list.splice(idx, 1); }
+            setHidden(list);
+            renderDashboard();
+          });
+        });
+      }
+    }
+
+    /* ── Init ── */
+    if (isLoggedIn()) {
+      showDashboard();
+    } else {
+      showLogin();
+    }
+  })();
+  </script>
+</body>
+</html>
