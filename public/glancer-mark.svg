@@ -1,0 +1,37 @@
+<svg viewBox="95 195 610 410" xmlns="http://www.w3.org/2000/svg">
+  <!-- Eye contour -->
+  <path d="M 110 400 C 110 400, 270 230, 400 230 C 530 230, 690 400, 690 400 C 690 400, 530 570, 400 570 C 270 570, 110 400, 110 400 Z"
+        fill="none" stroke="#0B3C6B" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 110 400 L 150 380 L 150 420 Z" fill="#0B3C6B"/>
+  <path d="M 690 400 L 650 380 L 650 420 Z" fill="#0B3C6B"/>
+
+  <!-- Iris: neural network -->
+  <circle cx="400" cy="400" r="148" fill="none" stroke="#00E5FF" stroke-width="3" opacity="0.55"/>
+  <g stroke="#00E5FF" stroke-width="2.5" opacity="0.85">
+    <line x1="400" y1="400" x2="400" y2="270"/>
+    <line x1="400" y1="400" x2="503" y2="335"/>
+    <line x1="400" y1="400" x2="503" y2="465"/>
+    <line x1="400" y1="400" x2="400" y2="530"/>
+    <line x1="400" y1="400" x2="297" y2="465"/>
+    <line x1="400" y1="400" x2="297" y2="335"/>
+    <line x1="400" y1="270" x2="503" y2="335"/>
+    <line x1="503" y1="335" x2="503" y2="465"/>
+    <line x1="503" y1="465" x2="400" y2="530"/>
+    <line x1="400" y1="530" x2="297" y2="465"/>
+    <line x1="297" y1="465" x2="297" y2="335"/>
+    <line x1="297" y1="335" x2="400" y2="270"/>
+  </g>
+  <g fill="#00E5FF">
+    <circle cx="400" cy="270" r="9"/>
+    <circle cx="503" cy="335" r="9"/>
+    <circle cx="503" cy="465" r="9"/>
+    <circle cx="400" cy="530" r="9"/>
+    <circle cx="297" cy="465" r="9"/>
+    <circle cx="297" cy="335" r="9"/>
+  </g>
+
+  <!-- Pupil: abstract G -->
+  <circle cx="400" cy="400" r="78" fill="#06243F"/>
+  <path d="M 455 365 L 400 335 L 350 365 L 335 400 L 350 435 L 400 465 L 445 450 L 445 410 L 405 410 L 405 425 L 432 425"
+        fill="none" stroke="#00E5FF" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>

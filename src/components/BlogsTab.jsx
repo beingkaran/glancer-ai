@@ -1,0 +1,90 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { BLOG_POSTS } from '../data/allBlogs';
+
+const ArrowIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+);
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Get user-written approved blogs from localStorage
+function getApprovedUserBlogs() {
+  try {
+    const all = JSON.parse(localStorage.getItem('glancer_user_blogs') || '[]');
+    return all.filter(b => b.status === 'approved');
+  } catch { return []; }
+}
+
+const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map(p => p.category)))];
+
+export default function BlogsTab({ limit }) {
+  const [filter, setFilter] = useState('All');
+
+  const userBlogs = getApprovedUserBlogs();
+  const allPosts = [...userBlogs, ...BLOG_POSTS];
+  const filtered = filter === 'All' ? allPosts : allPosts.filter(p => p.category === filter);
+  const posts = limit ? filtered.slice(0, limit) : filtered;
+
+  return (
+    <div className="content-section">
+      <div className="container">
+        <div className="news-header">
+          <div>
+            <p className="section-label">Expert Insights</p>
+            <h2 className="section-title-lg">In-Depth Articles &amp; Guides</h2>
+          </div>
+          <div className="news-filter" role="group" aria-label="Filter by category">
+            {ALL_CATEGORIES.slice(0, 6).map(cat => (
+              <button key={cat} className={`filter-chip${filter === cat ? ' active' : ''}`} onClick={() => setFilter(cat)}>
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="blogs-grid">
+          {posts.map(post => (
+            <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
+              <div className="blog-card-banner" style={{ background: post.bgGradient || post.gradient }} aria-hidden="true">
+                <span style={{ position: 'relative', zIndex: 1, fontSize: '3rem' }}>{post.icon || post.emoji}</span>
+              </div>
+              <div className="blog-card-body">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span className="news-category-tag tag-purple" style={{ fontSize: '0.68rem' }}>{post.category}</span>
+                  {post.featured && <span className="news-category-tag tag-cyan" style={{ fontSize: '0.65rem' }}>Featured</span>}
+                </div>
+                <h3 className="blog-card-title">{post.title}</h3>
+                <p className="blog-card-subtitle">{post.subtitle}</p>
+                <div className="tag-list">
+                  {(post.tags || []).slice(0, 3).map(tag => (
+                    <span key={tag} className="tag-pill">#{tag}</span>
+                  ))}
+                </div>
+                <div className="blog-card-footer">
+                  <span className="blog-meta">{formatDate(post.date)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span className="read-time-badge">{post.readTime} min</span>
+                    <span className="read-more-link">Read <ArrowIcon /></span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {limit && filtered.length > limit && (
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <Link to="/blogs" className="search-btn" style={{ display: 'inline-block', padding: '12px 32px', borderRadius: 12, textDecoration: 'none' }}>
+              View all {filtered.length} articles →
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
