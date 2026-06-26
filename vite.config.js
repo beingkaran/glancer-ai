@@ -30,9 +30,33 @@ function llmDevApi(mode) {
   }
 }
 
+// Dev-only middleware mirroring the production Worker's /api/proxy route, so the
+// first-party CORS proxy (used by the live news feed) works under `npm run dev`.
+function proxyDevApi() {
+  return {
+    name: 'proxy-dev-api',
+    configureServer(server) {
+      server.middlewares.use('/api/proxy', async (req, res) => {
+        try {
+          const { proxyFetch } = await server.ssrLoadModule('/worker/proxyCore.js')
+          const u = new URL(req.originalUrl, 'http://localhost')
+          const { status, contentType, body } = await proxyFetch(u.searchParams.get('url'))
+          res.statusCode = status
+          res.setHeader('content-type', contentType)
+          res.setHeader('access-control-allow-origin', '*')
+          res.end(Buffer.from(body))
+        } catch (e) {
+          res.statusCode = 502
+          res.end('Upstream fetch failed: ' + (e?.message || e))
+        }
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), llmDevApi(mode)],
+  plugins: [react(), llmDevApi(mode), proxyDevApi()],
   // Honor a PORT assigned by the harness/preview tooling; fall back to Vite's
   // default when run directly.
   server: { port: Number(process.env.PORT) || 5184 },

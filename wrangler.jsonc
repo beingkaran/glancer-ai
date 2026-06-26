@@ -2,10 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "glancer-ai",
   "compatibility_date": "2026-06-26",
-  // Static-asset-only Worker: serve the Vite build output, and fall back to
-  // index.html for client-side routes (React Router SPA behaviour).
+  // Worker-with-assets: the script in `main` runs first (it serves the
+  // first-party CORS proxy at /api/proxy), and delegates everything else to the
+  // static Vite build via the ASSETS binding, with index.html SPA fallback for
+  // client-side routes (React Router).
+  "main": "worker/index.js",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   }
 }
