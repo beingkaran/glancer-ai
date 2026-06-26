@@ -17,9 +17,9 @@ function llmDevApi(mode) {
           for await (const chunk of req) raw += chunk
           const { system, prompt, temperature } = raw ? JSON.parse(raw) : {}
           const byokKey = req.headers['x-llm-key']
-          const text = await runLLM({ system, prompt, temperature, env, byokKey })
+          const { text, provider } = await runLLM({ system, prompt, temperature, env, byokKey })
           res.setHeader('content-type', 'application/json')
-          res.end(JSON.stringify({ text }))
+          res.end(JSON.stringify({ text, provider }))
         } catch (e) {
           res.statusCode = e.status || 500
           res.setHeader('content-type', 'application/json')

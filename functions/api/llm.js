@@ -14,11 +14,17 @@ const DEFAULT_MODELS = {
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 
-function pickProvider(env) {
-  if (env.LLM_PROVIDER) return env.LLM_PROVIDER;
-  if (env.GROQ_API_KEY) return 'groq';
-  if (env.OPENROUTER_API_KEY) return 'openrouter';
-  return 'gemini';
+const PROVIDER_ORDER = ['gemini', 'groq', 'openrouter'];
+
+function keyFor(provider, env, byokKey) {
+  if (provider === 'gemini') return byokKey || env.GEMINI_API_KEY;
+  if (provider === 'groq') return env.GROQ_API_KEY;
+  if (provider === 'openrouter') return env.OPENROUTER_API_KEY;
+}
+
+function providerChain(env, byokKey) {
+  if (env.LLM_PROVIDER) return [env.LLM_PROVIDER];
+  return PROVIDER_ORDER.filter((p) => keyFor(p, env, byokKey));
 }
 
 async function callGemini(key, model, system, prompt, temperature, maxTokens) {
@@ -50,24 +56,27 @@ export async function onRequestPost({ request, env }) {
     const { system, prompt, temperature = 0.7 } = await request.json();
     if (!prompt || !String(prompt).trim()) return json({ error: 'Missing prompt' }, 400);
     const byokKey = request.headers.get('x-llm-key') || undefined;
-    const provider = pickProvider(env);
-    const model = env.LLM_MODEL || DEFAULT_MODELS[provider] || DEFAULT_MODELS.gemini;
     const t = Math.max(0, Math.min(1, Number(temperature)));
     const maxTokens = 1500;
-    const notConfigured = () => json({ error: 'Live AI is not configured. Set GEMINI_API_KEY (or GROQ_API_KEY / OPENROUTER_API_KEY) in your Pages environment.' }, 503);
+    const chain = providerChain(env, byokKey);
+    if (!chain.length) return json({ error: 'Live AI is not configured. Set GEMINI_API_KEY (or GROQ_API_KEY / OPENROUTER_API_KEY) in your Pages environment.' }, 503);
 
-    let text;
-    if (provider === 'groq') {
-      const key = byokKey || env.GROQ_API_KEY; if (!key) return notConfigured();
-      text = await callOpenAI('https://api.groq.com/openai/v1', key, model, system, prompt, t, maxTokens);
-    } else if (provider === 'openrouter') {
-      const key = byokKey || env.OPENROUTER_API_KEY; if (!key) return notConfigured();
-      text = await callOpenAI('https://openrouter.ai/api/v1', key, model, system, prompt, t, maxTokens);
-    } else {
-      const key = byokKey || env.GEMINI_API_KEY; if (!key) return notConfigured();
-      text = await callGemini(key, model, system, prompt, t, maxTokens);
+    // Try each provider in turn; fall through on quota/rate-limit/outage.
+    let lastErr;
+    for (const provider of chain) {
+      const key = keyFor(provider, env, byokKey);
+      if (!key) continue;
+      const model = (env.LLM_PROVIDER && env.LLM_MODEL) ? env.LLM_MODEL : (DEFAULT_MODELS[provider] || DEFAULT_MODELS.gemini);
+      try {
+        let text;
+        if (provider === 'groq') text = await callOpenAI('https://api.groq.com/openai/v1', key, model, system, prompt, t, maxTokens);
+        else if (provider === 'openrouter') text = await callOpenAI('https://openrouter.ai/api/v1', key, model, system, prompt, t, maxTokens);
+        else text = await callGemini(key, model, system, prompt, t, maxTokens);
+        if (!text) throw new Error('Empty response');
+        return json({ text, provider });
+      } catch (e) { lastErr = e; }
     }
-    return json({ text });
+    return json({ error: (lastErr && lastErr.message) || 'AI request failed' }, (lastErr && lastErr.status) || 500);
   } catch (e) {
     return json({ error: e.message || 'AI request failed' }, e.status || 500);
   }

@@ -20,9 +20,9 @@ export function setUserKey(k) {
 }
 
 /**
- * Ask the LLM. Resolves to the model's text. Throws on failure; the error may
- * carry `.notConfigured = true` when no server key is set (HTTP 503), which the
- * AI tools use to gracefully fall back to their offline templates.
+ * Ask the LLM. Resolves to `{ text, provider }`. Throws on failure; the error
+ * may carry `.notConfigured = true` when no server key is set (HTTP 503), which
+ * the AI tools use to gracefully fall back to their offline templates.
  */
 export async function askLLM(prompt, { system, temperature = 0.7 } = {}) {
   const headers = { 'content-type': 'application/json' };
@@ -47,5 +47,5 @@ export async function askLLM(prompt, { system, temperature = 0.7 } = {}) {
     e.notConfigured = res.status === 503 || res.status === 404;
     throw e;
   }
-  return (data.text || '').trim();
+  return { text: (data.text || '').trim(), provider: data.provider };
 }

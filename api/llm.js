@@ -13,8 +13,8 @@ export default async function handler(req, res) {
   try {
     const { system, prompt, temperature } = req.body || {};
     const byokKey = req.headers['x-llm-key']; // optional visitor-supplied key
-    const text = await runLLM({ system, prompt, temperature, env: process.env, byokKey });
-    res.status(200).json({ text });
+    const { text, provider } = await runLLM({ system, prompt, temperature, env: process.env, byokKey });
+    res.status(200).json({ text, provider });
   } catch (e) {
     res.status(e.status || 500).json({ error: e.message || 'AI request failed' });
   }

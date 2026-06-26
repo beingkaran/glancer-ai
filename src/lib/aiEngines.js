@@ -10,11 +10,13 @@ import { askLLM } from './llm';
 import * as T from './toolEngines';
 
 // Run an AI prompt with graceful template fallback.
-async function aiRun({ system, prompt, temperature, lang = 'text', preview, fallback, aiLabel = 'live AI' }) {
+const PROVIDER_NAMES = { gemini: 'Google Gemini', groq: 'Groq (Llama 3.3)', openrouter: 'OpenRouter' };
+
+async function aiRun({ system, prompt, temperature, lang = 'text', preview, fallback }) {
   try {
-    const text = await askLLM(prompt, { system, temperature });
+    const { text, provider } = await askLLM(prompt, { system, temperature });
     if (!text) throw new Error('Empty AI response');
-    return { output: text, lang, preview, note: `✨ Generated with ${aiLabel}` };
+    return { output: text, lang, preview, note: `✨ Generated with ${PROVIDER_NAMES[provider] || 'live AI'}` };
   } catch (e) {
     const fb = fallback?.();
     if (fb && !fb.error) {

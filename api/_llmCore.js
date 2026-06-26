@@ -24,11 +24,25 @@ function notConfigured() {
   return e;
 }
 
+// Preferred order: try Gemini first, fall back to Groq, then OpenRouter.
+const PROVIDER_ORDER = ['gemini', 'groq', 'openrouter'];
+
+function keyFor(provider, env, byokKey) {
+  if (provider === 'gemini') return byokKey || env.GEMINI_API_KEY;
+  if (provider === 'groq') return env.GROQ_API_KEY;
+  if (provider === 'openrouter') return env.OPENROUTER_API_KEY;
+  return undefined;
+}
+
+// Build the ordered list of providers to try, given which keys exist. A single
+// forced provider (env.LLM_PROVIDER) short-circuits the chain.
+export function providerChain(env = {}, byokKey) {
+  if (env.LLM_PROVIDER) return [env.LLM_PROVIDER];
+  return PROVIDER_ORDER.filter((p) => keyFor(p, env, byokKey));
+}
+
 export function pickProvider(env = {}) {
-  if (env.LLM_PROVIDER) return env.LLM_PROVIDER;
-  if (env.GROQ_API_KEY) return 'groq';
-  if (env.OPENROUTER_API_KEY) return 'openrouter';
-  return 'gemini';
+  return providerChain(env)[0] || 'gemini';
 }
 
 // Google Gemini (generativelanguage REST API).
@@ -64,23 +78,37 @@ async function callOpenAICompatible({ base, key, model, system, prompt, temperat
   return (json.choices?.[0]?.message?.content || '').trim();
 }
 
+async function callProvider(provider, { key, model, system, prompt, temperature, maxTokens }) {
+  if (provider === 'groq') return callOpenAICompatible({ base: 'https://api.groq.com/openai/v1', key, model, system, prompt, temperature, maxTokens });
+  if (provider === 'openrouter') return callOpenAICompatible({ base: 'https://openrouter.ai/api/v1', key, model, system, prompt, temperature, maxTokens });
+  return callGemini({ key, model, system, prompt, temperature, maxTokens });
+}
+
+/**
+ * Run the prompt against the first available provider. If that provider errors
+ * (quota/rate-limit exhausted, a bad key, an outage, …) it automatically falls
+ * through to the next provider in the chain (Gemini → Groq → OpenRouter).
+ * Returns { text, provider }.
+ */
 export async function runLLM({ system, prompt, temperature = 0.7, maxTokens = 1500, env = {}, byokKey } = {}) {
   if (!prompt || !String(prompt).trim()) { const e = new Error('Missing prompt'); e.status = 400; throw e; }
-  const provider = pickProvider(env);
-  const model = env.LLM_MODEL || DEFAULT_MODELS[provider] || DEFAULT_MODELS.gemini;
   const t = Math.max(0, Math.min(1, Number(temperature)));
+  const chain = providerChain(env, byokKey);
+  if (!chain.length) throw notConfigured();
 
-  if (provider === 'groq') {
-    const key = byokKey || env.GROQ_API_KEY;
-    if (!key) throw notConfigured();
-    return callOpenAICompatible({ base: 'https://api.groq.com/openai/v1', key, model, system, prompt, temperature: t, maxTokens });
+  let lastErr;
+  for (const provider of chain) {
+    const key = keyFor(provider, env, byokKey);
+    if (!key) continue;
+    const model = (env.LLM_PROVIDER && env.LLM_MODEL) ? env.LLM_MODEL : (DEFAULT_MODELS[provider] || DEFAULT_MODELS.gemini);
+    try {
+      const text = await callProvider(provider, { key, model, system, prompt, temperature: t, maxTokens });
+      if (!text) throw new Error('Empty response');
+      return { text, provider };
+    } catch (e) {
+      lastErr = e;
+      // Fall through to the next provider in the chain (if any).
+    }
   }
-  if (provider === 'openrouter') {
-    const key = byokKey || env.OPENROUTER_API_KEY;
-    if (!key) throw notConfigured();
-    return callOpenAICompatible({ base: 'https://openrouter.ai/api/v1', key, model, system, prompt, temperature: t, maxTokens });
-  }
-  const key = byokKey || env.GEMINI_API_KEY;
-  if (!key) throw notConfigured();
-  return callGemini({ key, model, system, prompt, temperature: t, maxTokens });
+  throw lastErr || notConfigured();
 }
