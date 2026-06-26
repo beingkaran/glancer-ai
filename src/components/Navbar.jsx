@@ -34,6 +34,7 @@ const PenIcon = () => (
 
 const NAV_LINKS = [
   { label: 'AI News', to: '/#news' },
+  { label: 'Free AI Tools', to: '/ai-tools' },
   { label: 'Blogs', to: '/blogs' },
   { label: 'Metrics', to: '/metrics' },
   { label: 'Glossary', to: '/glossary' },

@@ -8,6 +8,7 @@ import CursorHalo from './components/CursorHalo';
 import HomePage from './pages/HomePage';
 import MetricsPage from './pages/MetricsPage';
 import GlossaryPage from './pages/GlossaryPage';
+import AIToolsPage from './pages/AIToolsPage';
 import AboutPage from './pages/AboutPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogPostPage from './pages/BlogPostPage';
@@ -51,6 +52,7 @@ export default function App() {
           <Route path="/news/:id"          element={<NewsReaderPage />} />
           <Route path="/metrics"           element={<MetricsPage />} />
           <Route path="/glossary"          element={<GlossaryPage />} />
+          <Route path="/ai-tools"          element={<AIToolsPage />} />
           <Route path="/profile"           element={<ProfilePage />} />
           <Route path="/about"             element={<AboutPage />} />
           <Route path="/_glancer/admin"    element={<AdminPage />} />

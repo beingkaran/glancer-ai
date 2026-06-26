@@ -851,3 +851,40 @@ button { font-family: var(--font-body); }
 .reader-rss img { width: 100%; border-radius: 12px; margin: 16px 0; }
 .reader-rss a { color: var(--cyan); text-decoration: underline; }
 .reader-rss ul, .reader-rss ol { padding-left: 22px; margin-bottom: 16px; }
+
+/* ============ Free AI Tools page ============ */
+.tools-filter-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 0 auto 18px; max-width: 900px; }
+
+.tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+.tool-card { border-radius: var(--border-radius); padding: 20px; display: flex; flex-direction: column; transition: transform 0.2s ease, border-color 0.2s ease; }
+.tool-card:hover { transform: translateY(-3px); border-color: var(--glass-border-strong); }
+
+.tool-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.tool-badge { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #fff; flex-shrink: 0; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.tool-card-titles { display: flex; flex-direction: column; min-width: 0; margin-right: auto; }
+.tool-card-name { font-size: 1.02rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.tool-card-by { font-size: 0.74rem; color: var(--text-muted); }
+.tool-cat-tag { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--purple); background: rgba(168,85,247,0.13); border: 1px solid rgba(168,85,247,0.25); padding: 4px 8px; border-radius: var(--border-radius-pill); white-space: nowrap; flex-shrink: 0; }
+
+.tool-card-blurb { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; flex-grow: 1; }
+
+.tool-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tool-tag { font-size: 0.68rem; color: var(--text-muted); background: var(--surface-hover); padding: 3px 9px; border-radius: var(--border-radius-pill); }
+
+.tool-launch { display: flex; gap: 8px; }
+.tool-prompt-input { flex: 1; min-width: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--border-radius-sm); padding: 10px 12px; color: var(--text-primary); font-size: 0.84rem; font-family: inherit; outline: none; transition: var(--transition); }
+.tool-prompt-input::placeholder { color: var(--text-muted); }
+.tool-prompt-input:focus { border-color: rgba(168,85,247,0.5); box-shadow: 0 0 0 3px rgba(168,85,247,0.10); }
+
+.tool-launch-btn { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; padding: 10px 16px; border: none; border-radius: var(--border-radius-sm); background: var(--tool-color, var(--purple)); color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: filter 0.18s ease, transform 0.18s ease; }
+.tool-launch-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.tool-launch-btn:active { transform: translateY(0); }
+
+.tool-launch-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 9px; }
+
+.tool-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 200; background: var(--glass-bg-strong); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); border: 1px solid var(--glass-border-strong); color: var(--text-primary); padding: 13px 22px; border-radius: var(--border-radius-pill); font-size: 0.86rem; font-weight: 500; box-shadow: var(--shadow-glass); animation: tool-toast-in 0.25s ease; }
+@keyframes tool-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+@media (max-width: 900px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .tools-grid { grid-template-columns: 1fr; } }
