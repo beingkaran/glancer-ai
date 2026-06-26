@@ -5,9 +5,13 @@
  * in-site article reader reach the source.
  */
 
+// Raw-passthrough CORS proxies, raced in parallel (Promise.any) so the first to
+// respond wins and dead ones don't matter. Keep several: public proxies come and
+// go — as of this writing corsproxy.io needs an API key (403) and allorigins is
+// frequently down, while proxy.cors.sh works. Listing extras is harmless.
 const PROXIES = [
+  (u) => `https://proxy.cors.sh/${u}`,
   (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
   (u) => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(u)}`,
 ];
 

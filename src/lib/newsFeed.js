@@ -14,13 +14,18 @@ import { proxiedText } from './proxy';
  * the in-site reader (/news/:rid) can look it up from the cache.
  */
 
+// AI-specific feeds that ship a real image per item (media:content / enclosure /
+// inline <img>), so cards render a photo instead of the emoji placeholder.
+// Verified: The Verge, VentureBeat, Wired, Ars Technica, AI News all return an
+// image on ~10/10 items via rss2json. TechCrunch's feed carries no inline image,
+// so its cards rely on the og:image enrichment pass (fetchOgImage) below.
 const FEEDS = [
-  { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch' },
-  { url: 'https://venturebeat.com/category/ai/feed/', source: 'VentureBeat' },
-  { url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed', source: 'MIT Tech Review' },
   { url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', source: 'The Verge' },
+  { url: 'https://venturebeat.com/category/ai/feed/', source: 'VentureBeat' },
+  { url: 'https://www.wired.com/feed/tag/ai/latest/rss', source: 'Wired' },
+  { url: 'https://arstechnica.com/ai/feed/', source: 'Ars Technica' },
   { url: 'https://www.artificialintelligence-news.com/feed/', source: 'AI News' },
-  { url: 'https://feeds.arstechnica.com/arstechnica/technology-lab', source: 'Ars Technica' },
+  { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch' },
 ];
 
 const CACHE_KEY = 'glancer_news_cache';
@@ -107,7 +112,10 @@ async function timedFetch(url, ms = 7000) {
 }
 
 async function fetchViaRss2Json(feed) {
-  const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&count=8`;
+  // NOTE: do NOT pass &count — rss2json's free tier now rejects it with HTTP 422
+  // ("you need a valid api key"), which previously broke every feed and forced
+  // the whole UI onto the static (emoji-only) fallback. Default count is ~10.
+  const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
   const res = await timedFetch(endpoint, 5000);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
