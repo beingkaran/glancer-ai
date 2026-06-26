@@ -183,7 +183,7 @@ export default function AIToolsPage() {
                     <span className="tool-badge" style={{ background: tool.color }}>{tool.badge}</span>
                     <div className="tool-card-titles">
                       <h3 className="tool-card-name">{tool.name}</h3>
-                      <span className="tool-card-by">In-browser · instant</span>
+                      <span className="tool-card-by">{tool.ai ? '✨ Live AI · free' : 'In-browser · instant'}</span>
                     </div>
                     <span className="tool-cat-tag">{tool.category}</span>
                   </div>

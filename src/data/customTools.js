@@ -12,6 +12,7 @@
  */
 
 import * as E from '../lib/toolEngines';
+import * as AI from '../lib/aiEngines';
 
 export const CUSTOM_TOOL_CATEGORIES = [
   'Sitemap & SEO',
@@ -171,7 +172,7 @@ export const CUSTOM_TOOLS = [
       { id: 'topic', label: 'What does your bot do?', type: 'text', placeholder: 'e.g. customer support, fitness coaching' },
       { id: 'tone', label: 'Tone', type: 'select', default: 'friendly', options: [{ value: 'friendly', label: 'Friendly' }, { value: 'professional', label: 'Professional' }, { value: 'playful', label: 'Playful' }] },
     ],
-    cta: 'Generate names', run: E.chatbotNameGenerator,
+    cta: 'Generate names', run: AI.chatbotNameGeneratorAI, ai: true, async: true,
   },
   {
     id: 'brand-name', name: 'SaaS Brand Name Generator', category: 'Generators',
@@ -179,7 +180,7 @@ export const CUSTOM_TOOLS = [
     blurb: 'Discover brandable SaaS / startup names with available-looking domains.',
     tags: ['naming', 'saas', 'startup'],
     inputs: [{ id: 'keywords', label: 'Keywords (one or two)', type: 'text', placeholder: 'e.g. invoice, automation' }],
-    cta: 'Generate names', run: E.brandNameGenerator,
+    cta: 'Generate names', run: AI.brandNameGeneratorAI, ai: true, async: true,
   },
   {
     id: 'blog-title', name: 'Blog Title Generator', category: 'Generators',
@@ -190,7 +191,7 @@ export const CUSTOM_TOOLS = [
       { id: 'topic', label: 'Topic / keyword', type: 'text', placeholder: 'e.g. remote team productivity' },
       { id: 'tone', label: 'Style', type: 'select', default: 'mixed', options: [{ value: 'mixed', label: 'Mixed' }, { value: 'listicle', label: 'Listicle' }, { value: 'howto', label: 'How-to' }, { value: 'question', label: 'Question' }] },
     ],
-    cta: 'Generate titles', run: E.blogTitleGenerator,
+    cta: 'Generate titles', run: AI.blogTitleGeneratorAI, ai: true, async: true,
   },
   {
     id: 'email-signature', name: 'Email Signature Generator', category: 'Generators',
@@ -244,7 +245,7 @@ export const CUSTOM_TOOLS = [
     blurb: 'Analyze an existing prompt and rewrite it into a stronger, structured one.',
     tags: ['prompt', 'optimize', 'ai'],
     inputs: [{ id: 'prompt', label: 'Your current prompt', type: 'textarea', rows: 5, placeholder: 'write me a blog post about dogs' }],
-    cta: 'Optimize', run: E.promptOptimizer,
+    cta: 'Optimize', run: AI.promptOptimizerAI, ai: true, async: true,
   },
 
   /* ---------------------------------------------------- Writing */
@@ -257,7 +258,7 @@ export const CUSTOM_TOOLS = [
       { id: 'text', label: 'Content', type: 'textarea', rows: 7, placeholder: 'Paste a product description, doc or article…' },
       { id: 'count', label: 'Number of questions', type: 'number', default: '6', placeholder: '6' },
     ],
-    cta: 'Generate FAQ', run: E.faqGenerator,
+    cta: 'Generate FAQ', run: AI.faqGeneratorAI, ai: true, async: true,
   },
   {
     id: 'email-response', name: 'Email Response Generator', category: 'Writing',
@@ -269,7 +270,7 @@ export const CUSTOM_TOOLS = [
       { id: 'tone', label: 'Tone', type: 'select', default: 'professional', options: [{ value: 'professional', label: 'Professional' }, { value: 'friendly', label: 'Friendly' }, { value: 'formal', label: 'Formal' }] },
       { id: 'intent', label: 'Your intent', type: 'select', default: 'info', options: [{ value: 'info', label: 'Provide info' }, { value: 'accept', label: 'Accept' }, { value: 'decline', label: 'Decline' }, { value: 'followup', label: 'Follow up' }] },
     ],
-    cta: 'Draft reply', run: E.emailResponseGenerator,
+    cta: 'Draft reply', run: AI.emailResponseAI, ai: true, async: true,
   },
   {
     id: 'letter-generator', name: 'AI Letter Generator', category: 'Writing',
@@ -282,7 +283,7 @@ export const CUSTOM_TOOLS = [
       { id: 'sender', label: 'Your name', type: 'text', placeholder: 'Karan Shah' },
       { id: 'details', label: 'Key details', type: 'textarea', rows: 3, placeholder: 'One or two sentences about the specifics…' },
     ],
-    cta: 'Generate letter', run: E.letterGenerator,
+    cta: 'Generate letter', run: AI.letterGeneratorAI, ai: true, async: true,
   },
   {
     id: 'cs-script', name: 'Customer Service Script Generator', category: 'Writing',
@@ -294,6 +295,6 @@ export const CUSTOM_TOOLS = [
       { id: 'product', label: 'Product / company', type: 'text', placeholder: 'Glancer AI' },
       { id: 'tone', label: 'Tone', type: 'select', default: 'friendly', options: [{ value: 'friendly', label: 'Friendly' }, { value: 'formal', label: 'Formal' }] },
     ],
-    cta: 'Generate script', run: E.customerServiceScript,
+    cta: 'Generate script', run: AI.customerServiceScriptAI, ai: true, async: true,
   },
 ];

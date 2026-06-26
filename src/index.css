@@ -964,6 +964,16 @@ button { font-family: var(--font-body); }
 .tr-md th, .tr-md td { border: 1px solid var(--glass-border); padding: 7px 10px; text-align: left; }
 .tr-md th { background: var(--surface); color: var(--text-primary); font-weight: 600; }
 
+.tr-result-note { font-size: 0.74rem; color: var(--text-secondary); background: var(--surface); border: 1px solid var(--glass-border); border-radius: var(--border-radius-sm); padding: 7px 11px; line-height: 1.4; }
+
+.tr-key-toggle { align-self: flex-start; background: none; border: none; padding: 0; font-size: 0.74rem; font-weight: 600; color: var(--purple); cursor: pointer; }
+.tr-key-toggle:hover { text-decoration: underline; }
+.tr-key-row { display: flex; gap: 6px; }
+.tr-key-row input { flex: 1; min-width: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--border-radius-sm); padding: 8px 10px; color: var(--text-primary); font-size: 0.8rem; font-family: inherit; outline: none; }
+.tr-key-row input:focus { border-color: rgba(168,85,247,0.5); box-shadow: 0 0 0 3px rgba(168,85,247,0.10); }
+.tr-key-row button { font-size: 0.76rem; font-weight: 600; padding: 0 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--glass-border); background: var(--surface); color: var(--text-secondary); cursor: pointer; }
+.tr-key-row button:hover { background: var(--surface-hover); color: var(--text-primary); }
+
 .tr-spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: tr-rotate 0.7s linear infinite; }
 @keyframes tr-rotate { to { transform: rotate(360deg); } }
 

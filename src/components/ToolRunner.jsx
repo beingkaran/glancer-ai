@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { renderMarkdown } from '../lib/miniMarkdown';
+import { getUserKey, setUserKey } from '../lib/llm';
 
 /*
  * ToolRunner — a generic modal that runs any Custom AI Tool defined in
@@ -17,6 +18,8 @@ export default function ToolRunner({ tool, onClose }) {
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState('output'); // 'output' | 'preview'
   const [copied, setCopied] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const [keyVal, setKeyVal] = useState(() => getUserKey());
   const firstField = useRef(null);
 
   // Reset when the open tool changes; focus the first field; lock body scroll.
@@ -126,7 +129,28 @@ export default function ToolRunner({ tool, onClose }) {
             <button className="tr-run" onClick={run} disabled={busy} style={{ '--tool-color': tool.color }}>
               {busy ? <><span className="tr-spin" /> Working…</> : (tool.cta || 'Run')}
             </button>
-            {tool.async && <p className="tr-note">Fetched live via a public proxy — some sites block cross-origin requests.</p>}
+
+            {tool.ai && (
+              <>
+                <p className="tr-note">✨ Powered by live AI — free, no sign-up. Falls back to an offline template if AI is unavailable.</p>
+                <button className="tr-key-toggle" type="button" onClick={() => setShowKey((s) => !s)}>
+                  {getUserKey() ? 'Using your own API key ✓' : 'Use your own API key (optional)'}
+                </button>
+                {showKey && (
+                  <div className="tr-key-row">
+                    <input
+                      type="password"
+                      placeholder="Paste a Gemini / Groq / OpenRouter key"
+                      value={keyVal}
+                      onChange={(e) => setKeyVal(e.target.value)}
+                    />
+                    <button type="button" onClick={() => { setUserKey(keyVal.trim()); setShowKey(false); }}>Save</button>
+                    {getUserKey() && <button type="button" onClick={() => { setUserKey(''); setKeyVal(''); }}>Clear</button>}
+                  </div>
+                )}
+              </>
+            )}
+            {!tool.ai && tool.async && <p className="tr-note">Fetched live via a public proxy — some sites block cross-origin requests.</p>}
           </div>
 
           {/* Output */}
@@ -137,6 +161,8 @@ export default function ToolRunner({ tool, onClose }) {
             {busy && <div className="tr-empty"><span className="tr-spin" /> Running…</div>}
 
             {result?.error && <div className="tr-error">⚠️ {result.error}</div>}
+
+            {result?.note && <div className="tr-result-note">{result.note}</div>}
 
             {result?.output && (
               <>
