@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Keep the admin route out of search results.
+Disallow: /_glancer/
+
+Sitemap: https://glancerai.com/sitemap.xml
