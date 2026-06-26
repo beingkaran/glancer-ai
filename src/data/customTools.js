@@ -14,8 +14,17 @@
 import * as E from '../lib/toolEngines';
 import * as AI from '../lib/aiEngines';
 
+// Document converters pull in heavy libs (mammoth, jsPDF, pdf.js, docx). Load
+// them lazily so they're code-split out of the main bundle and only fetched
+// when a visitor actually runs a converter — keeps initial page load fast.
+const D = {
+  wordToPdf: (v) => import('../lib/docEngines').then((m) => m.wordToPdf(v)),
+  pdfToWord: (v) => import('../lib/docEngines').then((m) => m.pdfToWord(v)),
+};
+
 export const CUSTOM_TOOL_CATEGORIES = [
   'Sitemap & SEO',
+  'PDF & Word',
   'Convert to Markdown',
   'Generators',
   'Calculators',
@@ -27,6 +36,24 @@ const urlField = (id = 'url', label = 'Website / sitemap URL', ph = 'https://exa
   ({ id, label, type: 'url', placeholder: ph });
 
 export const CUSTOM_TOOLS = [
+  /* ------------------------------------------------------- PDF & Word */
+  {
+    id: 'word-to-pdf', name: 'Word to PDF Converter', category: 'PDF & Word',
+    badge: '📄', color: '#DC2626',
+    blurb: 'Convert a Word .docx into a clean PDF right in your browser — text, headings, lists, tables and images preserved. Nothing is uploaded to a server.',
+    tags: ['word', 'docx', 'pdf', 'convert', 'document'],
+    inputs: [{ id: 'file', label: 'Word document (.docx)', type: 'file', accept: '.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document' }],
+    cta: 'Convert to PDF', run: D.wordToPdf, async: true,
+  },
+  {
+    id: 'pdf-to-word', name: 'PDF to Word Converter', category: 'PDF & Word',
+    badge: '📝', color: '#2563EB',
+    blurb: 'Turn a PDF into an editable Word .docx in your browser — text is extracted and rebuilt as paragraphs you can edit. 100% private, no upload.',
+    tags: ['pdf', 'word', 'docx', 'convert', 'document', 'editable'],
+    inputs: [{ id: 'file', label: 'PDF file (.pdf)', type: 'file', accept: '.pdf,application/pdf' }],
+    cta: 'Convert to Word', run: D.pdfToWord, async: true,
+  },
+
   /* ---------------------------------------------------- Sitemap & SEO */
   {
     id: 'sitemap-finder', name: 'Sitemap Finder & Checker', category: 'Sitemap & SEO',

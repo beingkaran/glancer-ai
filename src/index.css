@@ -934,6 +934,18 @@ button { font-family: var(--font-body); }
 .tr-run:disabled { opacity: 0.7; cursor: progress; }
 .tr-note { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
 
+/* File-upload field + binary (converted-file) result card */
+.tr-field input.tr-file { padding: 9px 11px; cursor: pointer; font-size: 0.8rem; }
+.tr-field input.tr-file::file-selector-button { margin-right: 10px; padding: 6px 12px; border: 1px solid var(--glass-border); border-radius: var(--border-radius-sm); background: var(--surface); color: var(--text-primary); font-family: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: var(--transition); }
+.tr-field input.tr-file::file-selector-button:hover { border-color: rgba(168,85,247,0.5); }
+.tr-file-result { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--glass-border); border-radius: var(--border-radius-sm); padding: 14px 16px; }
+.tr-file-check { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: rgba(16,185,129,0.15); color: #34d399; font-weight: 700; }
+.tr-file-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.tr-file-meta b { font-size: 0.86rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tr-file-meta span { font-size: 0.7rem; color: var(--text-muted); }
+.tr-file-dl { flex: none; padding: 9px 16px; border: none; border-radius: var(--border-radius-sm); background: var(--purple); color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: filter 0.18s ease, transform 0.18s ease; }
+.tr-file-dl:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
 .tr-output { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .tr-empty { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 30px 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .tr-error { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 12px 14px; border-radius: var(--border-radius-sm); font-size: 0.83rem; line-height: 1.5; }

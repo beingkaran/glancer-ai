@@ -10,7 +10,7 @@ import { getUserKey, setUserKey } from '../lib/llm';
  */
 
 const seedValues = (tool) =>
-  Object.fromEntries(tool.inputs.map((f) => [f.id, f.default ?? '']));
+  Object.fromEntries(tool.inputs.map((f) => [f.id, f.type === 'file' ? null : (f.default ?? '')]));
 
 export default function ToolRunner({ tool, onClose }) {
   const [values, setValues] = useState(() => seedValues(tool));
@@ -64,6 +64,15 @@ export default function ToolRunner({ tool, onClose }) {
   };
 
   const download = () => {
+    // Binary result (file converters) — download the produced Blob directly.
+    if (result?.blob) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(result.blob);
+      a.download = result.filename || `${tool.id}.bin`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      return;
+    }
     if (!result?.output) return;
     const ext = result.lang === 'xml' ? 'xml' : result.lang === 'markdown' ? 'md' : result.lang === 'json' ? 'json' : 'txt';
     const blob = new Blob([result.output], { type: 'text/plain;charset=utf-8' });
@@ -104,6 +113,14 @@ export default function ToolRunner({ tool, onClose }) {
                     placeholder={f.placeholder}
                     value={values[f.id]}
                     onChange={(e) => set(f.id, e.target.value)}
+                  />
+                ) : f.type === 'file' ? (
+                  <input
+                    ref={i === 0 ? firstField : null}
+                    type="file"
+                    className="tr-file"
+                    accept={f.accept}
+                    onChange={(e) => set(f.id, e.target.files?.[0] || null)}
                   />
                 ) : f.type === 'select' ? (
                   <select
@@ -163,6 +180,26 @@ export default function ToolRunner({ tool, onClose }) {
             {result?.error && <div className="tr-error">⚠️ {result.error}</div>}
 
             {result?.note && <div className="tr-result-note">{result.note}</div>}
+
+            {result?.blob && (
+              <>
+                {result.stats?.length > 0 && (
+                  <div className="tr-stats">
+                    {result.stats.map((s) => (
+                      <div key={s.label} className="tr-stat"><b>{s.value}</b><span>{s.label}</span></div>
+                    ))}
+                  </div>
+                )}
+                <div className="tr-file-result">
+                  <span className="tr-file-check">✓</span>
+                  <div className="tr-file-meta">
+                    <b>{result.filename}</b>
+                    <span>{(result.blob.size / 1024).toFixed(0)} KB · ready to download</span>
+                  </div>
+                  <button className="tr-file-dl" onClick={download}>Download</button>
+                </div>
+              </>
+            )}
 
             {result?.output && (
               <>
