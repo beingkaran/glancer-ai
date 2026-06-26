@@ -305,6 +305,10 @@ button { font-family: var(--font-body); }
 .blog-card-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; line-height: 1.35; color: var(--text-primary); margin-bottom: 10px; }
 .blog-card-subtitle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; flex: 1; margin-bottom: 18px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .blog-card-footer { display: flex; align-items: center; justify-content: space-between; }
+/* Full-bleed cover image (uploaded banner or illustrated cover) — fills the banner area */
+.blog-banner-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
+.blog-read-banner { position: relative; overflow: hidden; }
+.search-suggest-icon .blog-banner-img { border-radius: inherit; }
 /* Vendor logo shown on blog banners/cards in place of the emoji */
 .blog-logo-img { position: relative; z-index: 1; width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
 .blog-card-banner .blog-logo-img { width: 60px; height: 60px; }

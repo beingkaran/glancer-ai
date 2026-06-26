@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/allBlogs';
 import { getApprovedUserBlogs } from '../lib/blogStore';
+import BlogBanner from '../components/BlogBanner';
 
 const PenIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -104,8 +105,10 @@ export default function BlogsPage() {
               ) : (
                 suggestions.map((p) => (
                   <Link key={p.id} to={`/blog/${p.id}`} className="search-suggest-item" role="option" onClick={() => setShowSuggest(false)}>
-                    <span className="search-suggest-icon" style={{ background: p.bgGradient || p.gradient }}>
-                      {p.logo ? <img className="blog-logo-img" src={p.logo} alt="" /> : (p.icon || p.emoji)}
+                    <span className="search-suggest-icon" style={p.bannerImage ? null : { background: p.bgGradient || p.gradient }}>
+                      {p.bannerImage
+                        ? <img className="blog-banner-img" src={p.bannerImage} alt="" />
+                        : p.logo ? <img className="blog-logo-img" src={p.logo} alt="" /> : (p.icon || p.emoji)}
                     </span>
                     <span className="search-suggest-text">
                       <span className="search-suggest-title">{p.title}</span>
@@ -134,11 +137,7 @@ export default function BlogsPage() {
         {/* Featured */}
         {showFeatured && (
           <Link to={`/blog/${featured.id}`} className="news-featured news-link" style={{ marginBottom: 32 }} aria-label={`Read: ${featured.title}`}>
-            <div className="news-featured-img" style={{ background: featured.bgGradient || featured.gradient }} aria-hidden="true">
-              {featured.logo
-                ? <img className="blog-logo-img" style={{ width: 120, height: 120 }} src={featured.logo} alt="" />
-                : <span style={{ fontSize: '5rem', position: 'relative', zIndex: 1 }}>{featured.icon || featured.emoji}</span>}
-            </div>
+            <BlogBanner post={featured} className="news-featured-img" emojiSize="5rem" logoStyle={{ width: 120, height: 120 }} />
             <div className="news-featured-body">
               <div>
                 <span className="news-category-tag tag-purple">{featured.category}</span>
@@ -162,11 +161,7 @@ export default function BlogsPage() {
         <div className="blogs-grid">
           {(showFeatured ? rest : filtered).map((post) => (
             <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
-              <div className="blog-card-banner" style={{ background: post.bgGradient || post.gradient }} aria-hidden="true">
-                {post.logo
-                  ? <img className="blog-logo-img" src={post.logo} alt="" />
-                  : <span style={{ position: 'relative', zIndex: 1, fontSize: '3rem' }}>{post.icon || post.emoji}</span>}
-              </div>
+              <BlogBanner post={post} className="blog-card-banner" />
               <div className="blog-card-body">
                 <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
                   <span className="news-category-tag tag-purple" style={{ fontSize: '0.68rem' }}>{post.category}</span>

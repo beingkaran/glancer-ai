@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/allBlogs';
+import BlogBanner from './BlogBanner';
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -50,11 +51,7 @@ export default function BlogsTab({ limit }) {
         <div className="blogs-grid">
           {posts.map(post => (
             <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
-              <div className="blog-card-banner" style={{ background: post.bgGradient || post.gradient }} aria-hidden="true">
-                {post.logo
-                  ? <img className="blog-logo-img" src={post.logo} alt="" />
-                  : <span style={{ position: 'relative', zIndex: 1, fontSize: '3rem' }}>{post.icon || post.emoji}</span>}
-              </div>
+              <BlogBanner post={post} className="blog-card-banner" />
               <div className="blog-card-body">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                   <span className="news-category-tag tag-purple" style={{ fontSize: '0.68rem' }}>{post.category}</span>

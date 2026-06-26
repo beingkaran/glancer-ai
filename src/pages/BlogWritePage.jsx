@@ -21,6 +21,36 @@ const GRADIENTS = [
 ];
 const EMOJIS = ['🔭','📊','🤖','⚡','🛡️','🔗','☁️','⚙️','🧠','📟','🔍','🚀'];
 
+/* Read an image file and downscale it to a compressed JPEG data URL.
+ * Keeps localStorage small (banners are stored inline with the blog). */
+function fileToCompressedDataURL(file, maxW = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function ToolbarBtn({ onClick, active, title, children }) {
   return (
     <button
@@ -45,9 +75,36 @@ export default function BlogWritePage() {
   const [tags, setTags] = useState('');
   const [emoji, setEmoji] = useState('🔭');
   const [gradient, setGradient] = useState(GRADIENTS[0]);
+  const [bannerImage, setBannerImage] = useState('');
+  const [bannerName, setBannerName] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [readTime, setReadTime] = useState(5);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  async function handleBannerUpload(e) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file
+    if (!file) return;
+    setError('');
+    if (!file.type.startsWith('image/')) { setError('Please choose an image file (JPG, PNG, WebP, or GIF).'); return; }
+    if (file.size > 10 * 1024 * 1024) { setError('That image is too large. Please pick one under 10 MB.'); return; }
+    setUploading(true);
+    try {
+      const dataUrl = await fileToCompressedDataURL(file);
+      setBannerImage(dataUrl);
+      setBannerName(file.name);
+    } catch {
+      setError('Could not process that image. Please try a different file.');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeBanner() {
+    setBannerImage('');
+    setBannerName('');
+  }
 
   const editor = useEditor({
     extensions: [
@@ -88,6 +145,7 @@ export default function BlogWritePage() {
       emoji,
       bgGradient: gradient,
       gradient,
+      bannerImage: bannerImage || undefined,
       author: user?.name || 'Community',
       authorEmail: user?.email || null,
       avatar: '✍️',
@@ -140,7 +198,7 @@ export default function BlogWritePage() {
             <button className="search-btn" onClick={() => navigate('/blogs')} style={{ border: 'none', cursor: 'pointer', padding: '12px 28px', borderRadius: 10 }}>
               View All Blogs
             </button>
-            <button className="filter-chip" onClick={() => { setSubmitted(false); setTitle(''); setSubtitle(''); editor?.commands.clearContent(); }} style={{ padding: '12px 28px', cursor: 'pointer' }}>
+            <button className="filter-chip" onClick={() => { setSubmitted(false); setTitle(''); setSubtitle(''); removeBanner(); editor?.commands.clearContent(); }} style={{ padding: '12px 28px', cursor: 'pointer' }}>
               Write Another
             </button>
           </div>
@@ -213,7 +271,54 @@ export default function BlogWritePage() {
             {/* Cover card preview */}
             <div style={{ marginBottom: 8 }}>
               <label className="field-label">Card Appearance</label>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+
+              {/* Banner image upload */}
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 6 }}>Banner image (optional)</p>
+                {bannerImage ? (
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ width: 200, height: 110, borderRadius: 12, overflow: 'hidden', border: '1px solid var(--glass-border)', flexShrink: 0 }}>
+                      <img src={bannerImage} alt="Banner preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {bannerName || 'Uploaded image'}
+                      </span>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <label className="filter-chip" style={{ padding: '6px 14px', cursor: 'pointer', fontSize: '0.78rem' }}>
+                          Replace
+                          <input type="file" accept="image/*" onChange={handleBannerUpload} style={{ display: 'none' }} />
+                        </label>
+                        <button type="button" className="filter-chip" onClick={removeBanner} style={{ padding: '6px 14px', cursor: 'pointer', fontSize: '0.78rem' }}>
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <label
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      padding: '22px 16px', borderRadius: 12, cursor: uploading ? 'wait' : 'pointer',
+                      border: '2px dashed var(--glass-border)', background: 'var(--surface)', textAlign: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>🖼️</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                      {uploading ? 'Processing image…' : 'Upload a banner image'}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      JPG, PNG, WebP or GIF · up to 10 MB · shown across the top of your article
+                    </span>
+                    <input type="file" accept="image/*" onChange={handleBannerUpload} disabled={uploading} style={{ display: 'none' }} />
+                  </label>
+                )}
+              </div>
+
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 10 }}>
+                {bannerImage ? 'These are used only if you remove the banner image.' : 'No image? Pick an icon and gradient instead.'}
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', opacity: bannerImage ? 0.5 : 1 }}>
                 <div>
                   <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 6 }}>Icon</p>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -235,8 +340,10 @@ export default function BlogWritePage() {
                   </div>
                 </div>
                 {/* Live preview */}
-                <div style={{ width: 80, height: 60, borderRadius: 10, background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', border: '1px solid var(--glass-border)', flexShrink: 0 }}>
-                  {emoji}
+                <div style={{ width: 80, height: 60, borderRadius: 10, background: bannerImage ? undefined : gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', border: '1px solid var(--glass-border)', flexShrink: 0, overflow: 'hidden' }}>
+                  {bannerImage
+                    ? <img src={bannerImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : emoji}
                 </div>
               </div>
             </div>

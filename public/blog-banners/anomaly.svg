@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img">
+  <defs>
+    <linearGradient id="bg-ano" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#042f2e"/><stop offset="50%" stop-color="#115e59"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+    <radialGradient id="glow-ano" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid-ano" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#ffffff" opacity="0.06"/>
+    </pattern>
+    <filter id="soft-ano" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg-ano)"/>
+  <rect width="800" height="450" fill="url(#grid-ano)"/>
+  <rect width="800" height="450" fill="url(#glow-ano)"/>
+  <polyline points="150,330 632,330" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+    <path d="M150 270 L192 260 L234 266 L276 255 L318 262 L360 258 L402 264 L444 130 L486 260 L528 265 L570 256 L612 261" fill="none" stroke="#5eead4" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="444" cy="130" r="26" fill="none" stroke="#f87171" stroke-width="3"/>
+    <circle cx="444" cy="130" r="8" fill="#f87171"/>
+</svg>

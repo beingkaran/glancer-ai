@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
+import BlogBanner from '../components/BlogBanner';
 
 function formatDate(d) {
   const date = new Date(d);
@@ -34,11 +35,7 @@ export default function BlogPostPage() {
     <div className="page-section">
       <article className="container" style={{ maxWidth: 760 }}>
         {/* Banner */}
-        <div className="blog-read-banner" style={{ background: post.bgGradient || post.gradient }}>
-          {post.logo
-            ? <img className="blog-logo-img" src={post.logo} alt={`${post.title} logo`} />
-            : <span>{post.icon || post.emoji}</span>}
-        </div>
+        <BlogBanner post={post} className="blog-read-banner" emojiSize="5rem" />
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
@@ -77,9 +74,7 @@ export default function BlogPostPage() {
             <div className="blogs-grid">
               {more.map((b) => (
                 <Link key={b.id} to={`/blog/${b.id}`} className="blog-card" style={{ textDecoration: 'none' }}>
-                  <div className="blog-card-banner" style={{ background: b.bgGradient || b.gradient }} aria-hidden="true">
-                    <span style={{ position: 'relative', zIndex: 1, fontSize: '2.6rem' }}>{b.icon || b.emoji}</span>
-                  </div>
+                  <BlogBanner post={b} className="blog-card-banner" emojiSize="2.6rem" />
                   <div className="blog-card-body">
                     <span className="news-category-tag tag-purple" style={{ fontSize: '0.66rem' }}>{b.category}</span>
                     <h3 className="blog-card-title">{b.title}</h3>
