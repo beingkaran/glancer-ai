@@ -104,7 +104,9 @@ export default function BlogsPage() {
               ) : (
                 suggestions.map((p) => (
                   <Link key={p.id} to={`/blog/${p.id}`} className="search-suggest-item" role="option" onClick={() => setShowSuggest(false)}>
-                    <span className="search-suggest-icon" style={{ background: p.bgGradient || p.gradient }}>{p.icon || p.emoji}</span>
+                    <span className="search-suggest-icon" style={{ background: p.bgGradient || p.gradient }}>
+                      {p.logo ? <img className="blog-logo-img" src={p.logo} alt="" /> : (p.icon || p.emoji)}
+                    </span>
                     <span className="search-suggest-text">
                       <span className="search-suggest-title">{p.title}</span>
                       <span className="search-suggest-cat">{p.category} · {p.readTime} min</span>
@@ -133,7 +135,9 @@ export default function BlogsPage() {
         {showFeatured && (
           <Link to={`/blog/${featured.id}`} className="news-featured news-link" style={{ marginBottom: 32 }} aria-label={`Read: ${featured.title}`}>
             <div className="news-featured-img" style={{ background: featured.bgGradient || featured.gradient }} aria-hidden="true">
-              <span style={{ fontSize: '5rem', position: 'relative', zIndex: 1 }}>{featured.icon || featured.emoji}</span>
+              {featured.logo
+                ? <img className="blog-logo-img" style={{ width: 120, height: 120 }} src={featured.logo} alt="" />
+                : <span style={{ fontSize: '5rem', position: 'relative', zIndex: 1 }}>{featured.icon || featured.emoji}</span>}
             </div>
             <div className="news-featured-body">
               <div>
@@ -159,7 +163,9 @@ export default function BlogsPage() {
           {(showFeatured ? rest : filtered).map((post) => (
             <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
               <div className="blog-card-banner" style={{ background: post.bgGradient || post.gradient }} aria-hidden="true">
-                <span style={{ position: 'relative', zIndex: 1, fontSize: '3rem' }}>{post.icon || post.emoji}</span>
+                {post.logo
+                  ? <img className="blog-logo-img" src={post.logo} alt="" />
+                  : <span style={{ position: 'relative', zIndex: 1, fontSize: '3rem' }}>{post.icon || post.emoji}</span>}
               </div>
               <div className="blog-card-body">
                 <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>

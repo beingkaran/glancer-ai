@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
+import { GLOSSARY_TERMS } from '../data/allGlossary';
 
 const SearchIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -8,40 +9,71 @@ const SearchIcon = () => (
 
 const CHIPS = ['Observability', 'AIOps', 'OpenTelemetry', 'SLO', 'MTTR', 'Distributed Tracing', 'Anomaly Detection'];
 
-const GLOSSARY_TERMS = {
-  observability: { term: 'Observability', def: 'The ability to understand the internal state of a system by examining its external outputs — primarily metrics, logs, and traces. A system is observable if you can answer any question about its behavior, including ones you didn\'t anticipate.' },
-  aiops: { term: 'AIOps', def: 'Artificial Intelligence for IT Operations. The application of ML, big data, and analytics to IT operations data — automating anomaly detection, event correlation, root cause analysis, and remediation at machine speed and scale.' },
-  opentelemetry: { term: 'OpenTelemetry', def: 'A CNCF project providing a vendor-neutral, open-source framework for collecting and exporting telemetry data (metrics, logs, traces). It defines APIs, SDKs, and a wire protocol (OTLP) that works with any observability backend.' },
-  slo: { term: 'SLO (Service Level Objective)', def: 'A target value or range for a reliability metric that a service must meet. SLOs are the internal commitments teams make, typically stricter than SLAs. They drive error budget calculations and release decisions.' },
-  mttr: { term: 'MTTR (Mean Time to Recovery)', def: 'The average time it takes to restore a service after a failure. MTTR = total downtime / number of incidents. Reducing MTTR is a primary goal of observability investments.' },
-  'distributed tracing': { term: 'Distributed Tracing', def: 'The practice of tracking a single request end-to-end as it flows through multiple services. Each unit of work is a span; spans are stitched together by a trace ID to form a complete picture of request latency and failures.' },
-  'anomaly detection': { term: 'Anomaly Detection', def: 'Automated identification of data points or behaviors that deviate significantly from expected patterns. In AIOps, this replaces static thresholds with ML-driven baselines that adapt to normal seasonality and growth.' },
-};
-
+// Find the single best exact-ish match for a query (term or abbreviation).
 function lookup(query) {
   const q = query.trim().toLowerCase();
-  return GLOSSARY_TERMS[q] || null;
+  if (!q) return null;
+  return (
+    GLOSSARY_TERMS.find((t) => t.term.toLowerCase() === q || (t.abbr || '').toLowerCase() === q) ||
+    GLOSSARY_TERMS.find((t) => t.term.toLowerCase().startsWith(q)) ||
+    GLOSSARY_TERMS.find((t) => t.term.toLowerCase().includes(q) || (t.abbr || '').toLowerCase().includes(q)) ||
+    null
+  );
 }
 
 export default function SearchSection() {
   const [value, setValue] = useState('');
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
   const inputRef = useRef(null);
+  const boxRef = useRef(null);
+
+  const q = value.trim().toLowerCase();
+
+  // Live autocomplete: terms whose name/abbr match, prefix matches ranked first.
+  const suggestions = useMemo(() => {
+    if (q.length < 1) return [];
+    const starts = [];
+    const contains = [];
+    for (const t of GLOSSARY_TERMS) {
+      const name = t.term.toLowerCase();
+      const abbr = (t.abbr || '').toLowerCase();
+      if (name.startsWith(q) || abbr === q) starts.push(t);
+      else if (name.includes(q) || abbr.includes(q)) contains.push(t);
+      if (starts.length >= 8) break;
+    }
+    return [...starts, ...contains].slice(0, 8);
+  }, [q]);
+
+  // Close the dropdown when clicking outside the search box.
+  useEffect(() => {
+    const onClick = (e) => { if (boxRef.current && !boxRef.current.contains(e.target)) setShowSuggest(false); };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  function showTerm(entry) {
+    setResult(entry);
+    setSearched(true);
+    setShowSuggest(false);
+  }
+
+  function handleSelect(entry) {
+    setValue(entry.term);
+    showTerm(entry);
+  }
 
   function handleSearch(term) {
-    const q = term || value;
-    if (!q.trim()) return;
-    const r = lookup(q);
+    const r = lookup(term || value);
     setResult(r);
     setSearched(true);
+    setShowSuggest(false);
   }
 
   function handleChip(term) {
     setValue(term);
-    const r = lookup(term);
-    setResult(r);
-    setSearched(true);
+    handleSearch(term);
   }
 
   return (
@@ -55,15 +87,19 @@ export default function SearchSection() {
           Instant definitions for AIOps, Observability, APM, and AI/ML terminology — curated from how the industry actually uses them.
         </p>
 
-        <div className="search-box-wrap">
+        <div className="search-box-wrap" ref={boxRef}>
           <span className="search-icon" aria-hidden="true"><SearchIcon /></span>
           <input
             ref={inputRef}
             className="search-input"
             type="text"
             value={value}
-            onChange={e => setValue(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            onChange={e => { setValue(e.target.value); setShowSuggest(true); }}
+            onFocus={() => setShowSuggest(true)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleSearch();
+              else if (e.key === 'Escape') setShowSuggest(false);
+            }}
             placeholder="Search a term… e.g. MTTR, span, anomaly detection"
             aria-label="Search glossary terms"
             autoComplete="off"
@@ -72,6 +108,32 @@ export default function SearchSection() {
           <button className="search-btn" onClick={() => handleSearch()}>
             Define
           </button>
+
+          {showSuggest && q && (
+            <div className="search-suggest" role="listbox">
+              {suggestions.length === 0 ? (
+                <div className="search-suggest-empty">No terms match &ldquo;{value}&rdquo;</div>
+              ) : (
+                suggestions.map((t) => (
+                  <button
+                    key={t.term}
+                    type="button"
+                    className="search-suggest-item"
+                    role="option"
+                    onClick={() => handleSelect(t)}
+                  >
+                    <span className="search-suggest-icon" style={{ background: 'var(--grad-brand)', color: '#fff', fontWeight: 700, fontSize: '0.8rem' }}>
+                      {(t.abbr || t.term).slice(0, 2).toUpperCase()}
+                    </span>
+                    <span className="search-suggest-text">
+                      <span className="search-suggest-title">{t.term}{t.abbr ? ` · ${t.abbr}` : ''}</span>
+                      <span className="search-suggest-cat">{t.category}</span>
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         <div className="search-chips" role="group" aria-label="Quick search suggestions">
@@ -86,8 +148,8 @@ export default function SearchSection() {
           <div className="search-result-panel" role="region" aria-live="polite" aria-label="Search result">
             {result ? (
               <>
-                <div className="search-result-term">{result.term}</div>
-                <p className="search-result-def">{result.def}</p>
+                <div className="search-result-term">{result.term}{result.abbr ? ` (${result.abbr})` : ''}</div>
+                <p className="search-result-def">{result.definition}</p>
               </>
             ) : (
               <>

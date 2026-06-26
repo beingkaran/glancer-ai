@@ -1,0 +1,15 @@
+<svg viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glancer AI">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <path d="M44 40 L62.38 21.62 A26 26 0 0 1 70 40 Z" fill="url(#g)" opacity="0.18"/>
+  <circle cx="44" cy="40" r="26" fill="none" stroke="url(#g)" stroke-width="2.8"/>
+  <circle cx="44" cy="40" r="15.5" fill="none" stroke="url(#g)" stroke-width="1.5" opacity="0.5"/>
+  <path d="M44 40 L62.38 21.62" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="44" cy="40" r="3.6" fill="url(#g)"/>
+  <circle cx="57.8" cy="26.2" r="3.6" fill="#22D3EE"/>
+  <text x="86" y="51" font-family="'Space Grotesk', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#F8FAFC">Glancer<tspan fill="url(#g)"> AI</tspan></text>
+</svg>

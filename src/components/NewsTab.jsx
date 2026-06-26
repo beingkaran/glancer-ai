@@ -35,7 +35,7 @@ export default function NewsTab() {
     let alive = true;
     (async () => {
       try {
-        const { items: fresh, live: isLive } = await getNews(15);
+        const { items: fresh, live: isLive } = await getNews(20);
         if (alive && fresh?.length) { setItems(fresh); setLive(isLive); }
       } catch {
         /* keep static fallback */

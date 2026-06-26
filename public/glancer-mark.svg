@@ -1,37 +1,14 @@
-<svg viewBox="95 195 610 410" xmlns="http://www.w3.org/2000/svg">
-  <!-- Eye contour -->
-  <path d="M 110 400 C 110 400, 270 230, 400 230 C 530 230, 690 400, 690 400 C 690 400, 530 570, 400 570 C 270 570, 110 400, 110 400 Z"
-        fill="none" stroke="#0B3C6B" stroke-width="22" stroke-linejoin="round" stroke-linecap="round"/>
-  <path d="M 110 400 L 150 380 L 150 420 Z" fill="#0B3C6B"/>
-  <path d="M 690 400 L 650 380 L 650 420 Z" fill="#0B3C6B"/>
-
-  <!-- Iris: neural network -->
-  <circle cx="400" cy="400" r="148" fill="none" stroke="#00E5FF" stroke-width="3" opacity="0.55"/>
-  <g stroke="#00E5FF" stroke-width="2.5" opacity="0.85">
-    <line x1="400" y1="400" x2="400" y2="270"/>
-    <line x1="400" y1="400" x2="503" y2="335"/>
-    <line x1="400" y1="400" x2="503" y2="465"/>
-    <line x1="400" y1="400" x2="400" y2="530"/>
-    <line x1="400" y1="400" x2="297" y2="465"/>
-    <line x1="400" y1="400" x2="297" y2="335"/>
-    <line x1="400" y1="270" x2="503" y2="335"/>
-    <line x1="503" y1="335" x2="503" y2="465"/>
-    <line x1="503" y1="465" x2="400" y2="530"/>
-    <line x1="400" y1="530" x2="297" y2="465"/>
-    <line x1="297" y1="465" x2="297" y2="335"/>
-    <line x1="297" y1="335" x2="400" y2="270"/>
-  </g>
-  <g fill="#00E5FF">
-    <circle cx="400" cy="270" r="9"/>
-    <circle cx="503" cy="335" r="9"/>
-    <circle cx="503" cy="465" r="9"/>
-    <circle cx="400" cy="530" r="9"/>
-    <circle cx="297" cy="465" r="9"/>
-    <circle cx="297" cy="335" r="9"/>
-  </g>
-
-  <!-- Pupil: abstract G -->
-  <circle cx="400" cy="400" r="78" fill="#06243F"/>
-  <path d="M 455 365 L 400 335 L 350 365 L 335 400 L 350 435 L 400 465 L 445 450 L 445 410 L 405 410 L 405 425 L 432 425"
-        fill="none" stroke="#00E5FF" stroke-width="14" stroke-linecap="square" stroke-linejoin="miter"/>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glancer AI">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 32 L47.6 16.4 A22 22 0 0 1 54 32 Z" fill="url(#g)" opacity="0.16"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="url(#g)" stroke-width="2.6"/>
+  <circle cx="32" cy="32" r="13" fill="none" stroke="url(#g)" stroke-width="1.4" opacity="0.45"/>
+  <path d="M32 32 L47.6 16.4" stroke="url(#g)" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="3.2" fill="url(#g)"/>
+  <circle cx="43.7" cy="20.3" r="3.2" fill="#06B6D4"/>
 </svg>

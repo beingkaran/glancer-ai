@@ -1,12 +1,6 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
-
-const BackIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-  </svg>
-);
 
 function formatDate(d) {
   const date = new Date(d);
@@ -16,7 +10,6 @@ function formatDate(d) {
 
 export default function BlogPostPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const post = getBlogById(id);
 
   if (!post) {
@@ -40,17 +33,11 @@ export default function BlogPostPage() {
   return (
     <div className="page-section">
       <article className="container" style={{ maxWidth: 760 }}>
-        {/* Sticky back bar */}
-        <div className="reader-backbar">
-          <button className="reader-back-btn" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/blogs'))}>
-            <BackIcon /> Back
-          </button>
-          <Link to="/blogs" className="reader-source-link">All articles →</Link>
-        </div>
-
         {/* Banner */}
-        <div className="blog-read-banner blog-read-banner-inflow" style={{ background: post.bgGradient || post.gradient }}>
-          <span>{post.icon || post.emoji}</span>
+        <div className="blog-read-banner" style={{ background: post.bgGradient || post.gradient }}>
+          {post.logo
+            ? <img className="blog-logo-img" src={post.logo} alt={`${post.title} logo`} />
+            : <span>{post.icon || post.emoji}</span>}
         </div>
 
         {/* Header */}
