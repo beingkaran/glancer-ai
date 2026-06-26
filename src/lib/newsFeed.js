@@ -48,6 +48,24 @@ function firstImageFrom(html = '') {
   return m ? m[1] : null;
 }
 
+/*
+ * displayImage — route a remote article image through the wsrv.nl image proxy
+ * so it actually renders in the browser. Publisher CDNs (TechCrunch, The Verge,
+ * etc.) often block hot-linked images via a Referer check, and some serve over
+ * http (mixed-content) — both make a plain <img src> fail and fall back to the
+ * emoji placeholder. wsrv.nl fetches the image server-side and re-serves it
+ * CORS-enabled, https, and referrer-free. Returns null for empty input and
+ * passes data:/already-proxied URLs through untouched.
+ */
+export function displayImage(url, width = 1000) {
+  if (!url) return null;
+  let u = String(url).trim();
+  if (!u) return null;
+  if (u.startsWith('//')) u = 'https:' + u;
+  if (u.startsWith('data:') || u.includes('wsrv.nl') || u.includes('images.weserv.nl')) return u;
+  return `https://wsrv.nl/?url=${encodeURIComponent(u)}&w=${width}&output=webp&q=82&we`;
+}
+
 function formatDate(d) {
   const date = new Date(d);
   if (isNaN(date)) return '';

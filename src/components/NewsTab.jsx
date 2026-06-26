@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
-import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
+import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -9,12 +9,23 @@ const ArrowIcon = () => (
 );
 
 // Renders the article's real image when available, else a gradient + emoji.
+// stage 0 → proxied image (works past hot-link/CORS blocks), 1 → raw URL,
+// 2 → emoji fallback. Reset whenever the item's image changes.
 function Thumb({ item, className, emojiSize }) {
-  const [broken, setBroken] = useState(false);
-  if (item.image && !broken) {
+  const [stage, setStage] = useState(0);
+  useEffect(() => { setStage(0); }, [item.image]);
+  const src = stage === 0 ? displayImage(item.image) : stage === 1 ? item.image : null;
+  if (item.image && src) {
     return (
       <div className={className} aria-hidden="true" style={{ padding: 0, overflow: 'hidden' }}>
-        <img className="news-cover-img" src={item.image} alt="" loading="lazy" onError={() => setBroken(true)} />
+        <img
+          className="news-cover-img"
+          src={src}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          onError={() => setStage((s) => s + 1)}
+        />
       </div>
     );
   }

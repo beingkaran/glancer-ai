@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getCachedNewsItem } from '../lib/newsFeed';
+import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
 import { fetchArticle } from '../lib/articleReader';
 
 const BackIcon = () => (
@@ -22,10 +22,21 @@ function cleanRssHtml(html = '') {
     .replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
 }
 
+// stage 0 → proxied image (past hot-link/CORS blocks), 1 → raw URL, 2 → emoji.
 function HeroImage({ src, gradient, emoji }) {
-  const [broken, setBroken] = useState(false);
-  if (src && !broken) {
-    return <img className="reader-hero-img" src={src} alt="" onError={() => setBroken(true)} />;
+  const [stage, setStage] = useState(0);
+  useEffect(() => { setStage(0); }, [src]);
+  const shown = stage === 0 ? displayImage(src, 1400) : stage === 1 ? src : null;
+  if (src && shown) {
+    return (
+      <img
+        className="reader-hero-img"
+        src={shown}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={() => setStage((s) => s + 1)}
+      />
+    );
   }
   return (
     <div className="reader-hero-fallback" style={{ background: gradient }}>
