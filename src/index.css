@@ -341,6 +341,16 @@ button { font-family: var(--font-body); }
   cursor: pointer; transition: var(--transition); white-space: nowrap;
 }
 .search-btn:hover { opacity: 0.9; }
+
+/* Gradient button for normal page flow (forms, CTAs) — unlike .search-btn it is
+ * NOT absolutely positioned, so it won't overlap surrounding fields. */
+.btn-grad {
+  border: none; background: var(--grad-brand); color: #fff;
+  font-family: var(--font-heading); font-weight: 600; cursor: pointer;
+  border-radius: 10px; transition: var(--transition);
+}
+.btn-grad:hover { opacity: 0.9; }
+.btn-grad:disabled { opacity: 0.6; cursor: not-allowed; }
 .search-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
 .search-chip { padding: 6px 16px; border-radius: var(--border-radius-pill); border: 1px solid var(--glass-border); background: var(--surface); color: var(--text-secondary); font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: var(--transition); }
 .search-chip:hover { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); color: var(--purple); }

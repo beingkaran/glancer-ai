@@ -110,8 +110,8 @@ export default function ResetPasswordPage() {
           value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Re-enter password" autoComplete="new-password" />
       </div>
       {error && <p style={{ color: '#EF4444', fontSize: '0.8rem', marginBottom: 12 }}>{error}</p>}
-      <button type="submit" disabled={busy} className="search-btn"
-        style={{ width: '100%', border: 'none', cursor: busy ? 'wait' : 'pointer', padding: '13px', borderRadius: 10, fontSize: '0.95rem', opacity: busy ? 0.7 : 1 }}>
+      <button type="submit" disabled={busy} className="btn-grad"
+        style={{ width: '100%', padding: '13px', fontSize: '0.95rem' }}>
         {busy ? 'Updating…' : 'Update Password'}
       </button>
     </form>,

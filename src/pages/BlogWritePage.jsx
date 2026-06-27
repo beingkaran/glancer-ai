@@ -225,7 +225,7 @@ export default function BlogWritePage() {
             Your article <strong style={{ color: 'var(--text-primary)' }}>"{title}"</strong> has been submitted for review. It will appear publicly once approved by the Glancer AI team.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <button className="search-btn" onClick={() => navigate('/blogs')} style={{ border: 'none', cursor: 'pointer', padding: '12px 28px', borderRadius: 10 }}>
+            <button className="btn-grad" onClick={() => navigate('/blogs')} style={{ padding: '12px 28px' }}>
               View All Blogs
             </button>
             <button className="filter-chip" onClick={() => { setSubmitted(false); setTitle(''); setSubtitle(''); removeBanner(); editor?.commands.clearContent(); }} style={{ padding: '12px 28px', cursor: 'pointer' }}>
@@ -445,7 +445,7 @@ export default function BlogWritePage() {
             <button type="button" className="filter-chip" onClick={() => navigate('/blogs')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
               Cancel
             </button>
-            <button type="submit" disabled={submitting} className="search-btn" style={{ border: 'none', cursor: submitting ? 'wait' : 'pointer', padding: '12px 32px', borderRadius: 10, opacity: submitting ? 0.7 : 1 }}>
+            <button type="submit" disabled={submitting} className="btn-grad" style={{ padding: '12px 32px' }}>
               {submitting ? 'Submitting…' : 'Submit for Review →'}
             </button>
           </div>

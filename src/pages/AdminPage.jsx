@@ -230,7 +230,7 @@ export default function AdminPage() {
                 <form onSubmit={handleAddWriter} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                   <input className="field-input" type="email" value={newWriter} onChange={(e) => setNewWriter(e.target.value)}
                     placeholder="writer@example.com" style={{ flex: 1 }} />
-                  <button type="submit" disabled={accessBusy} className="search-btn" style={{ border: 'none', cursor: 'pointer', padding: '0 20px', borderRadius: 10 }}>Add</button>
+                  <button type="submit" disabled={accessBusy} className="btn-grad" style={{ padding: '0 20px' }}>Add</button>
                 </form>
                 {access.emails.length === 0 ? (
                   <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No emails on the allowlist yet.</p>
