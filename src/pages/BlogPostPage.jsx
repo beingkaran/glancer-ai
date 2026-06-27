@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
+import { figuresForPost, injectFiguresIntoHtml } from '../lib/blogImages';
 import BlogBanner from '../components/BlogBanner';
+import ShareBar from '../components/ShareBar';
+import Comments from '../components/Comments';
 
 function formatDate(d) {
   const date = new Date(d);
@@ -14,6 +17,15 @@ export default function BlogPostPage() {
   const { id } = useParams();
   const [post, setPost] = useState(undefined); // undefined = loading, null = not found
   const [more, setMore] = useState([]);
+
+  // Article HTML with relevant in-body figures injected (curated posts only;
+  // posts that already embed their own <img> are left untouched).
+  const bodyHtml = useMemo(() => {
+    if (!post) return '';
+    const base = post.body || '<p>This article has no content.</p>';
+    if (base.includes('<img')) return base;
+    return injectFiguresIntoHtml(base, figuresForPost(post));
+  }, [post]);
 
   useEffect(() => {
     let active = true;
@@ -89,7 +101,15 @@ export default function BlogPostPage() {
         </div>
 
         {/* Body */}
-        <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: post.body || '<p>This article has no content.</p>' }} />
+        <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+
+        {/* Share */}
+        <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid var(--glass-border)' }}>
+          <ShareBar post={post} />
+        </div>
+
+        {/* Comments */}
+        <Comments postId={post.id} />
 
         {/* More */}
         {more.length > 0 && (

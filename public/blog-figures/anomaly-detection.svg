@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 340" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto,Arial">
+  <defs><linearGradient id="bgan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#1a0b1e"/></linearGradient></defs>
+  <rect width="820" height="340" rx="18" fill="url(#bgan)"/>
+  <rect x="1" y="1" width="818" height="338" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  <text x="40" y="44" fill="#e5e7eb" font-size="19" font-weight="700">ML Baseline vs. Static Threshold</text>
+
+  <line x1="70" y1="290" x2="780" y2="290" stroke="#334155" stroke-width="1.5"/>
+  <line x1="70" y1="80" x2="70" y2="290" stroke="#334155" stroke-width="1.5"/>
+
+  <!-- static threshold -->
+  <line x1="70" y1="120" x2="780" y2="120" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="780" y="114" fill="#f87171" font-size="12" text-anchor="end">static threshold (misses subtle anomalies)</text>
+
+  <!-- dynamic baseline band -->
+  <path d="M70,210 C200,170 320,250 440,200 C560,150 660,220 780,180 L780,230 C660,270 560,200 440,250 C320,300 200,220 70,260 Z" fill="#a855f7" fill-opacity="0.16"/>
+  <path d="M70,235 C200,195 320,235 440,225 C560,165 660,235 780,205" fill="none" stroke="#c084fc" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="120" y="252" fill="#c084fc" font-size="12">learned baseline ± expected range</text>
+
+  <!-- actual signal -->
+  <polyline points="70,232 130,222 190,236 250,214 300,228 350,150 360,96 372,150 420,222 480,216 540,206 600,224 660,212 720,228 780,210"
+    fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="360" cy="96" r="7" fill="#f43f5e"/>
+  <text x="360" y="80" fill="#fb7185" font-size="12" text-anchor="middle">true anomaly caught early</text>
+</svg>

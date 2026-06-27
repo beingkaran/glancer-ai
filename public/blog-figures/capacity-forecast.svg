@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 340" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto,Arial">
+  <defs><linearGradient id="bgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#0a1626"/></linearGradient></defs>
+  <rect width="820" height="340" rx="18" fill="url(#bgf)"/>
+  <rect x="1" y="1" width="818" height="338" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  <text x="40" y="44" fill="#e5e7eb" font-size="19" font-weight="700">Predictive Capacity Forecasting</text>
+
+  <line x1="70" y1="290" x2="780" y2="290" stroke="#334155" stroke-width="1.5"/>
+  <line x1="70" y1="80" x2="70" y2="290" stroke="#334155" stroke-width="1.5"/>
+
+  <!-- now divider -->
+  <line x1="430" y1="80" x2="430" y2="290" stroke="#475569" stroke-width="1.2" stroke-dasharray="4 4"/>
+  <text x="430" y="76" fill="#94a3b8" font-size="12" text-anchor="middle">now</text>
+  <text x="240" y="76" fill="#64748b" font-size="12" text-anchor="middle">observed</text>
+  <text x="610" y="76" fill="#64748b" font-size="12" text-anchor="middle">forecast</text>
+
+  <!-- capacity ceiling -->
+  <line x1="70" y1="120" x2="780" y2="120" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="780" y="114" fill="#f87171" font-size="12" text-anchor="end">capacity limit</text>
+
+  <!-- confidence cone -->
+  <path d="M430,205 L780,120 L780,176 L430,205 Z" fill="#06b6d4" fill-opacity="0.14"/>
+  <!-- observed -->
+  <polyline points="70,262 150,254 230,244 310,232 390,216 430,205" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>
+  <!-- forecast -->
+  <polyline points="430,205 540,184 650,162 760,142" fill="none" stroke="#22d3ee" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>
+  <circle cx="735" cy="148" r="6" fill="#f59e0b"/>
+  <text x="700" y="132" fill="#fbbf24" font-size="12" text-anchor="end">breach predicted ~6 weeks out → scale ahead of time</text>
+</svg>

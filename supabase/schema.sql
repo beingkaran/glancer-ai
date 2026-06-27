@@ -194,15 +194,81 @@ drop policy if exists blogs_insert_own on public.blogs;
 create policy blogs_insert_own on public.blogs
   for insert with check (auth.uid() = author_id and status = 'pending' and public.can_write());
 
--- UPDATE — only admins (this is how approve / reject is locked down).
+-- UPDATE — admins can change anything (this is how approve / reject is locked
+-- down). Authors may edit their OWN posts, but their edit is forced back to
+-- `pending` (the WITH CHECK below) so they can never self-publish — an edited
+-- post always re-enters the review queue.
 drop policy if exists blogs_update_admin on public.blogs;
 create policy blogs_update_admin on public.blogs
   for update using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists blogs_update_own on public.blogs;
+create policy blogs_update_own on public.blogs
+  for update
+  using (auth.uid() = author_id)
+  with check (auth.uid() = author_id and status = 'pending');
 
 -- DELETE — admins, or an author removing their own post.
 drop policy if exists blogs_delete on public.blogs;
 create policy blogs_delete on public.blogs
   for delete using (public.is_admin() or auth.uid() = author_id);
+
+-- ---------------------------------------------------------------------------
+-- comments  (one row per comment on a post)
+-- ---------------------------------------------------------------------------
+-- post_id is plain text (not a FK) so it works for BOTH curated posts (numeric
+-- ids baked into the app) and user blogs (uuid). Comments are immutable: there
+-- is no UPDATE policy, so a comment can be created and deleted but never edited.
+create table if not exists public.comments (
+  id           uuid primary key default gen_random_uuid(),
+  post_id      text not null,
+  author_id    uuid not null references auth.users(id) on delete cascade,
+  author_name  text,
+  author_email text,
+  body         text not null,
+  created_at   timestamptz not null default now()
+);
+create index if not exists comments_post_idx on public.comments (post_id, created_at desc);
+
+alter table public.comments enable row level security;
+
+-- Anyone (even signed-out visitors) may READ comments.
+drop policy if exists comments_select on public.comments;
+create policy comments_select on public.comments for select using (true);
+
+-- A signed-in user may add a comment only AS THEMSELVES.
+drop policy if exists comments_insert_own on public.comments;
+create policy comments_insert_own on public.comments
+  for insert with check (auth.uid() = author_id);
+
+-- DELETE — the comment's own author, or an admin. NOBODY else (enforced here at
+-- the database level, so it can't be bypassed from the client).
+drop policy if exists comments_delete on public.comments;
+create policy comments_delete on public.comments
+  for delete using (public.is_admin() or auth.uid() = author_id);
+
+-- ---------------------------------------------------------------------------
+-- comment_likes  (one row per (comment, user) — a like is just its existence)
+-- ---------------------------------------------------------------------------
+create table if not exists public.comment_likes (
+  comment_id uuid not null references public.comments(id) on delete cascade,
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (comment_id, user_id)
+);
+alter table public.comment_likes enable row level security;
+
+-- Anyone may read likes (to show counts).
+drop policy if exists comment_likes_select on public.comment_likes;
+create policy comment_likes_select on public.comment_likes for select using (true);
+
+-- A user may like / unlike only as themselves.
+drop policy if exists comment_likes_insert_own on public.comment_likes;
+create policy comment_likes_insert_own on public.comment_likes
+  for insert with check (auth.uid() = user_id);
+drop policy if exists comment_likes_delete_own on public.comment_likes;
+create policy comment_likes_delete_own on public.comment_likes
+  for delete using (auth.uid() = user_id);
 
 -- ============================================================================
 -- BECOMING ADMIN

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto,Arial">
+  <defs><linearGradient id="bgac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#1a0b0b"/></linearGradient></defs>
+  <rect width="820" height="360" rx="18" fill="url(#bgac)"/>
+  <rect x="1" y="1" width="818" height="358" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  <text x="410" y="44" fill="#e5e7eb" font-size="19" font-weight="700" text-anchor="middle">From Alert Storm to One Incident</text>
+
+  <!-- noisy alerts left -->
+  <text x="150" y="84" fill="#f87171" font-size="13" text-anchor="middle">120+ raw alerts</text>
+  <g fill="#ef4444">
+    <rect x="60" y="100" width="180" height="20" rx="5" fill-opacity="0.85"/>
+    <rect x="74" y="128" width="160" height="20" rx="5" fill-opacity="0.7"/>
+    <rect x="56" y="156" width="172" height="20" rx="5" fill-opacity="0.8"/>
+    <rect x="80" y="184" width="150" height="20" rx="5" fill-opacity="0.6"/>
+    <rect x="62" y="212" width="176" height="20" rx="5" fill-opacity="0.75"/>
+    <rect x="78" y="240" width="158" height="20" rx="5" fill-opacity="0.55"/>
+    <rect x="60" y="268" width="168" height="20" rx="5" fill-opacity="0.7"/>
+  </g>
+
+  <!-- correlation engine -->
+  <g transform="translate(330,150)">
+    <rect x="0" y="0" width="160" height="70" rx="12" fill="#a855f7" fill-opacity="0.18" stroke="#a855f7" stroke-opacity="0.5"/>
+    <text x="80" y="32" fill="#c084fc" font-size="14" font-weight="700" text-anchor="middle">Correlation</text>
+    <text x="80" y="52" fill="#cbd5e1" font-size="12" text-anchor="middle">topology + ML</text>
+  </g>
+  <g stroke="#64748b" stroke-width="1.5" fill="none">
+    <path d="M240 110 C300 130 300 170 330 182"/>
+    <path d="M234 166 L330 185"/>
+    <path d="M238 222 C300 210 300 195 330 190"/>
+    <path d="M236 278 C300 250 300 210 330 198"/>
+  </g>
+  <path d="M490 185 l60 0 m-12 -8 l12 8 -12 8" stroke="#64748b" stroke-width="2" fill="none"/>
+
+  <!-- single incident right -->
+  <g transform="translate(560,150)">
+    <rect x="0" y="0" width="200" height="70" rx="12" fill="#22c55e" fill-opacity="0.16" stroke="#22c55e" stroke-opacity="0.5"/>
+    <text x="100" y="32" fill="#4ade80" font-size="15" font-weight="700" text-anchor="middle">1 Incident</text>
+    <text x="100" y="52" fill="#cbd5e1" font-size="12" text-anchor="middle">root cause + blast radius</text>
+  </g>
+  <text x="660" y="120" fill="#4ade80" font-size="13" text-anchor="middle">~95% less noise</text>
+</svg>

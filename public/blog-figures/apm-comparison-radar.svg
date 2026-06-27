@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 380" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto,Arial">
+  <defs><linearGradient id="bgr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#121a2e"/></linearGradient></defs>
+  <rect width="820" height="380" rx="18" fill="url(#bgr)"/>
+  <rect x="1" y="1" width="818" height="378" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+  <text x="410" y="42" fill="#e5e7eb" font-size="19" font-weight="700" text-anchor="middle">Evaluating APM Platforms</text>
+  <text x="410" y="66" fill="#64748b" font-size="13" text-anchor="middle">No single tool wins every axis — match the platform to your priorities</text>
+
+  <!-- radar grid -->
+  <g transform="translate(250,225)" stroke="#334155" stroke-width="1" fill="none">
+    <polygon points="0,-120 104,-60 104,60 0,120 -104,60 -104,-60"/>
+    <polygon points="0,-80 69,-40 69,40 0,80 -69,40 -69,-40"/>
+    <polygon points="0,-40 35,-20 35,20 0,40 -35,20 -35,-20"/>
+    <line x1="0" y1="0" x2="0" y2="-120"/><line x1="0" y1="0" x2="104" y2="-60"/><line x1="0" y1="0" x2="104" y2="60"/>
+    <line x1="0" y1="0" x2="0" y2="120"/><line x1="0" y1="0" x2="-104" y2="60"/><line x1="0" y1="0" x2="-104" y2="-60"/>
+  </g>
+  <!-- axis labels -->
+  <g transform="translate(250,225)" font-size="12" fill="#94a3b8" text-anchor="middle">
+    <text x="0" y="-132">Breadth</text>
+    <text x="128" y="-62">Tracing</text>
+    <text x="130" y="76">Pricing</text>
+    <text x="0" y="142">Ease</text>
+    <text x="-130" y="76">Scale</text>
+    <text x="-126" y="-62">AIOps</text>
+  </g>
+  <!-- platform A -->
+  <polygon transform="translate(250,225)" points="0,-104 90,-52 78,45 0,84 -60,35 -78,-45" fill="#a855f7" fill-opacity="0.22" stroke="#c084fc" stroke-width="2"/>
+  <!-- platform B -->
+  <polygon transform="translate(250,225)" points="0,-70 60,-35 95,55 0,104 -90,52 -55,-32" fill="#06b6d4" fill-opacity="0.18" stroke="#22d3ee" stroke-width="2"/>
+
+  <!-- legend / takeaways -->
+  <g transform="translate(560,120)" font-size="13.5" fill="#e5e7eb">
+    <rect x="-20" y="-24" width="14" height="14" rx="3" fill="#c084fc"/><text x="4" y="-12">Cloud-native SaaS</text>
+    <rect x="-20" y="6" width="14" height="14" rx="3" fill="#22d3ee"/><text x="4" y="18">Enterprise / hybrid</text>
+    <text x="-20" y="58" fill="#94a3b8" font-size="12.5">Compare on the axes that</text>
+    <text x="-20" y="78" fill="#94a3b8" font-size="12.5">matter to your team:</text>
+    <text x="-20" y="104" fill="#cbd5e1" font-size="12.5">• Data volume &amp; cost model</text>
+    <text x="-20" y="126" fill="#cbd5e1" font-size="12.5">• Depth of distributed tracing</text>
+    <text x="-20" y="148" fill="#cbd5e1" font-size="12.5">• Built-in AIOps / anomaly ML</text>
+    <text x="-20" y="170" fill="#cbd5e1" font-size="12.5">• Time-to-value &amp; ease of use</text>
+  </g>
+</svg>

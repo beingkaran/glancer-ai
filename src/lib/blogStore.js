@@ -111,6 +111,32 @@ export async function addBlog(input) {
   return fromRow(data);
 }
 
+/* Author (or admin): edit an existing post. RLS forces an author's edit back to
+ * `pending`, so an edited post is re-reviewed before it can go public again. */
+export async function updateBlog(id, input) {
+  if (!isSupabaseConfigured) throw new Error('Sign-in is not configured.');
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('You must be signed in to edit.');
+
+  const patch = {
+    title: input.title,
+    subtitle: input.subtitle || '',
+    category: input.category,
+    icon: input.icon || input.emoji,
+    gradient: input.gradient,
+    banner_image: input.bannerImage || null,
+    read_time: Number(input.readTime) || 5,
+    tags: input.tags || [],
+    body: input.body,
+    status: 'pending', // edits re-enter the review queue
+  };
+
+  const { data, error } = await supabase.from('blogs').update(patch).eq('id', id).select().single();
+  if (error) throw error;
+  notifyChange();
+  return fromRow(data);
+}
+
 /* Admin: approve / reject. RLS rejects this for non-admins. */
 export async function updateBlogStatus(id, status) {
   const { error } = await supabase.from('blogs').update({ status }).eq('id', id);
@@ -140,6 +166,102 @@ export async function getBlogById(id) {
 export async function getPublishedBlogs() {
   const approved = await getApprovedUserBlogs();
   return [...approved, ...BLOG_POSTS];
+}
+
+/* ---------------------------------------------------------------------------
+ * Comments + likes — server-enforced by RLS (see supabase/schema.sql).
+ *   • Anyone can read.  • Signed-in users can comment as themselves.
+ *   • Only the author or an admin can delete a comment.
+ *   • A like is a row in comment_likes; a user can only (un)like as themselves.
+ * ------------------------------------------------------------------------- */
+
+/* All comments for a post (newest first), each annotated with like count, and
+ * whether the current user liked / authored it. postId may be a curated post's
+ * numeric id or a user blog's uuid — it's matched as text. */
+export async function getComments(postId) {
+  if (!isSupabaseConfigured) return [];
+  const pid = String(postId);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: rows, error } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('post_id', pid)
+    .order('created_at', { ascending: false });
+  if (error) { console.error('[blogStore] getComments', error); return []; }
+
+  const ids = rows.map((r) => r.id);
+  let likes = [];
+  if (ids.length) {
+    const { data: likeRows } = await supabase
+      .from('comment_likes')
+      .select('comment_id, user_id')
+      .in('comment_id', ids);
+    likes = likeRows || [];
+  }
+
+  return rows.map((r) => {
+    const mine = !!user && r.author_id === user.id;
+    const myLike = !!user && likes.some((l) => l.comment_id === r.id && l.user_id === user.id);
+    return {
+      id: r.id,
+      postId: r.post_id,
+      authorId: r.author_id,
+      author: r.author_name || 'User',
+      authorEmail: r.author_email,
+      body: r.body,
+      createdAt: r.created_at,
+      likeCount: likes.filter((l) => l.comment_id === r.id).length,
+      likedByMe: myLike,
+      mine,
+    };
+  });
+}
+
+/* Add a comment to a post. Caller is responsible for the profanity check; the
+ * DB still enforces that you can only post as yourself. */
+export async function addComment(postId, body) {
+  if (!isSupabaseConfigured) throw new Error('Sign-in is not configured.');
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('You must be signed in to comment.');
+  const clean = (body || '').trim();
+  if (!clean) throw new Error('Comment cannot be empty.');
+
+  const row = {
+    post_id: String(postId),
+    author_id: user.id,
+    author_name: user.user_metadata?.name || user.email.split('@')[0],
+    author_email: user.email,
+    body: clean.slice(0, 2000),
+  };
+  const { data, error } = await supabase.from('comments').insert(row).select().single();
+  if (error) throw error;
+  return data;
+}
+
+/* Delete a comment. RLS rejects this unless you're the author or an admin. */
+export async function deleteComment(id) {
+  const { error } = await supabase.from('comments').delete().eq('id', id);
+  if (error) throw error;
+}
+
+/* Like or unlike a comment. Pass the CURRENT liked state; this flips it. */
+export async function toggleCommentLike(commentId, currentlyLiked) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('You must be signed in to like a comment.');
+  if (currentlyLiked) {
+    const { error } = await supabase
+      .from('comment_likes')
+      .delete()
+      .eq('comment_id', commentId)
+      .eq('user_id', user.id);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from('comment_likes')
+      .insert({ comment_id: commentId, user_id: user.id });
+    if (error && error.code !== '23505') throw error; // ignore duplicate like
+  }
 }
 
 /* ---------------------------------------------------------------------------

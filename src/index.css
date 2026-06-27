@@ -527,6 +527,8 @@ button { font-family: var(--font-body); }
 .tiptap-editor u { text-decoration: underline; }
 .tiptap-editor ul, .tiptap-editor ol { padding-left: 24px; margin-bottom: 14px; }
 .tiptap-editor li { margin-bottom: 6px; }
+.tiptap-editor img { max-width: 100%; height: auto; border-radius: 10px; margin: 14px 0; display: block; }
+.tiptap-editor img.ProseMirror-selectednode { outline: 2px solid var(--purple); outline-offset: 2px; }
 .tiptap-editor blockquote {
   border-left: 3px solid var(--purple); padding-left: 16px;
   margin: 16px 0; color: var(--text-secondary); font-style: italic;
@@ -729,6 +731,11 @@ button { font-family: var(--font-body); }
 .blog-read-content pre { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 10px; padding: 18px; margin: 20px 0; overflow-x: auto; }
 .blog-read-content pre code { background: none; border: none; padding: 0; color: var(--cyan); }
 .blog-read-content img { border-radius: 10px; margin: 20px 0; max-width: 100%; }
+.blog-read-content figure.blog-figure { margin: 30px 0; text-align: center; }
+.blog-read-content figure.blog-figure img { width: 100%; max-width: 760px; margin: 0 auto; display: block; border-radius: 14px; border: 1px solid var(--glass-border); }
+.blog-read-content figure.blog-figure-diagram img { background: #0b1120; }
+.blog-read-content figure.blog-figure-photo img { max-height: 380px; object-fit: cover; }
+.blog-read-content figure.blog-figure figcaption { margin-top: 10px; font-size: 0.85rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
 .blog-read-content .key-takeaways { background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
 .blog-read-content .key-takeaways h3 { margin-top: 0; }
 

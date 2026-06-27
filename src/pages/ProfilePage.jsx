@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
-import { getMyBlogs } from '../lib/blogStore';
+import { getMyBlogs, deleteBlog } from '../lib/blogStore';
 
 const PenIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -36,6 +36,7 @@ export default function ProfilePage() {
   const { user, isAuthed, logout } = useAuth();
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
+  const [busyId, setBusyId] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -44,6 +45,19 @@ export default function ProfilePage() {
     window.addEventListener('glancer:blogs-changed', refresh);
     return () => window.removeEventListener('glancer:blogs-changed', refresh);
   }, [user]);
+
+  async function handleDelete(id) {
+    if (!window.confirm('Delete this article permanently? This cannot be undone.')) return;
+    setBusyId(id);
+    try {
+      await deleteBlog(id);
+      setBlogs((bs) => bs.filter((b) => b.id !== id));
+    } catch (err) {
+      alert(err?.message || 'Could not delete the article. Please try again.');
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   /* ---------- Signed-out state ---------- */
   if (!isAuthed) {
@@ -116,8 +130,9 @@ export default function ProfilePage() {
             {blogs.map((b) => {
               const meta = STATUS_META[b.status] || STATUS_META.pending;
               const clickable = b.status === 'approved';
-              const Card = (
-                <div className="chart-card profile-blog-row" style={{ padding: 18, display: 'flex', gap: 16, alignItems: 'center' }}>
+              const busy = busyId === b.id;
+              return (
+                <div key={b.id} className="chart-card profile-blog-row" style={{ padding: 18, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', opacity: busy ? 0.6 : 1 }}>
                   <div style={{ width: 54, height: 54, borderRadius: 12, background: b.bgGradient || b.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', flexShrink: 0 }}>
                     {b.icon || b.emoji}
                   </div>
@@ -132,12 +147,31 @@ export default function ProfilePage() {
                       <span>{b.readTime} min</span>
                     </div>
                   </div>
-                  {clickable && <span className="read-more-link" style={{ flexShrink: 0 }}>View →</span>}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+                    {clickable && (
+                      <Link to={`/blog/${b.id}`} className="read-more-link" style={{ textDecoration: 'none' }}>View →</Link>
+                    )}
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => navigate(`/blog/edit/${b.id}`)}
+                      className="filter-chip"
+                      style={{ padding: '7px 16px', cursor: 'pointer', fontSize: '0.8rem' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => handleDelete(b.id)}
+                      className="filter-chip"
+                      style={{ padding: '7px 16px', cursor: 'pointer', fontSize: '0.8rem', color: '#EF4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               );
-              return clickable
-                ? <Link key={b.id} to={`/blog/${b.id}`} style={{ textDecoration: 'none' }}>{Card}</Link>
-                : <div key={b.id}>{Card}</div>;
             })}
           </div>
         )}

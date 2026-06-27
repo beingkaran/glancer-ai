@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
-import { addBlog, canCurrentUserWrite } from '../lib/blogStore';
+import { addBlog, updateBlog, getBlogById, canCurrentUserWrite } from '../lib/blogStore';
 import AuthForm from '../components/AuthForm';
 
 const CATEGORIES = ['Observability','AIOps','APM','SRE','Distributed Tracing','Kubernetes','Cloud Native','Security','DevOps','AI / ML','Open Source','Industry'];
@@ -68,6 +69,8 @@ function ToolbarBtn({ onClick, active, title, children }) {
 
 export default function BlogWritePage() {
   const navigate = useNavigate();
+  const { id: editId } = useParams();
+  const isEditing = Boolean(editId);
   const { user, isAuthed } = useAuth();
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -82,6 +85,7 @@ export default function BlogWritePage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [canWrite, setCanWrite] = useState(null); // null = checking
+  const [loadingPost, setLoadingPost] = useState(isEditing);
   const [error, setError] = useState('');
 
   // Check publish permission once signed in (open mode → always true).
@@ -121,6 +125,7 @@ export default function BlogWritePage() {
       StarterKit,
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: 'editor-link' } }),
+      Image.configure({ inline: false, HTMLAttributes: { class: 'editor-image' } }),
       Placeholder.configure({ placeholder: 'Share your insights, experiences, and knowledge with the Glancer AI community…' }),
       CharacterCount,
     ],
@@ -139,6 +144,57 @@ export default function BlogWritePage() {
       editor.chain().focus().setLink({ href: url }).run();
     }
   }, [editor]);
+
+  // Insert an inline image into the article body. Reuses the same downscale +
+  // compress step as the banner, then embeds it as a data URL so it travels
+  // with the post body (no separate upload/storage needed).
+  const imageInputRef = useRef(null);
+  const [insertingImage, setInsertingImage] = useState(false);
+
+  async function handleInsertImage(e) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file
+    if (!file) return;
+    setError('');
+    if (!file.type.startsWith('image/')) { setError('Please choose an image file (JPG, PNG, WebP, or GIF).'); return; }
+    if (file.size > 10 * 1024 * 1024) { setError('That image is too large. Please pick one under 10 MB.'); return; }
+    setInsertingImage(true);
+    try {
+      const dataUrl = await fileToCompressedDataURL(file, 1000, 0.8);
+      editor?.chain().focus().setImage({ src: dataUrl }).run();
+    } catch {
+      setError('Could not insert that image. Please try a different file.');
+    } finally {
+      setInsertingImage(false);
+    }
+  }
+
+  // Edit mode: load the existing post once and prefill every field + the editor.
+  useEffect(() => {
+    if (!isEditing || !editor) return;
+    let active = true;
+    (async () => {
+      const post = await getBlogById(editId);
+      if (!active) return;
+      if (!post) {
+        setError("This article couldn't be loaded — it may have been removed, or you may not have permission to edit it.");
+        setLoadingPost(false);
+        return;
+      }
+      setTitle(post.title || '');
+      setSubtitle(post.subtitle || '');
+      setCategory(post.category || 'Observability');
+      setTags((post.tags || []).join(', '));
+      setEmoji(post.icon || post.emoji || '🔭');
+      setGradient(post.gradient || GRADIENTS[0]);
+      setBannerImage(post.bannerImage || '');
+      setBannerName(post.bannerImage ? 'Current banner image' : '');
+      setReadTime(post.readTime || 5);
+      editor.commands.setContent(post.body || '');
+      setLoadingPost(false);
+    })();
+    return () => { active = false; };
+  }, [isEditing, editId, editor]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -162,10 +218,14 @@ export default function BlogWritePage() {
 
     setSubmitting(true);
     try {
-      await addBlog(blog);
+      if (isEditing) {
+        await updateBlog(editId, blog);
+      } else {
+        await addBlog(blog);
+      }
       setSubmitted(true);
     } catch (err) {
-      setError(err?.message || 'Could not submit your article. Please try again.');
+      setError(err?.message || 'Could not save your article. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -219,19 +279,35 @@ export default function BlogWritePage() {
         <div className="container" style={{ maxWidth: 560, paddingTop: 'calc(var(--navbar-h) + 80px)', paddingBottom: 80 }}>
           <div style={{ fontSize: '4rem', marginBottom: 20 }}>✅</div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>
-            Article Submitted!
+            {isEditing ? 'Changes Saved!' : 'Article Submitted!'}
           </h1>
           <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 32 }}>
-            Your article <strong style={{ color: 'var(--text-primary)' }}>"{title}"</strong> has been submitted for review. It will appear publicly once approved by the Glancer AI team.
+            Your article <strong style={{ color: 'var(--text-primary)' }}>"{title}"</strong>{' '}
+            {isEditing
+              ? 'has been updated and sent back for review. It will reappear publicly once an admin re-approves it.'
+              : 'has been submitted for review. It will appear publicly once approved by the Glancer AI team.'}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <button className="btn-grad" onClick={() => navigate('/blogs')} style={{ padding: '12px 28px' }}>
-              View All Blogs
+            <button className="btn-grad" onClick={() => navigate(isEditing ? '/profile' : '/blogs')} style={{ padding: '12px 28px' }}>
+              {isEditing ? 'Back to Profile' : 'View All Blogs'}
             </button>
-            <button className="filter-chip" onClick={() => { setSubmitted(false); setTitle(''); setSubtitle(''); removeBanner(); editor?.commands.clearContent(); }} style={{ padding: '12px 28px', cursor: 'pointer' }}>
-              Write Another
-            </button>
+            {!isEditing && (
+              <button className="filter-chip" onClick={() => { setSubmitted(false); setTitle(''); setSubtitle(''); removeBanner(); editor?.commands.clearContent(); }} style={{ padding: '12px 28px', cursor: 'pointer' }}>
+                Write Another
+              </button>
+            )}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Loading the post being edited. */
+  if (isEditing && loadingPost) {
+    return (
+      <div className="page-section">
+        <div className="container" style={{ maxWidth: 560, paddingTop: 'calc(var(--navbar-h) + 90px)', paddingBottom: 80, textAlign: 'center', color: 'var(--text-muted)' }}>
+          Loading your article…
         </div>
       </div>
     );
@@ -243,10 +319,12 @@ export default function BlogWritePage() {
         <div style={{ marginBottom: 32 }}>
           <p className="section-label" style={{ marginBottom: 8 }}>Community</p>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-            Write an Article
+            {isEditing ? 'Edit Article' : 'Write an Article'}
           </h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>
-            Share your knowledge with the Glancer AI community. Articles are reviewed before publishing.
+            {isEditing
+              ? 'Update your article below. Saved changes go back to the review queue before they reappear publicly.'
+              : 'Share your knowledge with the Glancer AI community. Articles are reviewed before publishing.'}
           </p>
         </div>
 
@@ -417,6 +495,10 @@ export default function BlogWritePage() {
               <ToolbarBtn onClick={setLink} active={editor?.isActive('link')} title="Add link">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               </ToolbarBtn>
+              <ToolbarBtn onClick={() => imageInputRef.current?.click()} active={editor?.isActive('image')} title={insertingImage ? 'Inserting image…' : 'Insert image'}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              </ToolbarBtn>
+              <input ref={imageInputRef} type="file" accept="image/*" onChange={handleInsertImage} style={{ display: 'none' }} />
               <div className="editor-toolbar-sep" />
               <ToolbarBtn onClick={() => editor?.chain().focus().undo().run()} title="Undo">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
@@ -442,11 +524,11 @@ export default function BlogWritePage() {
           )}
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-            <button type="button" className="filter-chip" onClick={() => navigate('/blogs')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
+            <button type="button" className="filter-chip" onClick={() => navigate(isEditing ? '/profile' : '/blogs')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
               Cancel
             </button>
             <button type="submit" disabled={submitting} className="btn-grad" style={{ padding: '12px 32px' }}>
-              {submitting ? 'Submitting…' : 'Submit for Review →'}
+              {submitting ? 'Saving…' : isEditing ? 'Save Changes →' : 'Submit for Review →'}
             </button>
           </div>
         </form>
