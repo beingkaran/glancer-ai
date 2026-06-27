@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/allBlogs';
+import { getApprovedUserBlogs } from '../lib/blogStore';
 import BlogBanner from './BlogBanner';
 
 const ArrowIcon = () => (
@@ -13,20 +14,19 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Get user-written approved blogs from localStorage
-function getApprovedUserBlogs() {
-  try {
-    const all = JSON.parse(localStorage.getItem('glancer_user_blogs') || '[]');
-    return all.filter(b => b.status === 'approved');
-  } catch { return []; }
-}
-
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map(p => p.category)))];
 
 export default function BlogsTab({ limit }) {
   const [filter, setFilter] = useState('All');
+  const [userBlogs, setUserBlogs] = useState([]);
 
-  const userBlogs = getApprovedUserBlogs();
+  useEffect(() => {
+    const refresh = async () => setUserBlogs(await getApprovedUserBlogs());
+    refresh();
+    window.addEventListener('glancer:blogs-changed', refresh);
+    return () => window.removeEventListener('glancer:blogs-changed', refresh);
+  }, []);
+
   const allPosts = [...userBlogs, ...BLOG_POSTS];
   const filtered = filter === 'All' ? allPosts : allPosts.filter(p => p.category === filter);
   const posts = limit ? filtered.slice(0, limit) : filtered;

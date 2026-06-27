@@ -8,7 +8,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
 import { addBlog } from '../lib/blogStore';
-import GoogleSignIn from '../components/GoogleSignIn';
+import AuthForm from '../components/AuthForm';
 
 const CATEGORIES = ['Observability','AIOps','APM','SRE','Distributed Tracing','Kubernetes','Cloud Native','Security','DevOps','AI / ML','Open Source','Industry'];
 const GRADIENTS = [
@@ -80,6 +80,7 @@ export default function BlogWritePage() {
   const [uploading, setUploading] = useState(false);
   const [readTime, setReadTime] = useState(5);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   async function handleBannerUpload(e) {
@@ -130,36 +131,35 @@ export default function BlogWritePage() {
     }
   }, [editor]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     if (!title.trim()) { setError('Please enter a title.'); return; }
     if (!editor || editor.isEmpty) { setError('Please write some content.'); return; }
 
     const blog = {
-      id: `user-${Date.now()}`,
       title: title.trim(),
       subtitle: subtitle.trim(),
       category,
       icon: emoji,
       emoji,
-      bgGradient: gradient,
       gradient,
       bannerImage: bannerImage || undefined,
       author: user?.name || 'Community',
-      authorEmail: user?.email || null,
-      avatar: '✍️',
-      date: new Date().toISOString().split('T')[0],
       readTime: Number(readTime),
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
-      featured: false,
       body: editor.getHTML(),
-      status: 'pending',
-      submittedAt: new Date().toISOString(),
     };
 
-    addBlog(blog);
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      await addBlog(blog);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err?.message || 'Could not submit your article. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   /* Gate: writing requires sign-in. */
@@ -174,9 +174,8 @@ export default function BlogWritePage() {
               You need an account to write and publish articles. Your work stays as a draft until approved.
             </p>
           </div>
-          <div className="chart-card" style={{ padding: 36, textAlign: 'center', marginBottom: 80 }}>
-            <div style={{ fontSize: '2.4rem', marginBottom: 16 }}>🔐</div>
-            <GoogleSignIn full label="Sign in with Google" />
+          <div className="chart-card" style={{ padding: 36, marginBottom: 80 }}>
+            <AuthForm />
           </div>
         </div>
       </div>
@@ -415,8 +414,8 @@ export default function BlogWritePage() {
             <button type="button" className="filter-chip" onClick={() => navigate('/blogs')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
               Cancel
             </button>
-            <button type="submit" className="search-btn" style={{ border: 'none', cursor: 'pointer', padding: '12px 32px', borderRadius: 10 }}>
-              Submit for Review →
+            <button type="submit" disabled={submitting} className="search-btn" style={{ border: 'none', cursor: submitting ? 'wait' : 'pointer', padding: '12px 32px', borderRadius: 10, opacity: submitting ? 0.7 : 1 }}>
+              {submitting ? 'Submitting…' : 'Submit for Review →'}
             </button>
           </div>
         </form>

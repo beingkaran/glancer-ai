@@ -31,7 +31,7 @@ export default function BlogsPage() {
 
   // Merge approved user blogs with curated posts; refresh on changes.
   useEffect(() => {
-    const refresh = () => setPosts([...getApprovedUserBlogs(), ...BLOG_POSTS]);
+    const refresh = async () => setPosts([...(await getApprovedUserBlogs()), ...BLOG_POSTS]);
     refresh();
     window.addEventListener('glancer:blogs-changed', refresh);
     return () => window.removeEventListener('glancer:blogs-changed', refresh);

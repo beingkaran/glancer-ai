@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
@@ -11,7 +12,33 @@ function formatDate(d) {
 
 export default function BlogPostPage() {
   const { id } = useParams();
-  const post = getBlogById(id);
+  const [post, setPost] = useState(undefined); // undefined = loading, null = not found
+  const [more, setMore] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const found = await getBlogById(id);
+      if (!active) return;
+      setPost(found);
+      if (found) {
+        const approved = await getApprovedUserBlogs();
+        if (!active) return;
+        setMore([...approved, ...BLOG_POSTS].filter((b) => String(b.id) !== String(id)).slice(0, 3));
+      }
+    })();
+    return () => { active = false; };
+  }, [id]);
+
+  if (post === undefined) {
+    return (
+      <div className="page-section">
+        <div className="container" style={{ maxWidth: 700, textAlign: 'center', paddingTop: 'calc(var(--navbar-h) + 90px)', paddingBottom: 100 }}>
+          <p className="hero-sub">Loading article…</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -27,9 +54,6 @@ export default function BlogPostPage() {
       </div>
     );
   }
-
-  // "More articles" — a few others, excluding the current one.
-  const more = [...getApprovedUserBlogs(), ...BLOG_POSTS].filter((b) => String(b.id) !== String(id)).slice(0, 3);
 
   return (
     <div className="page-section">

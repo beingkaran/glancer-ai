@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import GoogleSignIn from '../components/GoogleSignIn';
-import { getBlogsByAuthor } from '../lib/blogStore';
+import AuthForm from '../components/AuthForm';
+import { getMyBlogs } from '../lib/blogStore';
 
 const PenIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,7 +39,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!user) return;
-    const refresh = () => setBlogs(getBlogsByAuthor(user.email));
+    const refresh = async () => setBlogs(await getMyBlogs());
     refresh();
     window.addEventListener('glancer:blogs-changed', refresh);
     return () => window.removeEventListener('glancer:blogs-changed', refresh);
@@ -57,15 +57,8 @@ export default function ProfilePage() {
               Sign in to write articles and manage your contributions. Your published work appears once approved.
             </p>
           </div>
-          <div className="chart-card" style={{ padding: 36, textAlign: 'center', marginBottom: 80 }}>
-            <div style={{ fontSize: '2.4rem', marginBottom: 16 }}>✍️</div>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
-              Writer Access
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 24, lineHeight: 1.6 }}>
-              Create an account to start writing. It only takes a moment.
-            </p>
-            <GoogleSignIn full label="Sign in with Google" onSuccess={() => navigate('/profile')} />
+          <div className="chart-card" style={{ padding: 36, marginBottom: 80 }}>
+            <AuthForm onSuccess={() => navigate('/profile')} />
           </div>
         </div>
       </div>
