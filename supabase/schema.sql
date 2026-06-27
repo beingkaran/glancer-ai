@@ -22,8 +22,11 @@ create table if not exists public.profiles (
   name       text,
   email      text,
   is_admin   boolean not null default false,
+  is_writer  boolean not null default false,   -- may publish when writer-restrict mode is ON
   created_at timestamptz not null default now()
 );
+-- Make this re-runnable on an earlier install that lacked is_writer.
+alter table public.profiles add column if not exists is_writer boolean not null default false;
 
 alter table public.profiles enable row level security;
 
@@ -35,18 +38,31 @@ create policy profiles_select_own on public.profiles
   for select using (auth.uid() = id);
 
 -- Auto-create a profile row whenever someone signs up.
+--   • The VERY FIRST account to sign up becomes the admin automatically
+--     (so you can skip the manual SQL step — just sign up first).
+--   • If the email is on the writer allowlist, they're flagged as a writer.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_is_first   boolean;
+  v_allowlisted boolean;
 begin
-  insert into public.profiles (id, name, email)
+  select not exists (select 1 from public.profiles) into v_is_first;
+  select exists (
+    select 1 from public.writer_allowlist w where lower(w.email) = lower(new.email)
+  ) into v_allowlisted;
+
+  insert into public.profiles (id, name, email, is_admin, is_writer)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
-    new.email
+    new.email,
+    v_is_first,                         -- first signup = admin
+    v_is_first or v_allowlisted         -- admin or allowlisted = writer
   )
   on conflict (id) do nothing;
   return new;
@@ -68,6 +84,63 @@ security definer
 set search_path = public
 as $$
   select coalesce((select is_admin from public.profiles where id = auth.uid()), false);
+$$;
+
+-- ---------------------------------------------------------------------------
+-- writer access control (email allowlist, opt-in)
+-- ---------------------------------------------------------------------------
+-- Single-row settings table. When restrict_writers = false (default), ANY
+-- signed-in user may submit posts. Flip it to true to require allowlisting.
+create table if not exists public.app_config (
+  id               int primary key default 1,
+  restrict_writers boolean not null default false,
+  check (id = 1)
+);
+insert into public.app_config (id) values (1) on conflict (id) do nothing;
+
+alter table public.app_config enable row level security;
+-- Anyone may read the flag; only admins may change it.
+drop policy if exists app_config_select on public.app_config;
+create policy app_config_select on public.app_config for select using (true);
+drop policy if exists app_config_admin on public.app_config;
+create policy app_config_admin on public.app_config
+  for update using (public.is_admin()) with check (public.is_admin());
+
+-- The allowlist of emails permitted to write (used only in restrict mode).
+create table if not exists public.writer_allowlist (
+  email    text primary key,
+  added_at timestamptz not null default now()
+);
+alter table public.writer_allowlist enable row level security;
+-- Only admins can read/manage the allowlist. (can_write() reads it via a
+-- SECURITY DEFINER function, so normal users never need direct access.)
+drop policy if exists writer_allowlist_admin on public.writer_allowlist;
+create policy writer_allowlist_admin on public.writer_allowlist
+  for all using (public.is_admin()) with check (public.is_admin());
+
+-- May the current user publish? Open mode → yes. Restrict mode → admins,
+-- profiles flagged is_writer, or emails on the allowlist.
+create or replace function public.can_write()
+returns boolean
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_restrict boolean;
+  v_email    text;
+begin
+  select restrict_writers into v_restrict from public.app_config where id = 1;
+  if not coalesce(v_restrict, false) then
+    return auth.uid() is not null;       -- open mode: any signed-in user
+  end if;
+  if public.is_admin() then return true; end if;
+  select email into v_email from public.profiles where id = auth.uid();
+  if v_email is null then return false; end if;
+  return coalesce((select is_writer from public.profiles where id = auth.uid()), false)
+      or exists (select 1 from public.writer_allowlist w where lower(w.email) = lower(v_email));
+end;
 $$;
 
 -- ---------------------------------------------------------------------------
@@ -115,10 +188,11 @@ drop policy if exists blogs_select_admin on public.blogs;
 create policy blogs_select_admin on public.blogs
   for select using (public.is_admin());
 
--- INSERT — you may only create rows you author, and only as `pending`.
+-- INSERT — you may only create rows you author, only as `pending`, and only if
+-- you're allowed to write (open mode = anyone signed in; restrict mode = allowlist).
 drop policy if exists blogs_insert_own on public.blogs;
 create policy blogs_insert_own on public.blogs
-  for insert with check (auth.uid() = author_id and status = 'pending');
+  for insert with check (auth.uid() = author_id and status = 'pending' and public.can_write());
 
 -- UPDATE — only admins (this is how approve / reject is locked down).
 drop policy if exists blogs_update_admin on public.blogs;
@@ -131,13 +205,26 @@ create policy blogs_delete on public.blogs
   for delete using (public.is_admin() or auth.uid() = author_id);
 
 -- ============================================================================
--- MAKE YOURSELF AN ADMIN
+-- BECOMING ADMIN
 -- ============================================================================
--- 1. First sign up through the website with the email you want to be admin.
--- 2. Then run this (replace the email), which flips your is_admin flag:
+-- The FIRST account to sign up is made admin automatically — so just sign up
+-- first, then open /_glancer/admin.
 --
---   update public.profiles set is_admin = true
---   where email = 'karan.igniite@gmail.com';
+-- To grant admin to someone else later (replace the email):
+--   update public.profiles set is_admin = true where email = 'someone@example.com';
 --
--- 3. Reload /_glancer/admin — you now have the approve/reject dashboard.
+-- ============================================================================
+-- WRITER ALLOWLIST (optional — restrict who can publish)
+-- ============================================================================
+-- By default ANY signed-in user can submit posts (they still need approval).
+-- To restrict publishing to specific people, you can use the Admin dashboard's
+-- "Writer Access" panel, or run SQL directly:
+--
+--   -- turn restriction on:
+--   update public.app_config set restrict_writers = true where id = 1;
+--   -- allow specific emails to write:
+--   insert into public.writer_allowlist (email) values ('writer@example.com')
+--     on conflict (email) do nothing;
+--   -- turn it back off (open to all signed-in users):
+--   update public.app_config set restrict_writers = false where id = 1;
 -- ============================================================================

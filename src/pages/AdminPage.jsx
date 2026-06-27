@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
-import { getAllBlogs, updateBlogStatus, deleteBlog } from '../lib/blogStore';
+import {
+  getAllBlogs, updateBlogStatus, deleteBlog,
+  getWriterAccess, setRestrictWriters, addWriter, removeWriter,
+} from '../lib/blogStore';
 
 /*
  * AdminPage — content moderation dashboard.
@@ -23,14 +26,49 @@ export default function AdminPage() {
   const [activeFilter, setActiveFilter] = useState('pending');
   const [preview, setPreview] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [access, setAccess] = useState({ restrict: false, emails: [] });
+  const [newWriter, setNewWriter] = useState('');
+  const [accessBusy, setAccessBusy] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) return;
     const refresh = async () => setBlogs(await getAllBlogs());
     refresh();
+    getWriterAccess().then(setAccess);
     window.addEventListener('glancer:blogs-changed', refresh);
     return () => window.removeEventListener('glancer:blogs-changed', refresh);
   }, [isAdmin]);
+
+  async function toggleRestrict() {
+    setAccessBusy(true);
+    try {
+      await setRestrictWriters(!access.restrict);
+      setAccess((a) => ({ ...a, restrict: !a.restrict }));
+    } catch (err) { alert(err?.message || 'Could not update setting.'); }
+    finally { setAccessBusy(false); }
+  }
+
+  async function handleAddWriter(e) {
+    e.preventDefault();
+    const email = newWriter.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Enter a valid email.'); return; }
+    setAccessBusy(true);
+    try {
+      await addWriter(email);
+      setAccess((a) => ({ ...a, emails: a.emails.includes(email) ? a.emails : [...a.emails, email] }));
+      setNewWriter('');
+    } catch (err) { alert(err?.message || 'Could not add writer.'); }
+    finally { setAccessBusy(false); }
+  }
+
+  async function handleRemoveWriter(email) {
+    setAccessBusy(true);
+    try {
+      await removeWriter(email);
+      setAccess((a) => ({ ...a, emails: a.emails.filter((x) => x !== email) }));
+    } catch (err) { alert(err?.message || 'Could not remove writer.'); }
+    finally { setAccessBusy(false); }
+  }
 
   async function updateStatus(id, status) {
     setBusyId(id);
@@ -152,11 +190,64 @@ export default function AdminPage() {
               <span style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: '1px 8px', fontSize: '0.75rem' }}>{f.count}</span>
             </button>
           ))}
+
+          <p style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '0 16px', margin: '18px 0 8px' }}>Access</p>
+          <button
+            onClick={() => setActiveFilter('writers')}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: activeFilter === 'writers' ? 'rgba(168,85,247,0.12)' : 'none', border: 'none', color: activeFilter === 'writers' ? 'var(--purple)' : 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.875rem', textAlign: 'left', borderLeft: activeFilter === 'writers' ? '2px solid var(--purple)' : '2px solid transparent' }}
+          >
+            <span>Writer Access</span>
+            {access.restrict && <span style={{ background: 'rgba(168,85,247,0.2)', color: 'var(--purple)', borderRadius: 20, padding: '1px 8px', fontSize: '0.7rem' }}>ON</span>}
+          </button>
         </div>
 
         {/* Main content */}
         <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
-          {filtered.length === 0 ? (
+          {activeFilter === 'writers' ? (
+            <div style={{ maxWidth: 620 }}>
+              <h2 className="section-title-lg" style={{ marginBottom: 8 }}>Writer Access</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 20, lineHeight: 1.6 }}>
+                Control who can submit articles. (Everyone still needs admin approval before a post goes public.)
+              </p>
+
+              <div className="chart-card" style={{ padding: 20, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>Restrict to allowlist</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {access.restrict
+                      ? 'ON — only allowlisted emails (and admins) can publish.'
+                      : 'OFF — any signed-in user can submit articles.'}
+                  </div>
+                </div>
+                <button disabled={accessBusy} onClick={toggleRestrict} className="filter-chip"
+                  style={{ cursor: 'pointer', padding: '10px 20px', fontWeight: 600, color: access.restrict ? '#22C55E' : 'var(--text-secondary)' }}>
+                  {access.restrict ? 'Turn Off' : 'Turn On'}
+                </button>
+              </div>
+
+              <div className="chart-card" style={{ padding: 20, opacity: access.restrict ? 1 : 0.55 }}>
+                <h3 className="chart-title" style={{ marginBottom: 14 }}>Allowed writers</h3>
+                <form onSubmit={handleAddWriter} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                  <input className="field-input" type="email" value={newWriter} onChange={(e) => setNewWriter(e.target.value)}
+                    placeholder="writer@example.com" style={{ flex: 1 }} />
+                  <button type="submit" disabled={accessBusy} className="search-btn" style={{ border: 'none', cursor: 'pointer', padding: '0 20px', borderRadius: 10 }}>Add</button>
+                </form>
+                {access.emails.length === 0 ? (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No emails on the allowlist yet.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {access.emails.map((email) => (
+                      <div key={email} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--surface)', borderRadius: 10, border: '1px solid var(--glass-border)' }}>
+                        <span style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>{email}</span>
+                        <button disabled={accessBusy} onClick={() => handleRemoveWriter(email)}
+                          style={{ background: 'rgba(239,68,68,0.1)', border: 'none', color: '#EF4444', borderRadius: 8, padding: '5px 12px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}>Remove</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
               No {activeFilter === 'all' ? '' : activeFilter} posts yet.
               {activeFilter === 'pending' && <p style={{ marginTop: 10, fontSize: '0.875rem' }}>Community blog submissions will appear here for review.</p>}

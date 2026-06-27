@@ -38,14 +38,15 @@ Real email/password login + a shared blog database, powered by **Supabase**
 > Production: add the same two `VITE_SUPABASE_*` variables in your host's
 > dashboard (Cloudflare Pages/Workers env vars), then redeploy.
 
-### 4. Make yourself the admin
+### 4. Make yourself the admin (now automatic)
 1. Open the website → **Sign in** → **Create Account** with your email + a password.
-2. Back in Supabase **SQL Editor**, run (use the same email):
+   **The very first account to sign up becomes the admin automatically** — no SQL needed.
+2. Visit `/_glancer/admin` → you have the approve/reject dashboard.
+
+   To grant admin to someone else later, run in Supabase SQL Editor:
    ```sql
-   update public.profiles set is_admin = true
-   where email = 'karan.igniite@gmail.com';
+   update public.profiles set is_admin = true where email = 'someone@example.com';
    ```
-3. Visit `/_glancer/admin` → you now have the approve/reject dashboard.
 
 ### 5. (Recommended) Decide on email confirmation
 Supabase **Authentication → Providers → Email**:
@@ -57,6 +58,41 @@ The app handles both: if confirmation is on, sign-up shows a "check your inbox" 
 
 ---
 
+---
+
+## Forgot password (works automatically once Supabase is configured)
+The sign-in form has a **"Forgot password?"** link → it emails a reset link that
+lands on `/reset-password`, where the user sets a new password.
+
+One required setting so the link is trusted:
+- Supabase → **Authentication → URL Configuration**:
+  - **Site URL**: your production URL (e.g. `https://glancerai.com`).
+  - **Redirect URLs**: add both `https://glancerai.com/reset-password` and
+    `http://localhost:5173/reset-password` (for local testing).
+
+## CAPTCHA + rate-limiting (optional but recommended for a public site)
+- **Rate-limiting** is already on: Supabase rate-limits auth endpoints (sign-in,
+  sign-up, reset emails) server-side by default — nothing to configure.
+- **CAPTCHA** (extra bot protection) uses **Cloudflare Turnstile** (free):
+  1. Cloudflare dashboard → **Turnstile → Add widget**. Add hostnames
+     `glancerai.com` and `localhost`. Copy the **Site key** and **Secret key**.
+  2. Put the **Site key** in `.env` as `VITE_TURNSTILE_SITE_KEY=...` (and in your
+     host's env vars for production).
+  3. Supabase → **Authentication → Settings → Bot and Abuse Protection** →
+     enable **Captcha protection**, provider **Turnstile**, paste the **Secret key**.
+  4. Restart the dev server. A CAPTCHA now appears on sign-in / sign-up / reset.
+
+  Leave `VITE_TURNSTILE_SITE_KEY` blank to keep the CAPTCHA off.
+
+## Writer allowlist (control who can publish)
+By default, any signed-in user can submit articles (they still need your approval).
+To restrict publishing to specific people:
+- In the **Admin dashboard → Writer Access** panel: toggle **Restrict to allowlist
+  ON**, then add the emails that are allowed to write. Remove them anytime.
+- This is enforced in the database (`can_write()` + RLS), so a blocked user can't
+  publish even by calling the API directly. They'll see a "Writer access pending"
+  message on the write page.
+
 ## How it works (the flow)
 1. A visitor signs up / signs in with email + password.
 2. They write an article → it's saved as **pending** (hidden from the public).
@@ -67,7 +103,9 @@ The app handles both: if confirmation is on, sign-up shows a "check your inbox" 
 ## Files involved
 - `src/lib/supabase.js` — the Supabase client.
 - `src/context/AuthContext.jsx` — login/signup/session state.
-- `src/components/AuthForm.jsx` — the email/password form.
+- `src/components/AuthForm.jsx` — the email/password form (+ forgot-password + CAPTCHA).
+- `src/components/Turnstile.jsx` — the optional Cloudflare Turnstile CAPTCHA widget.
+- `src/pages/ResetPasswordPage.jsx` — the `/reset-password` landing page.
 - `src/lib/blogStore.js` — all blog reads/writes (async, RLS-guarded).
 - `src/pages/AdminPage.jsx` — admin-only moderation dashboard.
 - `supabase/schema.sql` — tables + security policies (the source of truth for access).

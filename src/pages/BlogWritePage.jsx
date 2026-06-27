@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -7,7 +7,7 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
-import { addBlog } from '../lib/blogStore';
+import { addBlog, canCurrentUserWrite } from '../lib/blogStore';
 import AuthForm from '../components/AuthForm';
 
 const CATEGORIES = ['Observability','AIOps','APM','SRE','Distributed Tracing','Kubernetes','Cloud Native','Security','DevOps','AI / ML','Open Source','Industry'];
@@ -81,7 +81,16 @@ export default function BlogWritePage() {
   const [readTime, setReadTime] = useState(5);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [canWrite, setCanWrite] = useState(null); // null = checking
   const [error, setError] = useState('');
+
+  // Check publish permission once signed in (open mode → always true).
+  useEffect(() => {
+    if (!isAuthed) { setCanWrite(null); return; }
+    let active = true;
+    canCurrentUserWrite().then((ok) => { if (active) setCanWrite(ok); });
+    return () => { active = false; };
+  }, [isAuthed]);
 
   async function handleBannerUpload(e) {
     const file = e.target.files?.[0];
@@ -176,6 +185,28 @@ export default function BlogWritePage() {
           </div>
           <div className="chart-card" style={{ padding: 36, marginBottom: 80 }}>
             <AuthForm />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Gate: account must be allowed to publish (writer-restrict mode). */
+  if (canWrite === false) {
+    return (
+      <div className="page-section">
+        <div className="container" style={{ maxWidth: 480 }}>
+          <div className="page-hero" style={{ paddingTop: 'calc(var(--navbar-h) + 70px)', paddingBottom: 28, textAlign: 'center' }}>
+            <p className="section-label" style={{ marginBottom: 12 }}>Write an Article</p>
+            <h1 className="page-hero-title" style={{ fontSize: '2rem' }}>Writer access pending</h1>
+          </div>
+          <div className="chart-card" style={{ padding: 36, textAlign: 'center', marginBottom: 80 }}>
+            <div style={{ fontSize: '2.4rem', marginBottom: 16 }}>✋</div>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 24 }}>
+              You're signed in as <strong style={{ color: 'var(--text-primary)' }}>{user?.email}</strong>, but
+              this account isn't approved to publish yet. Ask the site admin to add you to the writer allowlist.
+            </p>
+            <RouterLink to="/profile" className="filter-chip" style={{ padding: '10px 22px', textDecoration: 'none' }}>← Back to profile</RouterLink>
           </div>
         </div>
       </div>

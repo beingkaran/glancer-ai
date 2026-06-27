@@ -141,3 +141,44 @@ export async function getPublishedBlogs() {
   const approved = await getApprovedUserBlogs();
   return [...approved, ...BLOG_POSTS];
 }
+
+/* ---------------------------------------------------------------------------
+ * Writer access (email allowlist) — server-enforced by RLS + can_write().
+ * ------------------------------------------------------------------------- */
+
+/* Can the signed-in user publish? (Asks the DB function can_write().) */
+export async function canCurrentUserWrite() {
+  if (!isSupabaseConfigured) return false;
+  const { data, error } = await supabase.rpc('can_write');
+  if (error) { console.error('[blogStore] can_write', error); return false; }
+  return !!data;
+}
+
+/* Admin: read the restrict flag + the allowlist (admin-only via RLS). */
+export async function getWriterAccess() {
+  if (!isSupabaseConfigured) return { restrict: false, emails: [] };
+  const [{ data: cfg }, { data: list }] = await Promise.all([
+    supabase.from('app_config').select('restrict_writers').eq('id', 1).maybeSingle(),
+    supabase.from('writer_allowlist').select('email').order('added_at', { ascending: true }),
+  ]);
+  return { restrict: !!cfg?.restrict_writers, emails: (list || []).map((r) => r.email) };
+}
+
+/* Admin: toggle whether publishing is restricted to the allowlist. */
+export async function setRestrictWriters(restrict) {
+  const { error } = await supabase.from('app_config').update({ restrict_writers: restrict }).eq('id', 1);
+  if (error) throw error;
+}
+
+/* Admin: add an email to the allowlist. */
+export async function addWriter(email) {
+  const e = email.trim().toLowerCase();
+  const { error } = await supabase.from('writer_allowlist').insert({ email: e });
+  if (error && error.code !== '23505') throw error; // ignore duplicate
+}
+
+/* Admin: remove an email from the allowlist. */
+export async function removeWriter(email) {
+  const { error } = await supabase.from('writer_allowlist').delete().eq('email', email.trim().toLowerCase());
+  if (error) throw error;
+}

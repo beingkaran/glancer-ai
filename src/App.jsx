@@ -15,6 +15,7 @@ import BlogPostPage from './pages/BlogPostPage';
 import NewsReaderPage from './pages/NewsReaderPage';
 import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminPage from './pages/AdminPage';
 
 export default function App() {
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/glossary"          element={<GlossaryPage />} />
           <Route path="/ai-tools"          element={<AIToolsPage />} />
           <Route path="/profile"           element={<ProfilePage />} />
+          <Route path="/reset-password"    element={<ResetPasswordPage />} />
           <Route path="/about"             element={<AboutPage />} />
           <Route path="/_glancer/admin"    element={<AdminPage />} />
         </Routes>
