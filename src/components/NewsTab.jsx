@@ -1,6 +1,22 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
+import InshortsView from './InshortsView';
+
+// True on phone-width viewports — used to swap the grid for the Inshorts feed.
+function useIsMobile() {
+  const query = '(max-width: 768px)';
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (e) => setIsMobile(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return isMobile;
+}
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -41,6 +57,7 @@ export default function NewsTab() {
   const [items, setItems] = useState(STATIC_NEWS);
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     let alive = true;
@@ -90,6 +107,11 @@ export default function NewsTab() {
           )}
         </div>
 
+        {/* Mobile: Inshorts-style swipeable card feed (desktop layout untouched) */}
+        {isMobile ? (
+          <InshortsView items={filtered} />
+        ) : (
+          <>
         {/* Featured */}
         {featured && (
           <a className="news-featured news-link" href={featured.url} target="_blank" rel="noopener noreferrer" aria-label={`Read: ${featured.title}`}>
@@ -130,6 +152,8 @@ export default function NewsTab() {
             </a>
           ))}
         </div>
+          </>
+        )}
       </div>
     </div>
   );
