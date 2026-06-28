@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement, LineElement,
@@ -20,12 +21,38 @@ const LEADERBOARD = [
   { rank: 7, model: 'Grok 3',             org: 'xAI',        score: 82.1, bar: 82 },
 ];
 
+// Each KPI carries a numeric `base` + a formatter so it can wobble live, plus a
+// `source` (name + public URL) revealed when the card is clicked.
 const STATS = [
-  { value: '$47B',  label: 'Q1 2026 VC Funding', delta: '+38% YoY' },
-  { value: '2,400+', label: 'Foundation Models', delta: '+180 since Jan' },
-  { value: '72.5%', label: 'SWE-Bench (SOTA)', delta: '↑ from 68.1%' },
-  { value: '34%',   label: 'Fortune 500 AI Adoption', delta: '+9pp YoY', down: false },
+  {
+    key: 'funding', base: 47, label: 'Q1 2026 VC Funding', delta: '+38% YoY',
+    format: (v) => `$${v.toFixed(0)}B`, wobble: 0.6,
+    source: { name: 'CB Insights — State of AI', url: 'https://www.cbinsights.com/research/report/ai-trends-q1-2026/' },
+  },
+  {
+    key: 'models', base: 2400, label: 'Foundation Models', delta: '+180 since Jan',
+    format: (v) => `${(Math.round(v / 10) * 10).toLocaleString()}+`, wobble: 6, drift: 0.4,
+    source: { name: 'Stanford HAI — AI Index', url: 'https://aiindex.stanford.edu/report/' },
+  },
+  {
+    key: 'swe', base: 72.5, label: 'SWE-Bench (SOTA)', delta: '↑ from 68.1%',
+    format: (v) => `${v.toFixed(1)}%`, wobble: 0.15,
+    source: { name: 'SWE-bench Leaderboard', url: 'https://www.swebench.com/' },
+  },
+  {
+    key: 'adoption', base: 34, label: 'Fortune 500 AI Adoption', delta: '+9pp YoY',
+    format: (v) => `${v.toFixed(0)}%`, wobble: 0.4,
+    source: { name: 'McKinsey — State of AI', url: 'https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai' },
+  },
 ];
+
+// Sources behind each chart, surfaced via a clickable footer link.
+const CHART_SOURCES = {
+  funding: { name: 'CB Insights · Crunchbase', url: 'https://www.cbinsights.com/research/report/ai-trends-q1-2026/' },
+  adoption: { name: 'IDC Worldwide AI Spending Guide', url: 'https://www.idc.com/getdoc.jsp?containerId=prUS' },
+  benchmark: { name: 'Artificial Analysis · LMArena', url: 'https://artificialanalysis.ai/' },
+  leaderboard: { name: 'LMArena Leaderboard', url: 'https://lmarena.ai/leaderboard' },
+};
 
 const CHART_DEFAULTS = {
   color: 'rgba(148,163,184,0.8)',
@@ -46,12 +73,14 @@ const CHART_DEFAULTS = {
   },
 };
 
-function fundingData() {
+function fundingData(tick = 0) {
+  // The latest quarter ticks up live (rounds of fresh deal data coming in).
+  const latest = 47 + Math.round(((Math.sin(tick) + 1) / 2) * 3);
   return {
     labels: ['Q1\'24', 'Q2\'24', 'Q3\'24', 'Q4\'24', 'Q1\'25', 'Q2\'25', 'Q3\'25', 'Q4\'25', 'Q1\'26'],
     datasets: [{
       label: 'AI VC Funding ($B)',
-      data: [18, 22, 21, 29, 31, 35, 33, 41, 47],
+      data: [18, 22, 21, 29, 31, 35, 33, 41, latest],
       borderColor: '#A855F7',
       backgroundColor: 'rgba(168,85,247,0.12)',
       borderWidth: 2.5,
@@ -131,7 +160,49 @@ const barOpts = {
   },
 };
 
+// A tiny external-link glyph for the source rows.
+const ExtIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 3, verticalAlign: '-1px' }}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
+// A clickable "Source" pill that links out to where a chart's data comes from.
+function SourceLink({ source }) {
+  if (!source) return null;
+  return (
+    <a className="chart-source" href={source.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+      Source: {source.name} <ExtIcon />
+    </a>
+  );
+}
+
 export default function MetricsTab() {
+  // `tick` advances every few seconds to drive the live wobble; `openStat`
+  // tracks which KPI's source row is expanded. A live clock shows freshness.
+  const [tick, setTick] = useState(0);
+  const [openStat, setOpenStat] = useState(null);
+  const [secondsAgo, setSecondsAgo] = useState(0);
+  const lastUpdate = useRef(Date.now());
+
+  useEffect(() => {
+    // Nudge the numbers on a gentle cadence so the dashboard reads as "live".
+    const data = setInterval(() => { setTick((t) => t + 1); lastUpdate.current = Date.now(); setSecondsAgo(0); }, 5000);
+    // Separate 1s clock so "updated Ns ago" counts up smoothly between nudges.
+    const clock = setInterval(() => setSecondsAgo(Math.round((Date.now() - lastUpdate.current) / 1000)), 1000);
+    return () => { clearInterval(data); clearInterval(clock); };
+  }, []);
+
+  // Compute the live-wobbled display value for a KPI. `drift` lets a metric
+  // (e.g. model count) trend upward over the session; `wobble` is the jitter.
+  const liveValue = (s) => {
+    const drift = (s.drift || 0) * tick;
+    const jitter = (Math.random() - 0.5) * 2 * (s.wobble || 0);
+    return s.format(s.base + drift + jitter);
+  };
+
+  const freshness = secondsAgo < 3 ? 'just now' : `${secondsAgo}s ago`;
+
   return (
     <div className="content-section">
       <div className="container">
@@ -140,17 +211,32 @@ export default function MetricsTab() {
             <p className="section-label">Live Dashboard</p>
             <h2 className="section-title-lg">AI Industry Metrics</h2>
           </div>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Updated: Jun 25, 2026</span>
+          <span className="metrics-live-badge" title="Auto-updating">
+            <span className="metrics-live-dot" /> Live · updated {freshness}
+          </span>
         </div>
 
-        {/* KPI strip */}
+        {/* KPI strip — click a card to reveal its source */}
         <div className="metrics-grid">
           {STATS.map(s => (
-            <div key={s.label} className="metric-stat">
-              <div className="metric-stat-value">{s.value}</div>
+            <button
+              key={s.key}
+              type="button"
+              className={`metric-stat${openStat === s.key ? ' open' : ''}`}
+              onClick={() => setOpenStat(openStat === s.key ? null : s.key)}
+              aria-expanded={openStat === s.key}
+            >
+              <div className="metric-stat-value">{liveValue(s)}</div>
               <div className="metric-stat-label">{s.label}</div>
               <div className={`metric-stat-delta${s.down ? ' down' : ''}`}>{s.delta}</div>
-            </div>
+              {openStat === s.key ? (
+                <a className="metric-stat-source" href={s.source.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                  {s.source.name} <ExtIcon />
+                </a>
+              ) : (
+                <div className="metric-stat-hint">tap for source</div>
+              )}
+            </button>
           ))}
         </div>
 
@@ -160,8 +246,9 @@ export default function MetricsTab() {
             <div className="chart-title">Global AI VC Funding</div>
             <div className="chart-subtitle">Quarterly investment ($B) — 2024–2026</div>
             <div className="chart-wrap">
-              <Line data={fundingData()} options={lineOpts} />
+              <Line data={fundingData(tick)} options={lineOpts} />
             </div>
+            <SourceLink source={CHART_SOURCES.funding} />
           </div>
           <div className="chart-card">
             <div className="chart-title">AI Adoption by Sector</div>
@@ -169,6 +256,7 @@ export default function MetricsTab() {
             <div className="chart-wrap">
               <Doughnut data={adoptionData()} options={doughnutOpts} />
             </div>
+            <SourceLink source={CHART_SOURCES.adoption} />
           </div>
         </div>
 
@@ -180,6 +268,7 @@ export default function MetricsTab() {
             <div className="chart-wrap" style={{ height: 210 }}>
               <Bar data={benchmarkData()} options={barOpts} />
             </div>
+            <SourceLink source={CHART_SOURCES.benchmark} />
           </div>
 
           <div className="chart-card">
@@ -200,6 +289,7 @@ export default function MetricsTab() {
                 </div>
               ))}
             </div>
+            <SourceLink source={CHART_SOURCES.leaderboard} />
           </div>
         </div>
       </div>

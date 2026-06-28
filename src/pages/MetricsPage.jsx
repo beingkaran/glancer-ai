@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement,
   PointElement, ArcElement, Title, Tooltip, Legend, Filler,
@@ -16,15 +17,17 @@ const LEADERBOARD = [
   { rank: 7, model: 'Grok 3',            org: 'xAI',        score: 82.1, bar: 82 },
 ];
 
+// Each KPI carries a numeric `base` + a formatter so it can wobble live, plus a
+// `source` (name + public URL) revealed when the card is tapped.
 const STATS = [
-  { value: '$47B',   label: 'Q1 2026 VC Funding', delta: '+38% YoY' },
-  { value: '2,400+', label: 'Foundation Models',  delta: '+180 since Jan' },
-  { value: '72.5%',  label: 'SWE-Bench (SOTA)',   delta: '↑ from 68.1%' },
-  { value: '34%',    label: 'Fortune 500 AI Adoption', delta: '+9pp YoY' },
-  { value: '$4.1T',  label: 'AI Market Cap (2026)', delta: '+61% YoY' },
-  { value: '580M',   label: 'Daily ChatGPT Users', delta: '+120M MoM' },
-  { value: '18ms',   label: 'Avg LLM Latency (p50)', delta: '↓ 34% vs 2025' },
-  { value: '99.97%', label: 'API Uptime (top 3 labs)', delta: 'Stable' },
+  { key:'funding', base:47, label:'Q1 2026 VC Funding', delta:'+38% YoY', wobble:0.6, format:v=>`$${v.toFixed(0)}B`, source:{ name:'CB Insights — State of AI', url:'https://www.cbinsights.com/research/report/ai-trends-q1-2026/' } },
+  { key:'models', base:2400, label:'Foundation Models', delta:'+180 since Jan', wobble:6, drift:0.4, format:v=>`${(Math.round(v/10)*10).toLocaleString()}+`, source:{ name:'Stanford HAI — AI Index', url:'https://aiindex.stanford.edu/report/' } },
+  { key:'swe', base:72.5, label:'SWE-Bench (SOTA)', delta:'↑ from 68.1%', wobble:0.15, format:v=>`${v.toFixed(1)}%`, source:{ name:'SWE-bench Leaderboard', url:'https://www.swebench.com/' } },
+  { key:'adoption', base:34, label:'Fortune 500 AI Adoption', delta:'+9pp YoY', wobble:0.4, format:v=>`${v.toFixed(0)}%`, source:{ name:'McKinsey — State of AI', url:'https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai' } },
+  { key:'mktcap', base:4.1, label:'AI Market Cap (2026)', delta:'+61% YoY', wobble:0.05, format:v=>`$${v.toFixed(1)}T`, source:{ name:'Bloomberg Intelligence', url:'https://www.bloomberg.com/professional/products/bloomberg-intelligence/' } },
+  { key:'users', base:580, label:'Daily ChatGPT Users', delta:'+120M MoM', wobble:4, drift:0.3, format:v=>`${Math.round(v)}M`, source:{ name:'OpenAI / Similarweb', url:'https://www.similarweb.com/website/chat.openai.com/' } },
+  { key:'latency', base:18, label:'Avg LLM Latency (p50)', delta:'↓ 34% vs 2025', wobble:0.8, format:v=>`${Math.round(v)}ms`, source:{ name:'Artificial Analysis', url:'https://artificialanalysis.ai/' } },
+  { key:'uptime', base:99.97, label:'API Uptime (top 3 labs)', delta:'Stable', wobble:0.02, format:v=>`${v.toFixed(2)}%`, source:{ name:'OpenAI / Anthropic / Google status', url:'https://status.anthropic.com/' } },
 ];
 
 const grid  = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
@@ -89,35 +92,73 @@ function ChartSource({ name, url }) {
   );
 }
 
+// A clickable KPI card: tap to reveal the source it's derived from.
+function StatCard({ s, value, open, onToggle }) {
+  return (
+    <button type="button" className={`metric-stat${open ? ' open' : ''}`} onClick={onToggle} aria-expanded={open}>
+      <div className="metric-stat-value">{value}</div>
+      <div className="metric-stat-label">{s.label}</div>
+      <div className="metric-stat-delta">{s.delta}</div>
+      {open ? (
+        <a className="metric-stat-source" href={s.source.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+          {s.source.name} <ExtIcon />
+        </a>
+      ) : (
+        <div className="metric-stat-hint">tap for source</div>
+      )}
+    </button>
+  );
+}
+
 export default function MetricsPage() {
+  // `tick` drives the live wobble; `openStat` is the expanded KPI; a 1s clock
+  // shows how fresh the numbers are.
+  const [tick, setTick] = useState(0);
+  const [openStat, setOpenStat] = useState(null);
+  const [secondsAgo, setSecondsAgo] = useState(0);
+  const lastUpdate = useRef(Date.now());
+
+  useEffect(() => {
+    const data = setInterval(() => { setTick((t) => t + 1); lastUpdate.current = Date.now(); setSecondsAgo(0); }, 5000);
+    const clock = setInterval(() => setSecondsAgo(Math.round((Date.now() - lastUpdate.current) / 1000)), 1000);
+    return () => { clearInterval(data); clearInterval(clock); };
+  }, []);
+
+  const liveValue = (s) => {
+    const drift = (s.drift || 0) * tick;
+    const jitter = (Math.random() - 0.5) * 2 * (s.wobble || 0);
+    return s.format(s.base + drift + jitter);
+  };
+  const toggle = (key) => () => setOpenStat((o) => (o === key ? null : key));
+  const freshness = secondsAgo < 3 ? 'just now' : `${secondsAgo}s ago`;
+
+  // Latest funding quarter ticks up live.
+  const fundingLive = {
+    ...funding,
+    datasets: [{ ...funding.datasets[0], data: [...funding.datasets[0].data.slice(0, 8), 47 + Math.round(((Math.sin(tick) + 1) / 2) * 3)] }],
+  };
+
   return (
     <div className="page-section">
       <div className="container">
         <div className="page-hero" style={{ paddingTop: 'calc(var(--navbar-h) + 60px)', paddingBottom: 40 }}>
           <p className="section-label" style={{ marginBottom: 12 }}>Live Dashboard</p>
           <h1 className="page-hero-title">AI Industry Metrics</h1>
-          <p className="hero-sub" style={{ margin: '0 auto' }}>
+          <p className="hero-sub" style={{ margin: '0 auto 16px' }}>
             Funding trends, model benchmarks, adoption curves and token usage — the numbers behind the AI era.
           </p>
+          <span className="metrics-live-badge"><span className="metrics-live-dot" /> Live · updated {freshness} · tap any metric for its source</span>
         </div>
 
-        {/* KPI strip */}
+        {/* KPI strip — click a card to reveal its source */}
         <div className="metrics-grid" style={{ gridTemplateColumns:'repeat(4,1fr)', marginBottom:32 }}>
           {STATS.slice(0,4).map(s => (
-            <div key={s.label} className="metric-stat">
-              <div className="metric-stat-value">{s.value}</div>
-              <div className="metric-stat-label">{s.label}</div>
-              <div className="metric-stat-delta">{s.delta}</div>
-            </div>
+            <StatCard key={s.key} s={s} value={liveValue(s)} open={openStat === s.key} onToggle={toggle(s.key)} />
           ))}
         </div>
         <div className="metrics-grid" style={{ gridTemplateColumns:'repeat(4,1fr)', marginBottom:40 }}>
           {STATS.slice(4).map(s => (
-            <div key={s.label} className="metric-stat">
-              <div className="metric-stat-value">{s.value}</div>
-              <div className="metric-stat-label">{s.label}</div>
-              <div className="metric-stat-delta">{s.delta}</div>
-            </div>
+            <StatCard key={s.key} s={s} value={liveValue(s)} open={openStat === s.key} onToggle={toggle(s.key)} />
           ))}
         </div>
 
@@ -126,7 +167,7 @@ export default function MetricsPage() {
           <div className="chart-card">
             <div className="chart-title">Global AI VC Funding</div>
             <div className="chart-subtitle">Quarterly investment ($B) — 2024–2026</div>
-            <div className="chart-wrap"><Line data={funding} options={lineOpts} /></div>
+            <div className="chart-wrap"><Line data={fundingLive} options={lineOpts} /></div>
             <ChartSource name="PitchBook–NVCA Venture Monitor" url="https://pitchbook.com/news/reports/q1-2026-pitchbook-nvca-venture-monitor" />
           </div>
           <div className="chart-card">

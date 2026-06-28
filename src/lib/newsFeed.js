@@ -83,11 +83,28 @@ const FEEDS = [
   { url: 'https://aws.amazon.com/blogs/machine-learning/feed/', source: 'AWS ML', category: 'Hardware' },
   { url: 'https://www.therobotreport.com/feed/', source: 'The Robot Report', category: 'Hardware' },
 
-  // ── Observability & AIOps (AIOps) ────────────────────────────────────────
+  // ── Observability, APM & AIOps (AIOps) ───────────────────────────────────
+  // All free, non-gated RSS. Covers OpenTelemetry, the major APM/observability
+  // vendors, and analyst commentary. Unreachable feeds are skipped gracefully.
   { url: 'https://opentelemetry.io/blog/index.xml', source: 'OpenTelemetry', category: 'AIOps' },
   { url: 'https://www.datadoghq.com/blog/index.xml', source: 'Datadog', category: 'AIOps' },
   { url: 'https://grafana.com/blog/index.xml', source: 'Grafana', category: 'AIOps' },
   { url: 'https://newrelic.com/blog/feed', source: 'New Relic', category: 'AIOps' },
+  { url: 'https://www.dynatrace.com/news/feed/', source: 'Dynatrace', category: 'AIOps' },
+  { url: 'https://www.elastic.co/blog/feed', source: 'Elastic', category: 'AIOps' },
+  { url: 'https://signoz.io/blog/rss.xml', source: 'SigNoz', category: 'AIOps' },
+  { url: 'https://victoriametrics.com/blog/index.xml', source: 'VictoriaMetrics', category: 'AIOps' },
+  { url: 'https://sysdig.com/feed/', source: 'Sysdig', category: 'AIOps' },
+  { url: 'https://logz.io/blog/feed/', source: 'Logz.io', category: 'AIOps' },
+  { url: 'https://coralogix.com/blog/feed/', source: 'Coralogix', category: 'AIOps' },
+  { url: 'https://www.pagerduty.com/blog/feed/', source: 'PagerDuty', category: 'AIOps' },
+  { url: 'https://chronosphere.io/feed/', source: 'Chronosphere', category: 'AIOps' },
+  { url: 'https://blog.sentry.io/feed.xml', source: 'Sentry', category: 'AIOps' },
+  { url: 'https://thenewstack.io/category/observability/feed/', source: 'The New Stack · Observability', category: 'AIOps' },
+  { url: 'https://www.honeycomb.io/feed', source: 'Honeycomb', category: 'AIOps' },
+  // ── Analyst commentary (Gartner blog network — free; the research reports
+  //    themselves are gated, but the public blogs carry APM/observability takes)
+  { url: 'https://blogs.gartner.com/feed/', source: 'Gartner Blog Network', category: 'AIOps' },
 
   // ── Policy, safety & society (Policy) ────────────────────────────────────
   { url: 'https://www.brookings.edu/topic/artificial-intelligence/feed/', source: 'Brookings', category: 'Policy' },
@@ -100,14 +117,14 @@ const FEEDS = [
 // abandons every visitor's old cache on their next load — without it, anyone who
 // saw the previous (broken, emoji-only) feed would keep seeing it from cache for
 // up to CACHE_TTL even after a fix ships.
-const CACHE_KEY = 'glancer_news_cache_v4';
+const CACHE_KEY = 'glancer_news_cache_v5';
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours — for a successful LIVE fetch
 // Static fallback is cached only briefly so a transient feed outage can't pin
 // the emoji placeholders for 12 hours; the next visit retries the live feed.
 const FALLBACK_TTL = 20 * 60 * 1000; // 20 minutes
 
 // One-time cleanup of older cache keys so they don't linger.
-try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
+try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
 
 const GRADIENTS = [
   'linear-gradient(135deg, #1a0533 0%, #4c1d95 50%, #7c3aed 100%)',

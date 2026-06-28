@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -33,6 +33,17 @@ const LINES = [
 export default function GreetingBanner() {
   const { user, isAuthed } = useAuth();
 
+  // The banner is a warm hello, not a permanent fixture — fade it out after a
+  // few seconds so it greets the reader, then gets out of the way of the feed.
+  // `leaving` triggers the CSS fade; `gone` unmounts it once the fade finishes.
+  const [leaving, setLeaving] = useState(false);
+  const [gone, setGone] = useState(false);
+  useEffect(() => {
+    const fade = setTimeout(() => setLeaving(true), 5000);
+    const drop = setTimeout(() => setGone(true), 5600); // after the 0.5s fade
+    return () => { clearTimeout(fade); clearTimeout(drop); };
+  }, []);
+
   // Compute once per mount. Picks the time-of-day greeting and a friendly line.
   const { greeting, emoji, line } = useMemo(() => {
     const now = new Date();
@@ -48,8 +59,10 @@ export default function GreetingBanner() {
     return { greeting, emoji, line };
   }, [isAuthed, user]);
 
+  if (gone) return null;
+
   return (
-    <div className="greeting-wrap">
+    <div className={`greeting-wrap${leaving ? ' greeting-leaving' : ''}`}>
       <div className="container">
         <div className="greeting-card">
           <div className="greeting-text">

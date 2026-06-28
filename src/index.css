@@ -273,7 +273,9 @@ button { font-family: var(--font-body); }
 /* ============================================================
    Personalised greeting banner (top of the home feed)
    ============================================================ */
-.greeting-wrap { padding: 18px 0 4px; }
+.greeting-wrap { padding: 18px 0 4px; transition: opacity 0.5s ease, transform 0.5s ease, max-height 0.5s ease, padding 0.5s ease; }
+/* After ~5s the banner fades up and collapses out of the feed's way. */
+.greeting-wrap.greeting-leaving { opacity: 0; transform: translateY(-8px); max-height: 0; padding-top: 0; padding-bottom: 0; pointer-events: none; overflow: hidden; }
 .greeting-card {
   display: flex; align-items: center; justify-content: space-between; gap: 18px;
   padding: 18px 22px; border-radius: var(--border-radius);
@@ -314,15 +316,33 @@ button { font-family: var(--font-body); }
 /* Metrics */
 .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
 .metric-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 0;
   border-radius: var(--border-radius); background: var(--glass-bg);
   border: 1px solid var(--glass-border); backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
   padding: 20px; text-align: center; transition: var(--transition-slow);
+  font-family: inherit; cursor: pointer; width: 100%;
 }
 .metric-stat:hover { border-color: var(--glass-border-strong); background: var(--surface-hover); }
-.metric-stat-value { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; background: var(--grad-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; margin-bottom: 4px; }
+.metric-stat.open { border-color: rgba(168,85,247,0.4); }
+.metric-stat-value { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; background: var(--grad-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
 .metric-stat-label { font-size: 0.78rem; color: var(--text-secondary); font-weight: 500; }
 .metric-stat-delta { font-size: 0.72rem; color: #22C55E; font-weight: 600; margin-top: 4px; }
 .metric-stat-delta.down { color: #EF4444; }
+.metric-stat-hint { font-size: 0.62rem; color: var(--text-muted); margin-top: 8px; opacity: 0.6; letter-spacing: 0.02em; }
+.metric-stat-source { font-size: 0.68rem; color: var(--purple); font-weight: 600; margin-top: 8px; text-decoration: none; line-height: 1.35; }
+.metric-stat-source:hover { text-decoration: underline; }
+/* Live badge with a pulsing dot in the metrics header. */
+.metrics-live-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+}
+.metrics-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 0 rgba(34,197,94,0.6); animation: metrics-pulse 1.8s infinite; }
+@keyframes metrics-pulse { 0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); } 70% { box-shadow: 0 0 0 7px rgba(34,197,94,0); } 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); } }
+/* Clickable "Source:" link under each chart card. */
+.chart-source { display: inline-block; margin-top: 14px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.15s ease; }
+.chart-source:hover { color: var(--purple); }
 .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
 .chart-card {
   border-radius: var(--border-radius); background: var(--glass-bg);
@@ -1350,3 +1370,108 @@ html[data-platform="android"] button:active,
 html[data-platform="android"] .greeting-cta:active { transform: scale(0.97); filter: brightness(1.06); }
 /* Android's font renders a touch heavier — nudge body weight down for parity. */
 html[data-platform="android"] body { -webkit-font-smoothing: auto; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Full-screen news carousel — opens when a news card is tapped (desktop +
+   mobile). One story per slide, swiped horizontally; arrows + dots aid nav.
+   ───────────────────────────────────────────────────────────────────────── */
+.carousel-overlay {
+  position: fixed; inset: 0; z-index: 1200;
+  display: flex; flex-direction: column;
+  background: rgba(6, 8, 20, 0.86);
+  backdrop-filter: blur(22px) saturate(120%); -webkit-backdrop-filter: blur(22px) saturate(120%);
+  animation: carousel-in 0.22s ease;
+}
+[data-theme="light"] .carousel-overlay { background: rgba(226, 232, 240, 0.88); }
+@keyframes carousel-in { from { opacity: 0; } to { opacity: 1; } }
+
+.carousel-topbar {
+  position: relative; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(14px + env(safe-area-inset-top)) 18px 10px;
+}
+.carousel-progress {
+  font-family: var(--font-mono, monospace); font-size: 0.82rem; font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  padding: 6px 12px; border-radius: 999px;
+}
+.carousel-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-primary); cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;
+}
+.carousel-close:hover { background: var(--surface-hover); transform: rotate(90deg); }
+
+.carousel-feed {
+  flex: 1; min-height: 0;
+  display: flex; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.carousel-feed::-webkit-scrollbar { display: none; }
+
+.carousel-slide {
+  flex: 0 0 100%; width: 100%; scroll-snap-align: center; scroll-snap-stop: always;
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px 20px 24px; overflow-y: auto;
+}
+.carousel-slide-inner {
+  width: 100%; max-width: 680px;
+  display: flex; flex-direction: column; gap: 0;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-card);
+}
+.carousel-img { width: 100%; height: 320px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.carousel-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-img-fallback span { font-size: 4.5rem; }
+.carousel-body { padding: 22px 26px 28px; display: flex; flex-direction: column; gap: 12px; }
+.carousel-title {
+  font-family: var(--font-heading); font-size: clamp(1.3rem, 3vw, 1.85rem); font-weight: 800;
+  line-height: 1.25; color: var(--text-primary); margin: 4px 0 0;
+}
+.carousel-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 9px;
+  font-size: 0.82rem; color: var(--text-muted);
+}
+.carousel-text { font-size: 0.96rem; line-height: 1.65; color: var(--text-secondary); margin: 2px 0 6px; }
+.carousel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.carousel-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 11px; cursor: pointer;
+  font-size: 0.86rem; font-weight: 600; font-family: inherit;
+  background: var(--glass-bg-strong); border: 1px solid var(--glass-border); color: var(--text-primary);
+  transition: transform 0.14s ease, background 0.14s ease, filter 0.14s ease;
+}
+.carousel-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--surface-hover); }
+.carousel-btn:disabled { opacity: 0.65; cursor: default; }
+.carousel-btn.primary { background: var(--grad-brand); border-color: transparent; color: #fff; }
+.carousel-btn.primary:hover { filter: brightness(1.08); }
+
+.carousel-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+  color: var(--text-primary); cursor: pointer; transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+.carousel-nav:hover:not(:disabled) { background: var(--surface-hover); transform: translateY(-50%) scale(1.06); }
+.carousel-nav:disabled { opacity: 0.28; cursor: default; }
+.carousel-nav.prev { left: 22px; }
+.carousel-nav.next { right: 22px; }
+
+.carousel-dots {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 0 calc(16px + env(safe-area-inset-bottom));
+}
+.carousel-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--glass-border-strong); transition: all 0.2s ease; }
+.carousel-dot.active { width: 22px; border-radius: 4px; background: var(--purple); }
+
+@media (max-width: 768px) {
+  .carousel-nav { display: none; }            /* swipe instead of buttons */
+  .carousel-slide { padding: 6px 14px 18px; align-items: flex-start; }
+  .carousel-img { height: 230px; }
+  .carousel-body { padding: 18px 18px 22px; }
+  .carousel-btn { flex: 1 1 auto; justify-content: center; }
+}

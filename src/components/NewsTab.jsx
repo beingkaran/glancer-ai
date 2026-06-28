@@ -1,22 +1,8 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
-import NewsSwipe, { ShareButton } from './NewsSwipe';
-
-// True on phone-width viewports — used to swap the grid for the swipe feed.
-function useIsMobile() {
-  const query = '(max-width: 768px)';
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const onChange = (e) => setIsMobile(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-  return isMobile;
-}
+import { ShareButton } from './NewsSwipe';
+import NewsCarousel from './NewsCarousel';
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -53,11 +39,13 @@ function Thumb({ item, className, emojiSize }) {
 }
 
 export default function NewsTab() {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('All'); // "All" is the default category
   const [items, setItems] = useState(STATIC_NEWS);
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
-  const isMobile = useIsMobile();
+  // Index (within `filtered`) of the story to open the full-screen carousel at;
+  // null = closed. Clicking any card opens it on both desktop and mobile.
+  const [carouselAt, setCarouselAt] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -93,6 +81,15 @@ export default function NewsTab() {
   const featured = filtered[0];
   const rest = filtered.slice(1);
 
+  // Open the full-screen carousel at `idx` within `filtered`. Plain left-clicks
+  // open the reader; ⌘/Ctrl/middle-click fall through to the source URL so the
+  // card still behaves like a real link for power users.
+  const openAt = (idx) => (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    setCarouselAt(idx);
+  };
+
   return (
     <div className="content-section">
       <div className="container">
@@ -115,14 +112,9 @@ export default function NewsTab() {
           )}
         </div>
 
-        {/* Mobile: horizontally swipeable card feed (desktop layout untouched) */}
-        {isMobile ? (
-          <NewsSwipe items={filtered} />
-        ) : (
-          <>
         {/* Featured */}
         {featured && (
-          <a className="news-featured news-link" href={featured.url} target="_blank" rel="noopener noreferrer" aria-label={`Read: ${featured.title}`}>
+          <a className="news-featured news-link" href={featured.url} onClick={openAt(0)} rel="noopener noreferrer" aria-label={`Read: ${featured.title}`}>
             <Thumb item={featured} className="news-featured-img" emojiSize="5rem" />
             <div className="news-featured-body">
               <div>
@@ -146,8 +138,8 @@ export default function NewsTab() {
 
         {/* Grid */}
         <div className="news-grid">
-          {rest.map((item) => (
-            <a key={item.rid} className="news-card news-link" href={item.url} target="_blank" rel="noopener noreferrer" aria-label={`Read: ${item.title}`}>
+          {rest.map((item, i) => (
+            <a key={item.rid} className="news-card news-link" href={item.url} onClick={openAt(i + 1)} rel="noopener noreferrer" aria-label={`Read: ${item.title}`}>
               <Thumb item={item} className="news-card-thumb" emojiSize="3rem" />
               <div className="news-card-body">
                 <span className={`news-category-tag ${item.categoryClass}`} style={{ marginBottom: 10, fontSize: '0.68rem' }}>
@@ -166,7 +158,9 @@ export default function NewsTab() {
             </a>
           ))}
         </div>
-          </>
+
+        {carouselAt !== null && (
+          <NewsCarousel items={filtered} startIndex={carouselAt} onClose={() => setCarouselAt(null)} />
         )}
       </div>
     </div>
