@@ -13,6 +13,20 @@ dist-ssr
 .wrangler
 *.local
 
+# Capacitor native build output (the ios/ & android/ projects themselves are
+# committed once generated; these are per-machine build artifacts only)
+ios/App/Pods
+ios/App/build
+ios/DerivedData
+android/.gradle
+android/app/build
+android/build
+android/local.properties
+android/.idea
+android/captures
+*.keystore
+!debug.keystore
+
 # Secrets — never commit real API keys
 .env
 .env.*

@@ -8,6 +8,44 @@ import { askLLM } from './llm';
 
 export const ORIGIN = 'https://glancerai.com';
 
+// A subtle, consistent attribution appended to everything shared from the app.
+// Keeps the brand + domain in front of every new audience without shouting.
+export const SHARE_TAGLINE = 'via Glancer AI · glancerai.com';
+
+/*
+ * shareArticle — open the device's native share sheet for a news article (or any
+ * { title, url, source } shape). On phones this is the OS share menu
+ * (WhatsApp / Messages / X / etc.); inside the iOS & Android app shells the same
+ * navigator.share call bridges straight to the native sheet. Everywhere the
+ * shared text carries a subtle "via Glancer AI · glancerai.com" line so the
+ * brand travels with the link. Falls back to clipboard when sharing is
+ * unavailable. Returns 'shared' | 'copied' | 'cancelled'.
+ */
+export async function shareArticle(item = {}) {
+  const title = item.title || 'Glancer AI';
+  const url = item.url || ORIGIN;
+  const src = item.source ? ` (${item.source})` : '';
+  const text = `${title}${src}\n\n${SHARE_TAGLINE}`;
+
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      return 'shared';
+    } catch (err) {
+      // User dismissed the sheet — not an error worth surfacing.
+      if (err && err.name === 'AbortError') return 'cancelled';
+      /* fall through to clipboard */
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(`${title}\n${url}\n\n${SHARE_TAGLINE}`);
+    return 'copied';
+  } catch {
+    if (typeof window !== 'undefined') window.prompt('Copy this link:', url);
+    return 'copied';
+  }
+}
+
 export function blogPostUrl(post) {
   const id = post?.id ?? post?.slug;
   if (!id) return ORIGIN;
@@ -66,7 +104,7 @@ export function formatSharePost(hook, url, { tags = [] } = {}) {
   const tagStr = ['#AIOps', '#Observability', '#AI', ...tags.slice(0, 2).map((t) => `#${t.replace(/\s+/g, '')}`)]
     .slice(0, 5)
     .join(' ');
-  return `${hook.trim()}\n\n🔗 ${url}\n\n${tagStr}`;
+  return `${hook.trim()}\n\n🔗 ${url}\n\n${tagStr}\n\n${SHARE_TAGLINE}`;
 }
 
 const enc = encodeURIComponent;

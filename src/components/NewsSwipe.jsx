@@ -1,11 +1,38 @@
 import { useState, useEffect, useRef } from 'react';
 import { displayImage } from '../lib/newsFeed';
+import { shareArticle } from '../lib/socialShare';
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
   </svg>
 );
+
+const ShareIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+  </svg>
+);
+
+// A small share control that opens the native share sheet for one article.
+export function ShareButton({ item, className = 'swipe-share' }) {
+  const [done, setDone] = useState(false);
+  const onShare = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const res = await shareArticle(item);
+    if (res === 'copied') {
+      setDone(true);
+      setTimeout(() => setDone(false), 1600);
+    }
+  };
+  return (
+    <button type="button" className={className} onClick={onShare} aria-label={`Share: ${item.title}`}>
+      <ShareIcon /> {done ? 'Copied!' : 'Share'}
+    </button>
+  );
+}
 
 const BackIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -75,7 +102,10 @@ export default function NewsSwipe({ items }) {
           <article className="swipe-card" key={item.rid ?? i}>
             <CardImage item={item} />
             <div className="swipe-card-body">
-              <span className={`news-category-tag ${item.categoryClass}`}>{item.category}</span>
+              <div className="swipe-card-toprow">
+                <span className={`news-category-tag ${item.categoryClass}`}>{item.category}</span>
+                <ShareButton item={item} />
+              </div>
               <h3 className="swipe-card-title">{item.title}</h3>
               <p className="swipe-card-text">{item.excerpt}</p>
               <a

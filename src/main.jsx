@@ -15,6 +15,10 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ADSENSE_ENABLED, ADSENSE_CLIENT } from './lib/adsense.js'
+import { initNativeApp } from './lib/nativeApp.js'
+
+// Tag the platform + theme the native shell (no-op on the plain web build).
+initNativeApp()
 
 // Load the Google AdSense loader once, only after a real publisher id is set.
 // Keeping it out of index.html avoids a 404 + empty ad boxes during review.

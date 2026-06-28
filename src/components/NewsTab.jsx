@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
-import NewsSwipe from './NewsSwipe';
+import NewsSwipe, { ShareButton } from './NewsSwipe';
 
 // True on phone-width viewports — used to swap the grid for the swipe feed.
 function useIsMobile() {
@@ -135,7 +135,10 @@ export default function NewsTab() {
                 {featured.date && <><span className="news-meta-dot" aria-hidden="true" /><span>{featured.date}</span></>}
                 <span className="news-meta-dot" aria-hidden="true" />
                 <span>{featured.readMin} min read</span>
-                <span style={{ marginLeft: 'auto' }}><span className="read-more-link">Read story <ArrowIcon /></span></span>
+                <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+                  <ShareButton item={featured} className="news-share" />
+                  <span className="read-more-link">Read story <ArrowIcon /></span>
+                </span>
               </div>
             </div>
           </a>
@@ -154,7 +157,10 @@ export default function NewsTab() {
                 <p className="news-card-excerpt">{item.excerpt}</p>
                 <div className="news-card-footer">
                   <span>{item.source}{item.date ? ` · ${item.date}` : ''}</span>
-                  <span className="read-more-link">Read <ArrowIcon /></span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                    <ShareButton item={item} className="news-share" />
+                    <span className="read-more-link">Read <ArrowIcon /></span>
+                  </span>
                 </div>
               </div>
             </a>
