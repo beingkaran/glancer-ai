@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { blogPostUrl, formatSharePost, offlineHooks, PLATFORMS } from '../lib/socialShare';
 
 /*
  * ShareBar — share the current post to social platforms via each network's
- * public share-intent URL (no SDKs, no tracking). Plus a one-click "copy link".
+ * public share-intent URL (no SDKs, no tracking). Uses an engaging hook + blog link.
  */
 
 function shareUrl() {
@@ -55,16 +56,20 @@ function ShareBtn({ label, href, onClick, color, children }) {
 
 export default function ShareBar({ post }) {
   const [copied, setCopied] = useState(false);
-  const url = shareUrl();
-  const title = post?.title || 'Glancer AI';
-  const text = `${title} — via Glancer AI`;
+  const [copiedPost, setCopiedPost] = useState(false);
+  const url = post ? blogPostUrl(post) : shareUrl();
+  const hook = post ? offlineHooks(post)[0] : `${post?.title || 'Glancer AI'} — worth a read.`;
+  const postText = formatSharePost(hook, url, { tags: post?.tags });
 
-  const enc = encodeURIComponent;
-  const links = {
-    twitter: `https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(url)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`,
-    whatsapp: `https://wa.me/?text=${enc(`${text} ${url}`)}`,
+  const mainPlatforms = PLATFORMS.filter((p) =>
+    ['x', 'linkedin', 'facebook', 'whatsapp', 'reddit', 'bluesky'].includes(p.id),
+  );
+
+  const iconFor = {
+    x: ICONS.twitter,
+    linkedin: ICONS.linkedin,
+    facebook: ICONS.facebook,
+    whatsapp: ICONS.whatsapp,
   };
 
   async function copyLink() {
@@ -73,27 +78,47 @@ export default function ShareBar({ post }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
-      // Clipboard API can be blocked; fall back to a prompt.
       window.prompt('Copy this link:', url);
     }
   }
 
+  async function copyFullPost() {
+    try {
+      await navigator.clipboard.writeText(postText);
+      setCopiedPost(true);
+      setTimeout(() => setCopiedPost(false), 1800);
+    } catch {
+      window.prompt('Copy this post:', postText);
+    }
+  }
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', margin: '8px 0 4px' }}>
-      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 2 }}>
-        Share
-      </span>
-      <ShareBtn label="Share on X (Twitter)" href={links.twitter} color="var(--text-primary)">{ICONS.twitter} X</ShareBtn>
-      <ShareBtn label="Share on LinkedIn" href={links.linkedin} color="#0A66C2">{ICONS.linkedin} LinkedIn</ShareBtn>
-      <ShareBtn label="Share on Facebook" href={links.facebook} color="#1877F2">{ICONS.facebook} Facebook</ShareBtn>
-      <ShareBtn label="Share on WhatsApp" href={links.whatsapp} color="#25D366">{ICONS.whatsapp} WhatsApp</ShareBtn>
-      <ShareBtn label="Copy link" onClick={copyLink} color={copied ? '#22C55E' : 'var(--text-secondary)'}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-        </svg>
-        {copied ? 'Copied!' : 'Copy link'}
-      </ShareBtn>
+    <div style={{ margin: '8px 0 4px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 2 }}>
+          Share
+        </span>
+        {mainPlatforms.map((p) => (
+          <ShareBtn
+            key={p.id}
+            label={`Share on ${p.name}`}
+            href={p.buildUrl(postText, url, post?.title)}
+            color={p.id === 'x' ? 'var(--text-primary)' : p.color}
+          >
+            {iconFor[p.id] || <span>{p.icon}</span>} {p.name.split(' ')[0]}
+          </ShareBtn>
+        ))}
+        <ShareBtn label="Copy full post" onClick={copyFullPost} color={copiedPost ? '#22C55E' : 'var(--text-secondary)'}>
+          {copiedPost ? 'Copied!' : 'Copy post'}
+        </ShareBtn>
+        <ShareBtn label="Copy link" onClick={copyLink} color={copied ? '#22C55E' : 'var(--text-secondary)'}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          {copied ? 'Copied!' : 'Link'}
+        </ShareBtn>
+      </div>
     </div>
   );
 }

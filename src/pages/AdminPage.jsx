@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
 import AnalyticsPanel from '../components/AnalyticsPanel';
+import SocialSharePanel from '../components/SocialSharePanel';
 import {
   getAllBlogs, updateBlogStatus, deleteBlog,
   getWriterAccess, setRestrictWriters, addWriter, removeWriter,
@@ -30,6 +31,7 @@ export default function AdminPage() {
   const [access, setAccess] = useState({ restrict: false, emails: [] });
   const [newWriter, setNewWriter] = useState('');
   const [accessBusy, setAccessBusy] = useState(false);
+  const [sharePost, setSharePost] = useState(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -75,8 +77,12 @@ export default function AdminPage() {
     setBusyId(id);
     try {
       await updateBlogStatus(id, status);
+      const updated = blogs.find((b) => b.id === id);
+      const withStatus = updated ? { ...updated, status } : null;
       setBlogs((bs) => bs.map((b) => (b.id === id ? { ...b, status } : b)));
       if (preview?.id === id) setPreview({ ...preview, status });
+      // Auto-open social share panel when a post goes live
+      if (status === 'approved' && withStatus) setSharePost(withStatus);
     } catch (err) {
       alert(err?.message || 'Could not update the post.');
     } finally {
@@ -296,6 +302,14 @@ export default function AdminPage() {
                       >
                         {preview?.id === blog.id ? 'Hide' : 'Preview'}
                       </button>
+                      {blog.status === 'approved' && (
+                        <button
+                          onClick={() => setSharePost(blog)}
+                          style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(99,102,241,0.15)', color: '#818CF8', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}
+                        >
+                          📣 Share
+                        </button>
+                      )}
                       {blog.status !== 'approved' && (
                         <button disabled={busyId === blog.id} onClick={() => updateStatus(blog.id, 'approved')} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: 'rgba(34,197,94,0.15)', color: '#22C55E', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600 }}>
                           ✓ Approve
@@ -324,6 +338,13 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      <SocialSharePanel
+        post={sharePost}
+        open={!!sharePost}
+        onClose={() => setSharePost(null)}
+        autoOpen
+      />
     </div>
   );
 }
