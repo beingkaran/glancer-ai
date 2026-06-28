@@ -258,6 +258,59 @@ button { font-family: var(--font-body); }
 .read-more-link { font-size: 0.8rem; font-weight: 600; color: var(--purple); display: flex; align-items: center; gap: 4px; transition: var(--transition); }
 .read-more-link:hover { color: var(--cyan); }
 
+/* Share control on news cards — opens the native share sheet (subtle brand
+   attribution travels with every shared link). */
+.news-share {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: var(--border-radius-pill);
+  font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+  background: var(--surface); border: 1px solid var(--glass-border);
+  cursor: pointer; transition: var(--transition); line-height: 1;
+}
+.news-share:hover { color: var(--text-primary); border-color: var(--glass-border-strong); background: var(--surface-hover); }
+.news-share:active { transform: scale(0.95); }
+
+/* ============================================================
+   Personalised greeting banner (top of the home feed)
+   ============================================================ */
+.greeting-wrap { padding: 18px 0 4px; }
+.greeting-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 18px 22px; border-radius: var(--border-radius);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
+  box-shadow: var(--shadow-card);
+  position: relative; overflow: hidden;
+}
+.greeting-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg, rgba(124,58,237,0.10), rgba(6,182,212,0.07) 60%, transparent);
+  pointer-events: none;
+}
+.greeting-text { position: relative; z-index: 1; min-width: 0; }
+.greeting-title {
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.2;
+  color: var(--text-primary); display: flex; align-items: center; gap: 9px;
+}
+.greeting-emoji { font-size: 1.4rem; }
+.greeting-line { font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.5; }
+.greeting-cta {
+  flex-shrink: 0; position: relative; z-index: 1;
+  display: inline-flex; align-items: center; padding: 9px 16px;
+  border-radius: var(--border-radius-pill); font-size: 0.84rem; font-weight: 700;
+  color: #fff; background: var(--grad-brand); box-shadow: var(--shadow-glow);
+  text-decoration: none; transition: var(--transition); white-space: nowrap;
+}
+.greeting-cta:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+@media (max-width: 768px) {
+  .greeting-wrap { padding: 12px 0 0; }
+  .greeting-card { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 18px; }
+  .greeting-title { font-size: 1.18rem; }
+  .greeting-cta { width: 100%; justify-content: center; }
+}
+
 /* Metrics */
 .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
 .metric-stat {
@@ -804,7 +857,21 @@ button { font-family: var(--font-body); }
     padding: 18px 20px 16px;
     display: flex; flex-direction: column;
   }
-  .swipe-card-body .news-category-tag { margin-bottom: 10px; font-size: 0.64rem; }
+  .swipe-card-body .news-category-tag { margin-bottom: 0; font-size: 0.64rem; }
+  .swipe-card-toprow {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .swipe-share {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 13px; border-radius: var(--border-radius-pill);
+    font-size: 0.74rem; font-weight: 700; color: var(--text-primary);
+    background: var(--surface); border: 1px solid var(--glass-border-strong);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: var(--transition);
+  }
+  .swipe-share:active { transform: scale(0.94); background: var(--surface-hover); }
   .swipe-card-title {
     font-family: var(--font-heading); font-weight: 700;
     font-size: 1.22rem; line-height: 1.28; letter-spacing: -0.01em;
@@ -1223,3 +1290,63 @@ button { font-family: var(--font-body); }
 @media (max-width: 600px) {
   .tour-replay { right: 14px; bottom: 14px; padding: 9px 14px; }
 }
+
+/* ============================================================
+   Native app feel — iOS & Android (Capacitor) + PWA standalone
+   ------------------------------------------------------------
+   `data-platform` is set on <html> by src/lib/nativeApp.js. The
+   safe-area rules also apply in mobile browsers (env() is 0 where
+   there's no notch / home indicator, so desktop is unaffected).
+   ============================================================ */
+
+/* Keep the floating navbar clear of the notch / Dynamic Island. */
+.navbar { top: calc(12px + env(safe-area-inset-top)); }
+
+/* Honour the home indicator + landscape notch at the page edges. */
+.footer { padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
+
+@media (max-width: 768px) {
+  /* Side insets so cards never hide under a landscape notch. */
+  .container { padding-left: calc(24px + env(safe-area-inset-left)); padding-right: calc(24px + env(safe-area-inset-right)); }
+
+  /* The full-height swipe feed must subtract both safe areas + the navbar. */
+  .swipe-feed { height: calc(100dvh - 104px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .swipe-back    { top: calc(10px + env(safe-area-inset-top)); }
+  .swipe-progress{ top: calc(10px + env(safe-area-inset-top)); }
+}
+
+/* ---- In-app / installed shell only (set by nativeApp.js) ---------------- */
+html.is-native, html.is-native body {
+  /* No rubber-band overscroll on the page itself; lock text scaling. */
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+html.is-native { scroll-behavior: auto; } /* native momentum handles smoothing */
+
+/* App-chrome shouldn't feel like a web page: kill the blue tap flash, the
+   long-press callout, and accidental text selection on interactive bits. */
+html.is-native * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+html.is-native button,
+html.is-native .nav-link,
+html.is-native .filter-chip,
+html.is-native .tab-btn,
+html.is-native .news-category-tag { -webkit-user-select: none; user-select: none; }
+
+/* ---- iOS: roomier tap targets + crisp momentum scrolling --------------- */
+html[data-platform="ios"] { --webkit-overflow-scrolling: touch; }
+html[data-platform="ios"] .icon-btn,
+html[data-platform="ios"] .write-btn,
+html[data-platform="ios"] .nav-avatar { min-width: 40px; min-height: 40px; }
+html[data-platform="ios"] .swipe-share,
+html[data-platform="ios"] .news-share { padding-top: 7px; padding-bottom: 7px; } /* 44px-ish touch height */
+html[data-platform="ios"] .swipe-card-text { -webkit-overflow-scrolling: touch; }
+
+/* ---- Android: Material-style press feedback (subtle ripple-in-place) ---- */
+html[data-platform="android"] button,
+html[data-platform="android"] .greeting-cta,
+html[data-platform="android"] .swipe-back { transition: transform 0.08s ease, filter 0.08s ease, background 0.12s ease; }
+html[data-platform="android"] button:active,
+html[data-platform="android"] .greeting-cta:active { transform: scale(0.97); filter: brightness(1.06); }
+/* Android's font renders a touch heavier — nudge body weight down for parity. */
+html[data-platform="android"] body { -webkit-font-smoothing: auto; }

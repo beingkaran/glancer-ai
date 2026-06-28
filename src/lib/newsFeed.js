@@ -1,5 +1,6 @@
 import { NEWS_ITEMS } from '../data/newsData';
 import { proxiedText } from './proxy';
+import { classify } from './categorize';
 
 /*
  * newsFeed — fetches live AI headlines and normalizes them into the card
@@ -174,10 +175,13 @@ function normalize(item, i) {
   const html = item.content || item.description || '';
   const text = stripHtml(html);
   const image = item.image || item.thumbnail || item.enclosure?.link || firstImageFrom(html) || null;
-  const category = item._category || 'Industry';
+  const title = stripHtml(item.title || 'Untitled');
+  // _category was auto-classified in selectDiverse (article content → best-fit
+  // chip). Re-classify defensively only if it's somehow missing.
+  const category = item._category || classify(title, text, 'Industry');
   return {
     id: item.guid || item.link || `live-${i}`,
-    title: stripHtml(item.title || 'Untitled'),
+    title,
     excerpt: text.length > 180 ? text.slice(0, 177) + '…' : text,
     html,
     url: item.link,
@@ -302,7 +306,10 @@ function selectDiverse(items, limit, maxPerSource = 3) {
     const key = it.title.toLowerCase();
     if (seenTitle.has(key)) continue;
     seenTitle.add(key);
-    const cat = it._category || 'Industry';
+    // Auto-categorise here too so the diverse round-robin balances by the
+    // chips the cards will actually show (set once; normalize trusts it).
+    const cat = classify(stripHtml(it.title), stripHtml(it.content || it.description || ''), it._category || 'Industry');
+    it._category = cat;
     if (!buckets.has(cat)) buckets.set(cat, []);
     buckets.get(cat).push(it);
   }

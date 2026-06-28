@@ -1,0 +1,21 @@
+{
+  "name": "Glancer AI — AI News & Intelligence Hub",
+  "short_name": "Glancer AI",
+  "description": "Breaking AI news, industry metrics, expert blogs and free in-browser AI tools — your intelligent hub for the AI ecosystem.",
+  "id": "/",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000814",
+  "theme_color": "#000814",
+  "lang": "en",
+  "categories": ["news", "technology", "productivity"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

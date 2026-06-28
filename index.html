@@ -3,8 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- viewport-fit=cover lets the UI extend under the notch / home indicator;
+         CSS uses env(safe-area-inset-*) to keep content clear of them. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Installable / native-app feel (PWA + iOS & Android web-app shells) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#000814" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Glancer AI" />
+    <meta name="format-detection" content="telephone=no" />
+
     <title>Glancer AI — AI News, Metrics, Free AI Tools & Intelligence Hub</title>
     <meta name="description" content="Stay ahead with AI News, industry metrics, leaderboards, expert blogs and 25+ free in-browser AI tools. Glancer AI (glancerai.com) is your intelligent hub for the AI ecosystem." />
     <meta name="author" content="Glancer AI" />
