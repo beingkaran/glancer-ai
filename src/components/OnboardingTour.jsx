@@ -15,6 +15,12 @@ const STEPS = [
     demo: 'theme',
   },
   {
+    sel: '[data-tour="glossary"]',
+    label: 'Glossary',
+    title: 'AI, AIOps & Observability Glossary',
+    body: 'The dictionary for AI, AIOps & Observability — look up any term in plain English.',
+  },
+  {
     sel: '[data-tour="write"]',
     label: 'Community',
     title: 'Write your own blogs',

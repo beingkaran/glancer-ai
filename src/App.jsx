@@ -18,6 +18,7 @@ import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminPage from './pages/AdminPage';
+import { recordHit } from './lib/analytics';
 
 export default function App() {
   const [theme, setTheme] = useState('dark');
@@ -29,6 +30,12 @@ export default function App() {
 
   // Scroll to top on route change
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+
+  // Count this page view (anonymous, fire-and-forget). Admin pages are excluded
+  // so the dashboard's own traffic doesn't inflate the public visit stats.
+  useEffect(() => {
+    if (!pathname.startsWith('/_glancer')) recordHit(pathname);
+  }, [pathname]);
 
   const isAdmin = pathname === '/_glancer/admin';
   const isHome = pathname === '/';

@@ -270,6 +270,87 @@ drop policy if exists comment_likes_delete_own on public.comment_likes;
 create policy comment_likes_delete_own on public.comment_likes
   for delete using (auth.uid() = user_id);
 
+-- ---------------------------------------------------------------------------
+-- page_hits  (anonymous page-view analytics)
+-- ---------------------------------------------------------------------------
+-- One row per page view. `visitor_id` is an anonymous, per-browser id generated
+-- client-side (localStorage) — no personal data, just enough to count UNIQUE
+-- visitors. Anyone may insert a hit; only admins can read the data, and the
+-- aggregate stats are served by the page_analytics() function below.
+create table if not exists public.page_hits (
+  id         uuid primary key default gen_random_uuid(),
+  visitor_id text not null,
+  path       text,
+  created_at timestamptz not null default now()
+);
+create index if not exists page_hits_created_idx on public.page_hits (created_at desc);
+create index if not exists page_hits_visitor_idx on public.page_hits (visitor_id);
+
+alter table public.page_hits enable row level security;
+
+-- Anyone (even signed-out visitors) may RECORD a hit...
+drop policy if exists page_hits_insert on public.page_hits;
+create policy page_hits_insert on public.page_hits
+  for insert with check (true);
+
+-- ...but only admins may read the raw rows.
+drop policy if exists page_hits_select_admin on public.page_hits;
+create policy page_hits_select_admin on public.page_hits
+  for select using (public.is_admin());
+
+-- Admin-only aggregate snapshot: totals + unique visitors for today / 7d / 12mo,
+-- plus daily (30d), weekly (12w) and yearly trend series. SECURITY DEFINER so it
+-- can scan the table, but it refuses any caller who isn't an admin.
+create or replace function public.page_analytics()
+returns json
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  result json;
+begin
+  if not public.is_admin() then
+    raise exception 'Only admins may view analytics.';
+  end if;
+
+  select json_build_object(
+    'total',        (select count(*) from page_hits),
+    'unique_total', (select count(distinct visitor_id) from page_hits),
+    'today',        (select count(*) from page_hits where created_at >= date_trunc('day', now())),
+    'unique_today', (select count(distinct visitor_id) from page_hits where created_at >= date_trunc('day', now())),
+    'week',         (select count(*) from page_hits where created_at >= now() - interval '7 days'),
+    'unique_week',  (select count(distinct visitor_id) from page_hits where created_at >= now() - interval '7 days'),
+    'year',         (select count(*) from page_hits where created_at >= now() - interval '12 months'),
+    'unique_year',  (select count(distinct visitor_id) from page_hits where created_at >= now() - interval '12 months'),
+    'daily',  (select coalesce(json_agg(json_build_object('label', label, 'hits', hits, 'uniques', uniques) order by bucket), '[]'::json) from (
+        select date_trunc('day', created_at) as bucket,
+               to_char(date_trunc('day', created_at), 'Mon DD') as label,
+               count(*) as hits, count(distinct visitor_id) as uniques
+        from page_hits where created_at >= now() - interval '30 days'
+        group by date_trunc('day', created_at)
+      ) d),
+    'weekly', (select coalesce(json_agg(json_build_object('label', label, 'hits', hits, 'uniques', uniques) order by bucket), '[]'::json) from (
+        select date_trunc('week', created_at) as bucket,
+               to_char(date_trunc('week', created_at), 'Mon DD') as label,
+               count(*) as hits, count(distinct visitor_id) as uniques
+        from page_hits where created_at >= now() - interval '12 weeks'
+        group by date_trunc('week', created_at)
+      ) w),
+    'yearly', (select coalesce(json_agg(json_build_object('label', label, 'hits', hits, 'uniques', uniques) order by bucket), '[]'::json) from (
+        select date_trunc('year', created_at) as bucket,
+               to_char(date_trunc('year', created_at), 'YYYY') as label,
+               count(*) as hits, count(distinct visitor_id) as uniques
+        from page_hits where created_at >= now() - interval '5 years'
+        group by date_trunc('year', created_at)
+      ) y)
+  ) into result;
+
+  return result;
+end;
+$$;
+
 -- ============================================================================
 -- BECOMING ADMIN
 -- ============================================================================

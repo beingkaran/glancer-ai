@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
+import AnalyticsPanel from '../components/AnalyticsPanel';
 import {
   getAllBlogs, updateBlogStatus, deleteBlog,
   getWriterAccess, setRestrictWriters, addWriter, removeWriter,
@@ -199,11 +200,21 @@ export default function AdminPage() {
             <span>Writer Access</span>
             {access.restrict && <span style={{ background: 'rgba(168,85,247,0.2)', color: 'var(--purple)', borderRadius: 20, padding: '1px 8px', fontSize: '0.7rem' }}>ON</span>}
           </button>
+
+          <p style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', padding: '0 16px', margin: '18px 0 8px' }}>Analytics</p>
+          <button
+            onClick={() => setActiveFilter('analytics')}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: activeFilter === 'analytics' ? 'rgba(168,85,247,0.12)' : 'none', border: 'none', color: activeFilter === 'analytics' ? 'var(--purple)' : 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.875rem', textAlign: 'left', borderLeft: activeFilter === 'analytics' ? '2px solid var(--purple)' : '2px solid transparent' }}
+          >
+            <span>📊 Page Hits</span>
+          </button>
         </div>
 
         {/* Main content */}
         <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
-          {activeFilter === 'writers' ? (
+          {activeFilter === 'analytics' ? (
+            <AnalyticsPanel />
+          ) : activeFilter === 'writers' ? (
             <div style={{ maxWidth: 620 }}>
               <h2 className="section-title-lg" style={{ marginBottom: 8 }}>Writer Access</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 20, lineHeight: 1.6 }}>

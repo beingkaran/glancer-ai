@@ -104,7 +104,7 @@ export default function Navbar({ theme, onToggleTheme }) {
             <NavLink
               key={link.label}
               to={link.to.startsWith('/#') ? '/' : link.to}
-              data-tour={link.to === '/ai-tools' ? 'tools' : undefined}
+              data-tour={link.to === '/ai-tools' ? 'tools' : link.to === '/glossary' ? 'glossary' : undefined}
               className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
               onClick={() => {
                 if (link.to === '/#news') {
