@@ -119,8 +119,8 @@ export default function Navbar({ theme, onToggleTheme }) {
         </nav>
 
         <div className="nav-actions">
-          <Link to="/blog/write" className="write-btn" data-tour="write" aria-label="Write a blog post" onClick={handleWrite}>
-            <PenIcon /> Write
+          <Link to="/blog/write" className="write-btn" data-tour="write" aria-label="Publish your own blogs" title="Publish your own blogs" onClick={handleWrite}>
+            <PenIcon />
           </Link>
           {isAuthed ? (
             <Link to="/profile" className="nav-avatar" aria-label="Your profile" title={user.name}>

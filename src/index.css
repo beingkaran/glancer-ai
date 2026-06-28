@@ -437,8 +437,8 @@ button { font-family: var(--font-body); }
    Navbar Write button
    ============================================================ */
 .write-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 18px; border-radius: 10px; border: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px; border-radius: 10px; border: none;
   background: var(--grad-brand); color: white;
   font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600;
   cursor: pointer; transition: var(--transition); white-space: nowrap;
