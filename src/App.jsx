@@ -10,6 +10,7 @@ import MetricsPage from './pages/MetricsPage';
 import GlossaryPage from './pages/GlossaryPage';
 import AIToolsPage from './pages/AIToolsPage';
 import AboutPage from './pages/AboutPage';
+import FAQPage from './pages/FAQPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogPostPage from './pages/BlogPostPage';
 import NewsReaderPage from './pages/NewsReaderPage';
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/profile"           element={<ProfilePage />} />
           <Route path="/reset-password"    element={<ResetPasswordPage />} />
           <Route path="/about"             element={<AboutPage />} />
+          <Route path="/faq"               element={<FAQPage />} />
           <Route path="/_glancer/admin"    element={<AdminPage />} />
         </Routes>
       </main>

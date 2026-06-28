@@ -32,14 +32,14 @@ const FEEDS = [
 // abandons every visitor's old cache on their next load — without it, anyone who
 // saw the previous (broken, emoji-only) feed would keep seeing it from cache for
 // up to CACHE_TTL even after a fix ships.
-const CACHE_KEY = 'glancer_news_cache_v2';
+const CACHE_KEY = 'glancer_news_cache_v3';
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours — for a successful LIVE fetch
 // Static fallback is cached only briefly so a transient feed outage can't pin
 // the emoji placeholders for 12 hours; the next visit retries the live feed.
 const FALLBACK_TTL = 20 * 60 * 1000; // 20 minutes
 
 // One-time cleanup of the pre-versioning cache key so it doesn't linger.
-try { localStorage.removeItem('glancer_news_cache'); } catch { /* noop */ }
+try { localStorage.removeItem('glancer_news_cache'); localStorage.removeItem('glancer_news_cache_v2'); } catch { /* noop */ }
 
 const GRADIENTS = [
   'linear-gradient(135deg, #1a0533 0%, #4c1d95 50%, #7c3aed 100%)',

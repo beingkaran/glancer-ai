@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
+import TiptapImage from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
@@ -22,13 +22,17 @@ const GRADIENTS = [
 ];
 const EMOJIS = ['🔭','📊','🤖','⚡','🛡️','🔗','☁️','⚙️','🧠','📟','🔍','🚀'];
 
-/* Read an image file and downscale it to a compressed JPEG data URL.
- * Keeps localStorage small (banners are stored inline with the blog). */
+/* Read an image file, downscale it, and compress to a WebP data URL — WebP is
+ * typically 25–35% smaller than JPEG at the same visual quality, which keeps the
+ * inline-stored images (banner + body) small. Falls back to JPEG on the rare
+ * engine that can't encode WebP.
+ * NOTE: the browser's global `Image` is shadowed by the TipTap `TiptapImage`
+ * import, so we construct a real HTMLImageElement via `window.Image`. */
 function fileToCompressedDataURL(file, maxW = 1280, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const scale = Math.min(1, maxW / img.width);
         const w = Math.max(1, Math.round(img.width * scale));
@@ -39,7 +43,12 @@ function fileToCompressedDataURL(file, maxW = 1280, quality = 0.82) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         try {
-          resolve(canvas.toDataURL('image/jpeg', quality));
+          // Prefer WebP; if the engine ignores it (returns PNG), fall back to JPEG.
+          let url = canvas.toDataURL('image/webp', quality);
+          if (!url.startsWith('data:image/webp')) {
+            url = canvas.toDataURL('image/jpeg', quality);
+          }
+          resolve(url);
         } catch (err) {
           reject(err);
         }
@@ -125,7 +134,7 @@ export default function BlogWritePage() {
       StarterKit,
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: 'editor-link' } }),
-      Image.configure({ inline: false, HTMLAttributes: { class: 'editor-image' } }),
+      TiptapImage.configure({ inline: false, HTMLAttributes: { class: 'editor-image' } }),
       Placeholder.configure({ placeholder: 'Share your insights, experiences, and knowledge with the Glancer AI community…' }),
       CharacterCount,
     ],

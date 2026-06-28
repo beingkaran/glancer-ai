@@ -5,5 +5,6 @@
   <url><loc>https://glancerai.com/blogs</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://glancerai.com/metrics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://glancerai.com/glossary</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://glancerai.com/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://glancerai.com/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

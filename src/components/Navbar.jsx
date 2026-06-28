@@ -38,6 +38,7 @@ const NAV_LINKS = [
   { label: 'Blogs', to: '/blogs' },
   { label: 'Metrics', to: '/metrics' },
   { label: 'Glossary', to: '/glossary' },
+  { label: 'FAQ', to: '/faq' },
   { label: 'About', to: '/about' },
 ];
 
