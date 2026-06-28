@@ -14,32 +14,99 @@ import { proxiedText } from './proxy';
  * the in-site reader (/news/:rid) can look it up from the cache.
  */
 
-// AI-specific feeds that ship a real image per item (media:content / enclosure /
-// inline <img>), so cards render a photo instead of the emoji placeholder.
-// Verified: The Verge, VentureBeat, Wired, Ars Technica, AI News all return an
-// image on ~10/10 items via rss2json. TechCrunch's feed carries no inline image,
-// so its cards rely on the og:image enrichment pass (fetchOgImage) below.
+// AI news RSS feeds. Every entry carries a `category` so each headline lands
+// under a filter chip (Research / Models / Industry / Open Source / Tools /
+// Hardware / AIOps / Policy) regardless of which publisher it came from.
+// Dead or unreachable feeds are skipped gracefully (Promise pool below uses
+// allSettled semantics), so the list can be generous — more sources means a
+// fuller, fresher feed. Each fetch shuffles this list and pulls with bounded
+// concurrency so we stay friendly to the free rss2json tier.
 const FEEDS = [
-  { url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', source: 'The Verge' },
-  { url: 'https://venturebeat.com/category/ai/feed/', source: 'VentureBeat' },
-  { url: 'https://www.wired.com/feed/tag/ai/latest/rss', source: 'Wired' },
-  { url: 'https://arstechnica.com/ai/feed/', source: 'Ars Technica' },
-  { url: 'https://www.artificialintelligence-news.com/feed/', source: 'AI News' },
-  { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch' },
+  // ── Major tech press (Industry) ──────────────────────────────────────────
+  { url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml', source: 'The Verge', category: 'Industry' },
+  { url: 'https://venturebeat.com/category/ai/feed/', source: 'VentureBeat', category: 'Industry' },
+  { url: 'https://www.wired.com/feed/tag/ai/latest/rss', source: 'Wired', category: 'Industry' },
+  { url: 'https://arstechnica.com/ai/feed/', source: 'Ars Technica', category: 'Industry' },
+  { url: 'https://techcrunch.com/category/artificial-intelligence/feed/', source: 'TechCrunch', category: 'Industry' },
+  { url: 'https://www.artificialintelligence-news.com/feed/', source: 'AI News', category: 'Industry' },
+  { url: 'https://www.zdnet.com/topic/artificial-intelligence/rss.xml', source: 'ZDNet', category: 'Industry' },
+  { url: 'https://www.technologyreview.com/topic/artificial-intelligence/feed', source: 'MIT Tech Review', category: 'Industry' },
+  { url: 'https://www.theregister.com/software/ai_ml/headlines.atom', source: 'The Register', category: 'Industry' },
+  { url: 'https://the-decoder.com/feed/', source: 'The Decoder', category: 'Industry' },
+  { url: 'https://www.unite.ai/feed/', source: 'Unite.AI', category: 'Industry' },
+  { url: 'https://aibusiness.com/rss.xml', source: 'AI Business', category: 'Industry' },
+  { url: 'https://siliconangle.com/category/ai/feed/', source: 'SiliconANGLE', category: 'Industry' },
+  { url: 'https://analyticsindiamag.com/feed/', source: 'Analytics India', category: 'Industry' },
+  { url: 'https://www.engadget.com/rss.xml', source: 'Engadget', category: 'Industry' },
+  { url: 'https://www.cnbc.com/id/19854910/device/rss/rss.html', source: 'CNBC Tech', category: 'Industry' },
+  { url: 'https://bdtechtalks.com/feed/', source: 'BD Tech Talks', category: 'Industry' },
+  { url: 'https://dailyai.com/feed/', source: 'DailyAI', category: 'Industry' },
+
+  // ── Frontier labs & model makers (Models) ────────────────────────────────
+  { url: 'https://openai.com/blog/rss.xml', source: 'OpenAI', category: 'Models' },
+  { url: 'https://deepmind.google/blog/rss.xml', source: 'Google DeepMind', category: 'Models' },
+  { url: 'https://blog.google/technology/ai/rss/', source: 'Google AI', category: 'Models' },
+  { url: 'https://www.interconnects.ai/feed', source: 'Interconnects', category: 'Models' },
+
+  // ── Research labs & academia (Research) ──────────────────────────────────
+  { url: 'https://bair.berkeley.edu/blog/feed.xml', source: 'Berkeley BAIR', category: 'Research' },
+  { url: 'https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml', source: 'MIT News', category: 'Research' },
+  { url: 'https://www.microsoft.com/en-us/research/feed/', source: 'Microsoft Research', category: 'Research' },
+  { url: 'https://blog.research.google/feeds/posts/default', source: 'Google Research', category: 'Research' },
+  { url: 'https://thegradient.pub/rss/', source: 'The Gradient', category: 'Research' },
+  { url: 'https://syncedreview.com/feed/', source: 'Synced', category: 'Research' },
+  { url: 'https://www.marktechpost.com/feed/', source: 'MarkTechPost', category: 'Research' },
+  { url: 'https://www.amazon.science/index.rss', source: 'Amazon Science', category: 'Research' },
+  { url: 'https://research.facebook.com/feed/', source: 'Meta Research', category: 'Research' },
+  { url: 'https://magazine.sebastianraschka.com/feed', source: 'Sebastian Raschka', category: 'Research' },
+
+  // ── Open source & ML engineering (Open Source) ───────────────────────────
+  { url: 'https://huggingface.co/blog/feed.xml', source: 'Hugging Face', category: 'Open Source' },
+  { url: 'https://pytorch.org/blog/feed.xml', source: 'PyTorch', category: 'Open Source' },
+  { url: 'https://blog.tensorflow.org/feeds/posts/default', source: 'TensorFlow', category: 'Open Source' },
+  { url: 'https://github.blog/ai-and-ml/feed/', source: 'GitHub', category: 'Open Source' },
+
+  // ── Tooling, applied ML & how-to (Tools) ─────────────────────────────────
+  { url: 'https://blog.langchain.dev/rss.xml', source: 'LangChain', category: 'Tools' },
+  { url: 'https://www.kdnuggets.com/feed', source: 'KDnuggets', category: 'Tools' },
+  { url: 'https://machinelearningmastery.com/feed/', source: 'ML Mastery', category: 'Tools' },
+  { url: 'https://towardsdatascience.com/feed', source: 'Towards Data Science', category: 'Tools' },
+  { url: 'https://blog.roboflow.com/rss/', source: 'Roboflow', category: 'Tools' },
+  { url: 'https://www.latent.space/feed', source: 'Latent Space', category: 'Tools' },
+  { url: 'https://simonwillison.net/atom/everything/', source: 'Simon Willison', category: 'Tools' },
+  { url: 'https://www.oreilly.com/radar/topics/ai-ml/feed/index.xml', source: "O'Reilly Radar", category: 'Tools' },
+
+  // ── Compute & hardware (Hardware) ────────────────────────────────────────
+  { url: 'https://blogs.nvidia.com/feed/', source: 'NVIDIA', category: 'Hardware' },
+  { url: 'https://developer.nvidia.com/blog/feed/', source: 'NVIDIA Developer', category: 'Hardware' },
+  { url: 'https://aws.amazon.com/blogs/machine-learning/feed/', source: 'AWS ML', category: 'Hardware' },
+  { url: 'https://www.therobotreport.com/feed/', source: 'The Robot Report', category: 'Hardware' },
+
+  // ── Observability & AIOps (AIOps) ────────────────────────────────────────
+  { url: 'https://opentelemetry.io/blog/index.xml', source: 'OpenTelemetry', category: 'AIOps' },
+  { url: 'https://www.datadoghq.com/blog/index.xml', source: 'Datadog', category: 'AIOps' },
+  { url: 'https://grafana.com/blog/index.xml', source: 'Grafana', category: 'AIOps' },
+  { url: 'https://newrelic.com/blog/feed', source: 'New Relic', category: 'AIOps' },
+
+  // ── Policy, safety & society (Policy) ────────────────────────────────────
+  { url: 'https://www.brookings.edu/topic/artificial-intelligence/feed/', source: 'Brookings', category: 'Policy' },
+  { url: 'https://importai.substack.com/feed', source: 'Import AI', category: 'Policy' },
+  { url: 'https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss', source: 'IEEE Spectrum', category: 'Policy' },
+  { url: 'https://lastweekin.ai/feed', source: 'Last Week in AI', category: 'Policy' },
 ];
 
 // Bump the version suffix whenever the feed list / item shape changes. This
 // abandons every visitor's old cache on their next load — without it, anyone who
 // saw the previous (broken, emoji-only) feed would keep seeing it from cache for
 // up to CACHE_TTL even after a fix ships.
-const CACHE_KEY = 'glancer_news_cache_v3';
+const CACHE_KEY = 'glancer_news_cache_v4';
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours — for a successful LIVE fetch
 // Static fallback is cached only briefly so a transient feed outage can't pin
 // the emoji placeholders for 12 hours; the next visit retries the live feed.
 const FALLBACK_TTL = 20 * 60 * 1000; // 20 minutes
 
-// One-time cleanup of the pre-versioning cache key so it doesn't linger.
-try { localStorage.removeItem('glancer_news_cache'); localStorage.removeItem('glancer_news_cache_v2'); } catch { /* noop */ }
+// One-time cleanup of older cache keys so they don't linger.
+try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
 
 const GRADIENTS = [
   'linear-gradient(135deg, #1a0533 0%, #4c1d95 50%, #7c3aed 100%)',
@@ -51,6 +118,22 @@ const GRADIENTS = [
 ];
 const EMOJIS = ['🧠', '⚡', '🤖', '🚀', '💡', '🔬', '📡', '🌐', '🛰️', '💬'];
 const TAG_CLASSES = ['tag-purple', 'tag-cyan', 'tag-pink', 'tag-blue', 'tag-orange'];
+
+// Stable colour per category so the same category always reads the same hue
+// across the live feed and the curated fallback. Falls back to a hashed pick.
+const CATEGORY_CLASS = {
+  Research: 'tag-purple',
+  Models: 'tag-pink',
+  Industry: 'tag-cyan',
+  'Open Source': 'tag-blue',
+  Tools: 'tag-cyan',
+  Hardware: 'tag-orange',
+  AIOps: 'tag-blue',
+  Policy: 'tag-orange',
+};
+function classFor(category, i = 0) {
+  return CATEGORY_CLASS[category] || TAG_CLASSES[i % TAG_CLASSES.length];
+}
 
 function stripHtml(html = '') {
   const tmp = document.createElement('div');
@@ -91,6 +174,7 @@ function normalize(item, i) {
   const html = item.content || item.description || '';
   const text = stripHtml(html);
   const image = item.image || item.thumbnail || item.enclosure?.link || firstImageFrom(html) || null;
+  const category = item._category || 'Industry';
   return {
     id: item.guid || item.link || `live-${i}`,
     title: stripHtml(item.title || 'Untitled'),
@@ -98,8 +182,8 @@ function normalize(item, i) {
     html,
     url: item.link,
     source: item._source,
-    category: item._source,
-    categoryClass: TAG_CLASSES[i % TAG_CLASSES.length],
+    category,
+    categoryClass: classFor(category, i),
     emoji: EMOJIS[i % EMOJIS.length],
     gradient: GRADIENTS[i % GRADIENTS.length],
     date: formatDate(item.pubDate),
@@ -130,7 +214,7 @@ async function fetchViaRss2Json(feed) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   if (data.status !== 'ok' || !Array.isArray(data.items)) throw new Error('bad feed');
-  return data.items.map((it) => ({ ...it, _source: feed.source }));
+  return data.items.map((it) => ({ ...it, _source: feed.source, _category: feed.category }));
 }
 
 async function fetchViaProxy(feed) {
@@ -160,6 +244,7 @@ async function fetchViaProxy(feed) {
       guid: n.querySelector('guid')?.textContent || link,
       image,
       _source: feed.source,
+      _category: feed.category,
     };
   });
 }
@@ -172,23 +257,84 @@ async function fetchFeed(feed) {
   }
 }
 
-async function fetchLiveNews(limit = 10) {
-  const settled = await Promise.allSettled(FEEDS.map(fetchFeed));
-  const items = settled.filter((r) => r.status === 'fulfilled').flatMap((r) => r.value);
-  if (!items.length) return null;
+// Fisher–Yates shuffle (on a copy) so each refresh prioritises a different
+// slice of the (large) feed list — over repeat visits every source gets a turn,
+// and a few rate-limited feeds never starve the same categories every time.
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-  const seen = new Set();
-  return items
+// Run `worker` over `items` with bounded concurrency. With 60+ feeds, firing
+// them all at once would hammer rss2json's free tier (and the browser's per-host
+// socket cap); a pool keeps it civil while still finishing quickly. Mirrors
+// Promise.allSettled — a failing feed resolves to null and is filtered out.
+async function runPool(items, worker, concurrency = 6) {
+  const out = new Array(items.length).fill(null);
+  let cursor = 0;
+  async function lane() {
+    while (cursor < items.length) {
+      const i = cursor++;
+      try { out[i] = await worker(items[i]); } catch { out[i] = null; }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, lane));
+  return out;
+}
+
+// Pick `limit` items with category diversity. We bucket the (date-sorted) pool
+// by category and round-robin across buckets, so the default "All" view always
+// surfaces several categories — not just whichever publishers happened to post
+// most often — while still preferring the freshest item within each category.
+// A per-source cap stops any single outlet from dominating.
+function selectDiverse(items, limit, maxPerSource = 3) {
+  const sorted = items
     .filter((it) => it.title && it.link)
-    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-    .filter((it) => {
-      const key = it.title.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .slice(0, limit)
-    .map(normalize);
+    .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  const seenTitle = new Set();
+  const buckets = new Map(); // category → date-desc items
+  for (const it of sorted) {
+    const key = it.title.toLowerCase();
+    if (seenTitle.has(key)) continue;
+    seenTitle.add(key);
+    const cat = it._category || 'Industry';
+    if (!buckets.has(cat)) buckets.set(cat, []);
+    buckets.get(cat).push(it);
+  }
+
+  const order = [...buckets.keys()];
+  const perSource = new Map();
+  const picked = [];
+  let progressed = true;
+  while (picked.length < limit && progressed) {
+    progressed = false;
+    for (const cat of order) {
+      if (picked.length >= limit) break;
+      const bucket = buckets.get(cat);
+      while (bucket.length) {
+        const it = bucket.shift();
+        const n = perSource.get(it._source) || 0;
+        if (n >= maxPerSource) continue; // skip, try next in this bucket
+        perSource.set(it._source, n + 1);
+        picked.push(it);
+        progressed = true;
+        break;
+      }
+    }
+  }
+  return picked;
+}
+
+async function fetchLiveNews(limit = 24) {
+  const results = await runPool(shuffled(FEEDS), fetchFeed, 6);
+  const items = results.filter(Boolean).flat();
+  if (!items.length) return null;
+  return selectDiverse(items, limit).map(normalize);
 }
 
 // ---- cache + public API ---------------------------------------------------
@@ -243,20 +389,8 @@ function enrichImagesInBackground(items, live) {
   });
 }
 
-/**
- * Returns { items, live, cached }. Serves the 12-hour cache when fresh,
- * otherwise fetches live and (failing that) falls back to the static list.
- */
-export async function getNews(limit = 10) {
-  const cache = loadCache();
-  if (cache?.items?.length) {
-    // Live caches last 12h; static-fallback caches expire fast so we keep
-    // retrying the live feed instead of being stuck on emoji placeholders.
-    const ttl = cache.live ? CACHE_TTL : FALLBACK_TTL;
-    if (Date.now() - cache.ts < ttl) {
-      return { items: cache.items, live: cache.live, cached: true };
-    }
-  }
+// Fetch live → cache → (fallback to static). Returns the render-ready result.
+async function fetchAndCache(limit) {
   const fresh = await fetchLiveNews(limit);
   if (fresh && fresh.length) {
     const items = withRouteIds(fresh);
@@ -268,6 +402,48 @@ export async function getNews(limit = 10) {
   saveCache(items, false);
   enrichImagesInBackground(items, false); // curated items still get real source images
   return { items, live: false, cached: false };
+}
+
+// Guard so overlapping page loads / event handlers don't spawn duplicate
+// background fetches against the feed list.
+let revalidating = false;
+
+// Refresh the live feed in the background, then notify the UI to swap it in.
+// This is what makes the feed current on EVERY visit/login: even when a fresh
+// cache is served instantly, we still re-pull behind it so the next paint (and
+// the next session) shows the very latest headlines.
+function revalidateInBackground(limit) {
+  if (revalidating) return;
+  revalidating = true;
+  fetchLiveNews(limit)
+    .then((fresh) => {
+      if (fresh && fresh.length) {
+        const items = withRouteIds(fresh);
+        saveCache(items, true);
+        enrichImagesInBackground(items, true);
+        try { window.dispatchEvent(new Event('glancer:news-updated')); } catch { /* noop */ }
+      }
+    })
+    .catch(() => { /* keep whatever is cached */ })
+    .finally(() => { revalidating = false; });
+}
+
+/**
+ * Returns { items, live, cached }. Stale-while-revalidate: serves the cache
+ * instantly when it's fresh for a fast first paint, but ALWAYS kicks off a live
+ * refresh in the background so the RSS feed is up to date no matter when the
+ * user last opened the page. With no usable cache it fetches live inline and
+ * falls back to the curated static list.
+ */
+export async function getNews(limit = 24) {
+  const cache = loadCache();
+  const ttl = cache?.live ? CACHE_TTL : FALLBACK_TTL;
+  const fresh = cache?.items?.length && Date.now() - cache.ts < ttl;
+  if (fresh) {
+    revalidateInBackground(limit); // keep it current for this paint + next visit
+    return { items: cache.items, live: cache.live, cached: true };
+  }
+  return fetchAndCache(limit);
 }
 
 /** Read whatever news is currently cached (used after a background update). */

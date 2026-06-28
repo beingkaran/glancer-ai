@@ -26,13 +26,23 @@ function ProfilePhoto() {
       }}>KS</div>
     );
   }
+  // Serve a 4.4 KB WebP first (84% smaller than the old JPG) so it loads
+  // instantly on mobile; browsers without WebP fall back to the optimized JPG.
+  // width/height are set so the avatar reserves its box and never shifts layout.
   return (
-    <img
-      src="/karan.jpg"
-      alt="Karan Shah"
-      onError={() => setBroken(true)}
-      style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 20px', display: 'block', border: '3px solid rgba(168,85,247,0.4)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
-    />
+    <picture>
+      <source srcSet="/karan.webp" type="image/webp" />
+      <img
+        src="/karan.jpg"
+        alt="Karan Shah"
+        width={110}
+        height={110}
+        decoding="async"
+        fetchpriority="high"
+        onError={() => setBroken(true)}
+        style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 20px', display: 'block', border: '3px solid rgba(168,85,247,0.4)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+      />
+    </picture>
   );
 }
 const GlobeIcon = () => (

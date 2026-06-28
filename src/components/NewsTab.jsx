@@ -63,7 +63,7 @@ export default function NewsTab() {
     let alive = true;
     (async () => {
       try {
-        const { items: fresh, live: isLive } = await getNews(20);
+        const { items: fresh, live: isLive } = await getNews(24);
         if (alive && fresh?.length) { setItems(fresh); setLive(isLive); }
       } catch {
         /* keep static fallback */
@@ -71,16 +71,24 @@ export default function NewsTab() {
         if (alive) setLoading(false);
       }
     })();
-    // When background image-enrichment finishes, refresh from cache.
+    // When a background refresh (live re-pull or image-enrichment) finishes,
+    // swap in the newest cached feed and flip the live badge if it went live.
     const onUpdate = () => {
       const cached = getCachedNews();
-      if (alive && cached?.items?.length) setItems(cached.items);
+      if (alive && cached?.items?.length) {
+        setItems(cached.items);
+        if (cached.live) setLive(true);
+      }
     };
     window.addEventListener('glancer:news-updated', onUpdate);
     return () => { alive = false; window.removeEventListener('glancer:news-updated', onUpdate); };
   }, []);
 
-  const categories = live ? ['All'] : NEWS_CATEGORIES;
+  // Show only the chips that actually have stories in the current feed, in the
+  // canonical order. Works for the live feed (categories come from each RSS
+  // source) and the curated fallback alike.
+  const present = new Set(items.map((i) => i.category));
+  const categories = NEWS_CATEGORIES.filter((c) => c === 'All' || present.has(c));
   const filtered = activeFilter === 'All' ? items : items.filter((i) => i.category === activeFilter);
   const featured = filtered[0];
   const rest = filtered.slice(1);
@@ -93,7 +101,7 @@ export default function NewsTab() {
             <p className="section-label">Latest Updates</p>
             <h2 className="section-title-lg">AI News &amp; Breakthroughs</h2>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4 }}>
-              {loading ? 'Fetching the latest headlines…' : live ? '🟢 Live feed · updates every 12 hours · opens at the source' : 'Curated headlines · opens at the source'}
+              {loading ? 'Fetching the latest headlines…' : live ? '🟢 Live feed · 60+ AI sources · refreshes every visit · opens at the source' : 'Curated headlines · opens at the source'}
             </p>
           </div>
           {categories.length > 1 && (

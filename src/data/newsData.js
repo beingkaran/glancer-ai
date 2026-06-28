@@ -267,4 +267,6 @@ export const NEWS_ITEMS = [
   },
 ];
 
-export const NEWS_CATEGORIES = ['All', 'Research', 'Models', 'Industry', 'Policy', 'AIOps', 'Open Source'];
+// Canonical chip order. NewsTab only renders the ones actually present in the
+// current feed, so live and curated views both show a tidy, relevant set.
+export const NEWS_CATEGORIES = ['All', 'Research', 'Models', 'Industry', 'Open Source', 'Tools', 'Hardware', 'AIOps', 'Policy'];
