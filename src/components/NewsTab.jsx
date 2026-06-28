@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
-import InshortsView from './InshortsView';
+import NewsSwipe from './NewsSwipe';
 
-// True on phone-width viewports — used to swap the grid for the Inshorts feed.
+// True on phone-width viewports — used to swap the grid for the swipe feed.
 function useIsMobile() {
   const query = '(max-width: 768px)';
   const [isMobile, setIsMobile] = useState(
@@ -107,9 +107,9 @@ export default function NewsTab() {
           )}
         </div>
 
-        {/* Mobile: Inshorts-style swipeable card feed (desktop layout untouched) */}
+        {/* Mobile: horizontally swipeable card feed (desktop layout untouched) */}
         {isMobile ? (
-          <InshortsView items={filtered} />
+          <NewsSwipe items={filtered} />
         ) : (
           <>
         {/* Featured */}

@@ -759,25 +759,29 @@ button { font-family: var(--font-body); }
 .news-featured-img img.news-cover-img { position: relative; z-index: 0; }
 
 /* ============================================================
-   Inshorts-style mobile feed (rendered only on phones via JS;
-   styles are themselves phone-scoped so desktop is never affected)
+   Swipeable mobile news feed (rendered only on phones via JS;
+   styles are themselves phone-scoped so desktop is never affected).
+   Cards swipe horizontally (left/right); a back button returns to top.
    ============================================================ */
 @media (max-width: 768px) {
-  .inshorts-wrap { position: relative; margin-top: 4px; }
-  /* One card per screen; the navbar floats above, so reserve ~104px for it. */
-  .inshorts-feed {
+  .swipe-wrap { position: relative; margin-top: 4px; }
+  /* One card per screen, scrolled horizontally. Navbar floats above, so
+     reserve ~104px of height for it. */
+  .swipe-feed {
     height: calc(100dvh - 104px);
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    display: flex; flex-direction: column; gap: 14px;
+    display: flex; flex-direction: row;
   }
-  .inshorts-feed::-webkit-scrollbar { display: none; }
+  .swipe-feed::-webkit-scrollbar { display: none; }
 
-  .inshorts-card {
-    flex: 0 0 calc(100dvh - 104px);
-    height: calc(100dvh - 104px);
+  .swipe-card {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex; flex-direction: column;
@@ -789,37 +793,48 @@ button { font-family: var(--font-body); }
     box-shadow: var(--shadow-card);
   }
 
-  .inshorts-card-img {
+  .swipe-card-img {
     flex: 0 0 42%;
     position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
   }
 
-  .inshorts-card-body {
+  .swipe-card-body {
     flex: 1; min-height: 0;
     padding: 18px 20px 16px;
     display: flex; flex-direction: column;
   }
-  .inshorts-card-body .news-category-tag { margin-bottom: 10px; font-size: 0.64rem; }
-  .inshorts-card-title {
+  .swipe-card-body .news-category-tag { margin-bottom: 10px; font-size: 0.64rem; }
+  .swipe-card-title {
     font-family: var(--font-heading); font-weight: 700;
     font-size: 1.22rem; line-height: 1.28; letter-spacing: -0.01em;
     color: var(--text-primary); margin-bottom: 10px;
   }
-  .inshorts-card-text {
+  .swipe-card-text {
     font-size: 0.92rem; line-height: 1.62; color: var(--text-secondary);
     flex: 1; min-height: 0; overflow-y: auto; margin-bottom: 12px;
     -webkit-overflow-scrolling: touch;
   }
-  .inshorts-card-foot {
+  .swipe-card-foot {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding-top: 12px; border-top: 1px solid var(--glass-border);
   }
-  .inshorts-source { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
-  .inshorts-card-foot .read-more-link { flex-shrink: 0; white-space: nowrap; }
+  .swipe-source { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+  .swipe-card-foot .read-more-link { flex-shrink: 0; white-space: nowrap; }
+
+  /* Back button — return to the top of the page (main view) */
+  .swipe-back {
+    position: absolute; top: 10px; left: 12px; z-index: 6;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px 7px 11px; border-radius: var(--border-radius-pill);
+    font-size: 0.78rem; font-weight: 700; color: #fff;
+    background: var(--grad-brand); border: none; cursor: pointer;
+    box-shadow: var(--shadow-glow); -webkit-tap-highlight-color: transparent;
+  }
+  .swipe-back:active { transform: scale(0.96); }
 
   /* Progress pill + first-card swipe hint */
-  .inshorts-progress {
+  .swipe-progress {
     position: absolute; top: 10px; right: 12px; z-index: 5;
     padding: 4px 11px; border-radius: var(--border-radius-pill);
     font-size: 0.7rem; font-weight: 700; color: var(--text-primary);
@@ -827,16 +842,16 @@ button { font-family: var(--font-body); }
     backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm);
     border: 1px solid var(--glass-border);
   }
-  .inshorts-hint {
-    position: absolute; left: 50%; bottom: 70px; transform: translateX(-50%); z-index: 5;
+  .swipe-hint {
+    position: absolute; right: 18px; bottom: 70px; z-index: 5;
     padding: 6px 14px; border-radius: var(--border-radius-pill);
     font-size: 0.74rem; font-weight: 600; color: var(--text-primary);
     background: var(--grad-brand); box-shadow: var(--shadow-glow);
-    animation: inshortsBounce 1.6s ease-in-out infinite; pointer-events: none;
+    animation: swipeNudge 1.6s ease-in-out infinite; pointer-events: none;
   }
-  @keyframes inshortsBounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.95; }
-    50%      { transform: translateX(-50%) translateY(-5px); opacity: 0.65; }
+  @keyframes swipeNudge {
+    0%, 100% { transform: translateX(0); opacity: 0.95; }
+    50%      { transform: translateX(-6px); opacity: 0.65; }
   }
 }
 
