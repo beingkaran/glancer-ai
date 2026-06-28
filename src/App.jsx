@@ -4,7 +4,7 @@ import './index.css';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import CursorHalo from './components/CursorHalo';
+import OnboardingTour from './components/OnboardingTour';
 import HomePage from './pages/HomePage';
 import MetricsPage from './pages/MetricsPage';
 import GlossaryPage from './pages/GlossaryPage';
@@ -31,6 +31,7 @@ export default function App() {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
 
   const isAdmin = pathname === '/_glancer/admin';
+  const isHome = pathname === '/';
 
   return (
     <div className="app" data-theme={theme}>
@@ -42,8 +43,10 @@ export default function App() {
         <div className="bg-grid" />
       </div>
 
-      {!isAdmin && <CursorHalo />}
       {!isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
+
+      {/* First-visit guided tour (home page only) + a "Show me" replay button. */}
+      {isHome && <OnboardingTour onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       <main>
         <Routes>

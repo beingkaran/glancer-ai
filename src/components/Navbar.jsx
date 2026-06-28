@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -52,8 +52,27 @@ function UserIcon() {
 
 export default function Navbar({ theme, onToggleTheme }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const navigate = useNavigate();
   const { user, isAuthed } = useAuth();
+
+  // Slide the floating menu up out of the way when the reader scrolls down into
+  // page content (e.g. the Write editor), and bring it back on scroll up. Keeps
+  // the glass navbar from overlapping content beneath it.
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y < 80 || mobileOpen) {
+        setHidden(false);
+      } else if (Math.abs(y - lastY.current) > 6) {
+        setHidden(y > lastY.current);
+      }
+      lastY.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [mobileOpen]);
 
   // Writing requires an account; send signed-out users to the profile page.
   const handleWrite = (e) => {
@@ -68,7 +87,7 @@ export default function Navbar({ theme, onToggleTheme }) {
     : '';
 
   return (
-    <header className="navbar">
+    <header className={`navbar${hidden ? ' navbar-hidden' : ''}`}>
       <div className="navbar-inner">
         <Link className="nav-logo" to="/" aria-label="Glancer AI home">
           <div className="nav-logo-icon">
@@ -85,6 +104,7 @@ export default function Navbar({ theme, onToggleTheme }) {
             <NavLink
               key={link.label}
               to={link.to.startsWith('/#') ? '/' : link.to}
+              data-tour={link.to === '/ai-tools' ? 'tools' : undefined}
               className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
               onClick={() => {
                 if (link.to === '/#news') {
@@ -99,7 +119,7 @@ export default function Navbar({ theme, onToggleTheme }) {
         </nav>
 
         <div className="nav-actions">
-          <Link to="/blog/write" className="write-btn" aria-label="Write a blog post" onClick={handleWrite}>
+          <Link to="/blog/write" className="write-btn" data-tour="write" aria-label="Write a blog post" onClick={handleWrite}>
             <PenIcon /> Write
           </Link>
           {isAuthed ? (
@@ -115,6 +135,7 @@ export default function Navbar({ theme, onToggleTheme }) {
           )}
           <button
             className="icon-btn"
+            data-tour="theme"
             onClick={onToggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >

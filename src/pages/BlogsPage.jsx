@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/allBlogs';
-import { getApprovedUserBlogs } from '../lib/blogStore';
+import { getApprovedUserBlogs, deleteBlog } from '../lib/blogStore';
+import { useAuth } from '../context/AuthContext';
 import BlogBanner from '../components/BlogBanner';
 
 const PenIcon = () => (
@@ -23,19 +24,40 @@ function formatDate(d) {
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map((p) => p.category)))];
 
 export default function BlogsPage() {
+  const { isAdmin } = useAuth();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showSuggest, setShowSuggest] = useState(false);
   const [posts, setPosts] = useState(BLOG_POSTS);
+  const [busyId, setBusyId] = useState(null);
   const boxRef = useRef(null);
 
-  // Merge approved user blogs with curated posts; refresh on changes.
+  // Merge approved user blogs (newest first) ahead of curated posts; refresh on
+  // changes. Tag user blogs so admins can delete them and we can feature them.
   useEffect(() => {
-    const refresh = async () => setPosts([...(await getApprovedUserBlogs()), ...BLOG_POSTS]);
+    const refresh = async () => {
+      const userBlogs = (await getApprovedUserBlogs()).map((b) => ({ ...b, isUserBlog: true }));
+      setPosts([...userBlogs, ...BLOG_POSTS]);
+    };
     refresh();
     window.addEventListener('glancer:blogs-changed', refresh);
     return () => window.removeEventListener('glancer:blogs-changed', refresh);
   }, []);
+
+  // Admin-only: permanently delete a community article from the public list.
+  async function handleDelete(e, post) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm(`Delete "${post.title}" permanently?`)) return;
+    setBusyId(post.id);
+    try {
+      await deleteBlog(post.id); // RLS allows this only for admins; fires a refresh
+    } catch (err) {
+      alert(err?.message || 'Could not delete the post.');
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   // Close suggestion dropdown on outside click.
   useEffect(() => {
@@ -65,7 +87,9 @@ export default function BlogsPage() {
     return catMatch && searchMatch;
   });
 
-  const featured = filtered.find((p) => p.featured);
+  // Spotlight the newest admin-approved community article at the top; fall back
+  // to a curated featured post when there are no community articles yet.
+  const featured = filtered.find((p) => p.isUserBlog) || filtered.find((p) => p.featured);
   const rest = filtered.filter((p) => p !== featured);
   const showFeatured = featured && filter === 'All' && !q;
 
@@ -136,12 +160,21 @@ export default function BlogsPage() {
 
         {/* Featured */}
         {showFeatured && (
-          <Link to={`/blog/${featured.id}`} className="news-featured news-link" style={{ marginBottom: 32 }} aria-label={`Read: ${featured.title}`}>
+          <Link to={`/blog/${featured.id}`} className="news-featured news-link" style={{ marginBottom: 32, position: 'relative' }} aria-label={`Read: ${featured.title}`}>
+            {isAdmin && featured.isUserBlog && (
+              <button
+                onClick={(e) => handleDelete(e, featured)}
+                disabled={busyId === featured.id}
+                className="blog-admin-delete"
+                aria-label="Delete article"
+                title="Delete article (admin)"
+              >🗑 Delete</button>
+            )}
             <BlogBanner post={featured} className="news-featured-img" emojiSize="5rem" logoStyle={{ width: 120, height: 120 }} />
             <div className="news-featured-body">
               <div>
                 <span className="news-category-tag tag-purple">{featured.category}</span>
-                <span className="news-category-tag tag-cyan" style={{ marginLeft: 6 }}>Featured</span>
+                <span className="news-category-tag tag-cyan" style={{ marginLeft: 6 }}>{featured.isUserBlog ? 'Latest' : 'Featured'}</span>
                 <h2 className="news-featured-title" style={{ marginTop: 12 }}>{featured.title}</h2>
                 <p className="news-featured-excerpt">{featured.subtitle}</p>
               </div>
@@ -160,7 +193,16 @@ export default function BlogsPage() {
         {/* Grid */}
         <div className="blogs-grid">
           {(showFeatured ? rest : filtered).map((post) => (
-            <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
+            <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none', position: 'relative' }}>
+              {isAdmin && post.isUserBlog && (
+                <button
+                  onClick={(e) => handleDelete(e, post)}
+                  disabled={busyId === post.id}
+                  className="blog-admin-delete"
+                  aria-label="Delete article"
+                  title="Delete article (admin)"
+                >🗑</button>
+              )}
               <BlogBanner post={post} className="blog-card-banner" />
               <div className="blog-card-body">
                 <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
