@@ -28,7 +28,7 @@ const today = new Date().toISOString().slice(0, 10);
 const staticRoutes = [
   { loc: '/', changefreq: 'daily', priority: '1.0', lastmod: today },
   { loc: '/blogs', changefreq: 'daily', priority: '0.9', lastmod: today },
-  { loc: '/ai-tools', changefreq: 'weekly', priority: '0.8', lastmod: today },
+  { loc: '/ai-tools', changefreq: 'weekly', priority: '0.9', lastmod: today },
   { loc: '/metrics', changefreq: 'daily', priority: '0.7', lastmod: today },
   { loc: '/glossary', changefreq: 'weekly', priority: '0.6', lastmod: today },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5', lastmod: today },
