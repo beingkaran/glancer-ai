@@ -33,7 +33,7 @@
   --shadow-glow:  0 0 40px rgba(168,85,247,0.15);
   --shadow-card:  0 4px 24px rgba(0,0,0,0.3);
   --max-w:    1200px;
-  --navbar-h: 70px;
+  --navbar-h: 56px;
   --transition: all 0.2s ease;
   --transition-slow: all 0.35s ease;
   --font-heading: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -129,27 +129,27 @@ button { font-family: var(--font-body); }
 .navbar-hidden { transform: translateX(-50%) translateY(-160%); opacity: 0; pointer-events: none; }
 .navbar-inner {
   display: flex; align-items: center; justify-content: space-between;
-  height: 60px; padding: 0 20px;
+  height: 48px; padding: 0 16px;
 }
-.nav-logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 700; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; }
+.nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 700; font-size: 0.9rem; cursor: pointer; flex-shrink: 0; }
 .nav-logo-icon {
-  width: 34px; height: 34px; background: #fff;
-  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  width: 27px; height: 27px; background: #fff;
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.nav-logo-icon img { display: block; width: 26px; height: 26px; }
+.nav-logo-icon img { display: block; width: 21px; height: 21px; }
 .nav-logo-text { color: var(--text-primary); }
 .nav-logo-dot { color: var(--purple); }
-.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links { display: flex; align-items: center; gap: 3px; }
 .nav-link {
-  padding: 7px 14px; border-radius: 8px; font-size: 0.875rem; font-weight: 500;
+  padding: 5px 11px; border-radius: 7px; font-size: 0.8rem; font-weight: 500;
   color: var(--text-secondary); cursor: pointer; transition: var(--transition);
   background: none; border: none; white-space: nowrap;
 }
 .nav-link:hover, .nav-link.active { color: var(--text-primary); background: rgba(168,85,247,0.12); }
-.nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .icon-btn {
-  width: 38px; height: 38px; border-radius: 10px;
+  width: 30px; height: 30px; border-radius: 8px;
   border: 1px solid var(--glass-border); background: var(--surface);
   color: var(--text-secondary); cursor: pointer;
   display: flex; align-items: center; justify-content: center; transition: var(--transition);
@@ -511,7 +511,7 @@ button { font-family: var(--font-body); }
    ============================================================ */
 .write-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border-radius: 10px; border: none;
+  padding: 5px 8px; border-radius: 8px; border: none;
   background: var(--grad-brand); color: white;
   font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600;
   cursor: pointer; transition: var(--transition); white-space: nowrap;

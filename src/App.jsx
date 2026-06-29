@@ -39,6 +39,7 @@ export default function App() {
   }, [pathname]);
 
   const isAdmin = pathname === '/_glancer/admin';
+  const isBlogs = pathname === '/blogs';
   const isHome = pathname === '/';
 
   return (
@@ -51,7 +52,7 @@ export default function App() {
         <div className="bg-grid" />
       </div>
 
-      {!isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
+      {!isAdmin && !isBlogs && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       {/* First-visit guided tour (home page only) + a "Show me" replay button. */}
       {isHome && <OnboardingTour onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
