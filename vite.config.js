@@ -54,9 +54,33 @@ function proxyDevApi() {
   }
 }
 
+// Dev-only middleware mirroring the production Worker's /api/news route, so the
+// edge news aggregator works under `npm run dev` too (no edge cache in dev — it
+// rebuilds each call, which is fine locally).
+function newsDevApi() {
+  return {
+    name: 'news-dev-api',
+    configureServer(server) {
+      server.middlewares.use('/api/news', async (req, res) => {
+        try {
+          const { buildRawNews } = await server.ssrLoadModule('/worker/newsCore.js')
+          const items = await buildRawNews()
+          res.setHeader('content-type', 'application/json')
+          res.setHeader('access-control-allow-origin', '*')
+          res.end(JSON.stringify({ ts: Date.now(), count: items.length, items }))
+        } catch (e) {
+          res.statusCode = 502
+          res.setHeader('content-type', 'application/json')
+          res.end(JSON.stringify({ error: e?.message || 'news build failed', items: [] }))
+        }
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), llmDevApi(mode), proxyDevApi()],
+  plugins: [react(), llmDevApi(mode), proxyDevApi(), newsDevApi()],
   // Honor a PORT assigned by the harness/preview tooling; fall back to Vite's
   // default when run directly.
   server: { port: Number(process.env.PORT) || 5184 },
