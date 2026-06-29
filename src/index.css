@@ -1475,3 +1475,191 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   .carousel-body { padding: 18px 18px 22px; }
   .carousel-btn { flex: 1 1 auto; justify-content: center; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Feature additions — hero auto-collapse, site links, newsletter popup,
+   AI-tools infographic, glossary diagram. Theme-aware via existing tokens.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- Hero: the intro banner collapses after 5s, revealing the feed -------- */
+.hero-intro {
+  overflow: hidden;
+  max-height: 520px;
+  opacity: 1;
+  transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, margin 0.8s ease, transform 0.8s ease;
+}
+.hero-collapsed { padding-top: calc(var(--navbar-h) + 28px); padding-bottom: 24px; transition: padding 0.8s ease; }
+.hero-collapsed .hero-intro {
+  max-height: 0; opacity: 0; transform: translateY(-12px);
+  margin: 0; pointer-events: none;
+}
+.hero-collapsed .hero-scroll-indicator { opacity: 0 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro { transition: none; }
+}
+
+/* ---- "More at glancerai.com" section link -------------------------------- */
+.section-site-link {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 40px;
+}
+.section-site-link a {
+  color: var(--purple, #a855f7);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+.section-site-link a:hover { border-bottom-color: currentColor; }
+
+.carousel-site-link {
+  text-align: center;
+  font-size: 0.8rem;
+  margin: 14px 0 2px;
+  color: var(--text-muted);
+}
+.carousel-site-link a {
+  color: var(--purple, #a855f7);
+  font-weight: 600;
+  text-decoration: none;
+}
+.carousel-site-link a:hover { text-decoration: underline; }
+
+/* ---- Newsletter popup ---------------------------------------------------- */
+.nl-overlay {
+  position: fixed; inset: 0; z-index: 1400;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  background: rgba(6, 8, 20, 0.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: nl-fade 0.3s ease;
+}
+@media (min-width: 600px) { .nl-overlay { align-items: center; } }
+[data-theme="light"] .nl-overlay { background: rgba(100, 116, 139, 0.4); }
+@keyframes nl-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.nl-card {
+  position: relative;
+  width: 100%; max-width: 420px;
+  border-radius: 22px;
+  padding: 30px 26px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  animation: nl-rise 0.34s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@keyframes nl-rise { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
+.nl-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); cursor: pointer; transition: transform 0.15s ease;
+}
+.nl-close:hover { transform: rotate(90deg); }
+.nl-icon {
+  width: 58px; height: 58px; margin: 4px auto 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 16px; font-size: 1.5rem; font-weight: 700;
+  background: var(--grad-brand); color: #fff;
+  box-shadow: 0 10px 26px rgba(168,85,247,0.4);
+}
+.nl-title { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0 0 8px; }
+.nl-sub { font-size: 0.92rem; line-height: 1.6; color: var(--text-secondary); margin: 0 0 20px; }
+.nl-form { display: flex; flex-direction: column; gap: 10px; }
+.nl-input {
+  width: 100%; padding: 13px 16px; border-radius: 12px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  color: var(--text-primary); font-family: inherit; font-size: 0.95rem;
+  transition: border-color 0.15s ease;
+}
+.nl-input:focus { outline: none; border-color: var(--purple, #a855f7); }
+.nl-error { color: #f87171; font-size: 0.82rem; margin: 2px 0 0; text-align: left; }
+.nl-submit {
+  margin-top: 4px; padding: 13px 16px; border-radius: 12px; border: none;
+  background: var(--grad-brand); color: #fff; font-family: inherit;
+  font-size: 0.96rem; font-weight: 700; cursor: pointer;
+  transition: filter 0.15s ease, transform 0.12s ease;
+}
+.nl-submit:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.nl-submit:disabled { opacity: 0.7; cursor: default; }
+.nl-skip {
+  margin-top: 12px; background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-family: inherit; font-size: 0.82rem;
+}
+.nl-skip:hover { color: var(--text-secondary); text-decoration: underline; }
+.nl-success { padding: 8px 0 10px; }
+.nl-success .nl-icon { font-size: 1.8rem; }
+
+/* ---- AI Tools infographic ------------------------------------------------ */
+.tool-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px; flex: 0 0 auto; overflow: hidden;
+  background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+}
+.tool-logo img { object-fit: contain; }
+.tool-logo-emoji { color: #fff; font-size: 1.4rem; }
+
+.tool-infographic { margin: 8px 0 36px; }
+.tool-logo-strip {
+  display: flex; gap: 10px; overflow-x: auto; padding: 6px 2px 14px;
+  scrollbar-width: thin; -webkit-overflow-scrolling: touch;
+}
+.tool-logo-strip::-webkit-scrollbar { height: 6px; }
+.tool-logo-strip::-webkit-scrollbar-thumb { background: var(--glass-border-strong); border-radius: 3px; }
+.tool-logo-chip {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  width: 84px; padding: 10px 6px; border-radius: 14px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+  font-family: inherit; transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.tool-logo-chip:hover { background: var(--glass-bg); transform: translateY(-2px); }
+.tool-logo-chip.active { background: var(--glass-bg-strong); border-color: var(--glass-border-strong); }
+.tool-logo-chip-name { font-size: 0.7rem; font-weight: 600; text-align: center; line-height: 1.1; white-space: nowrap; }
+
+.tool-spotlight {
+  border-radius: 22px; padding: 28px 28px 22px; margin-top: 4px;
+  animation: nl-fade 0.4s ease;
+}
+.tool-spotlight-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.tool-spotlight-name { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.1; }
+.tool-spotlight-by { font-size: 0.85rem; color: var(--text-muted); }
+.tool-spotlight-blurb { font-size: 1.02rem; line-height: 1.6; color: var(--text-secondary); margin: 0 0 18px; }
+.tool-spotlight-uses { margin-bottom: 20px; }
+.tool-spotlight-uses-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.tool-spotlight-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: 12px; text-decoration: none;
+  background: var(--tool-color, var(--purple, #a855f7)); color: #fff;
+  font-weight: 700; font-size: 0.95rem;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25); transition: filter 0.15s ease, transform 0.12s ease;
+}
+.tool-spotlight-cta:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.tool-spotlight-progress { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 20px; }
+.tool-spotlight-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--glass-border-strong); transition: all 0.25s ease; }
+.tool-spotlight-dot.active { width: 20px; border-radius: 4px; background: var(--purple, #a855f7); }
+
+@media (max-width: 600px) {
+  .tool-spotlight { padding: 22px 18px 18px; }
+  .tool-spotlight-name { font-size: 1.3rem; }
+}
+
+/* ---- Glossary concept diagram -------------------------------------------- */
+.glossary-diagram {
+  border-radius: 20px; padding: 24px 26px 22px; margin-bottom: 36px;
+}
+.glossary-diagram-head { margin-bottom: 14px; }
+.glossary-diagram-title { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.glossary-diagram-svg { width: 100%; height: auto; color: var(--text-secondary); margin: 4px 0; }
+.glossary-diagram-svg .gd-node { fill: var(--glass-bg-strong); stroke: var(--glass-border-strong); stroke-width: 1.4; }
+.glossary-diagram-svg .gd-hub { fill: url(#gd-grad); stroke: transparent; opacity: 0.92; }
+.glossary-diagram-svg .gd-aiops { fill: var(--purple, #a855f7); stroke: transparent; opacity: 0.92; }
+.glossary-diagram-svg .gd-label { font-size: 14px; font-weight: 600; fill: var(--text-primary); text-anchor: middle; dominant-baseline: middle; font-family: var(--font-body); }
+.glossary-diagram-svg .gd-label-strong { fill: #fff; }
+.glossary-diagram-svg .gd-aiops + text, .glossary-diagram-svg .gd-label-strong { font-weight: 700; }
+.glossary-diagram-svg .gd-section { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; fill: var(--text-muted); }
+[data-theme="light"] .glossary-diagram-svg .gd-label-strong { fill: #fff; }
+.glossary-diagram-note { font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 0; line-height: 1.5; }
+.glossary-diagram-note em { color: var(--text-secondary); font-style: normal; font-weight: 600; }

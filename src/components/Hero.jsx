@@ -12,7 +12,18 @@ export default function Hero({ activeTab, onTabChange }) {
   const heroRef = useRef(null);
   const contentRef = useRef(null);
   const [scrollY, setScrollY] = useState(0);
+  // After 5s the big intro banner (badge + headline + sub) collapses away so the
+  // news feed comes into view; the tab switcher stays put. Skipped if the reader
+  // has already scrolled down into the content themselves.
+  const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (window.scrollY < 80) setCollapsed(true);
+    }, 5000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -40,27 +51,29 @@ export default function Hero({ activeTab, onTabChange }) {
   }
 
   return (
-    <section className="hero" ref={heroRef} id="hero">
+    <section className={`hero${collapsed ? ' hero-collapsed' : ''}`} ref={heroRef} id="hero">
       <div
         className="hero-parallax-layer"
         style={{ transform: `translateY(${parallaxY}px)`, opacity, scale }}
         ref={contentRef}
       >
         <div className="container">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" aria-hidden="true" />
-            AI Intelligence Hub
+          <div className="hero-intro" aria-hidden={collapsed}>
+            <div className="hero-badge">
+              <span className="hero-badge-dot" aria-hidden="true" />
+              AI Intelligence Hub
+            </div>
+
+            <h1>
+              Your <span className="grad-text">AI-First</span> Window<br />
+              to What&apos;s Next
+            </h1>
+
+            <p className="hero-sub">
+              Breaking AI news, industry metrics &amp; expert analysis — all in one place.
+              Built for engineers, researchers, and the endlessly curious.
+            </p>
           </div>
-
-          <h1>
-            Your <span className="grad-text">AI-First</span> Window<br />
-            to What&apos;s Next
-          </h1>
-
-          <p className="hero-sub">
-            Breaking AI news, industry metrics &amp; expert analysis — all in one place.
-            Built for engineers, researchers, and the endlessly curious.
-          </p>
 
           <div id="home-tabs" className="tab-switcher-wrap">
             <div className="tab-switcher" role="tablist" aria-label="Content sections">

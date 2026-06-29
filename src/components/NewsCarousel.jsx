@@ -91,8 +91,8 @@ function Slide({ item }) {
           </div>
           <p className="carousel-text">{item.excerpt}</p>
           <div className="carousel-actions">
-            <a className="carousel-btn primary" href={item.url} target="_blank" rel="noopener noreferrer">
-              Read full story <ExtIcon />
+            <a className="carousel-btn primary" href={item.url} target={item.internal ? '_self' : '_blank'} rel="noopener noreferrer">
+              {item.internal ? 'Read full article' : 'Read full story'} <ExtIcon />
             </a>
             <button type="button" className="carousel-btn" onClick={onShareCard} disabled={cardState === 'busy'}>
               <CardIcon /> {cardState === 'busy' ? 'Creating…' : cardState === 'done' ? 'Saved!' : 'Share infographic'}
@@ -101,6 +101,9 @@ function Slide({ item }) {
               <ShareIcon /> {linkState === 'done' ? 'Copied!' : 'Share link'}
             </button>
           </div>
+          <p className="carousel-site-link">
+            <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
+          </p>
         </div>
       </div>
     </article>

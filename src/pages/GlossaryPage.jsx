@@ -1,5 +1,25 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { GLOSSARY_TERMS } from '../data/allGlossary';
+import { GLOSSARY_TERMS as BASE_GLOSSARY_TERMS } from '../data/allGlossary';
+import { EXTRA_GLOSSARY_TERMS } from '../data/extraGlossary';
+import GlossaryDiagram from '../components/GlossaryDiagram';
+
+// Merge the curated supplement into the base set, de-duplicated by lowercased
+// term name (and abbreviation) so no term is ever shown twice. New, distinct
+// terms are appended; anything already present is dropped.
+const GLOSSARY_TERMS = (() => {
+  const seen = new Set();
+  const keyOf = (t) => (t.term || '').trim().toLowerCase();
+  const out = [];
+  for (const t of BASE_GLOSSARY_TERMS) {
+    const k = keyOf(t);
+    if (k && !seen.has(k)) { seen.add(k); out.push(t); }
+  }
+  for (const t of EXTRA_GLOSSARY_TERMS) {
+    const k = keyOf(t);
+    if (k && !seen.has(k)) { seen.add(k); out.push(t); }
+  }
+  return out;
+})();
 
 const CAT_ICONS = {
   'AI/ML': '🧠', 'AIOps': '🤖', 'APM': '📊', 'Architecture': '🏛️',
@@ -111,7 +131,7 @@ export default function GlossaryPage() {
             <input
               className="blog-search-input"
               type="text"
-              placeholder="Search 1,599 terms… e.g. eBPF, SLO, Kubernetes, vector database"
+              placeholder={`Search ${GLOSSARY_TERMS.length.toLocaleString()} terms… e.g. eBPF, SLO, Kubernetes, RAG`}
               value={query}
               onChange={(e) => { setQuery(e.target.value); setShowSuggest(true); setActiveCat(null); }}
               onFocus={() => setShowSuggest(true)}
@@ -150,7 +170,8 @@ export default function GlossaryPage() {
           </div>
         )}
 
-        {/* Default: category cards */}
+        {/* Default: concept diagram + category cards */}
+        {!showResults && <GlossaryDiagram />}
         {!showResults && (
           <div>
             <p className="section-label" style={{ marginBottom: 12 }}>Browse by Category</p>

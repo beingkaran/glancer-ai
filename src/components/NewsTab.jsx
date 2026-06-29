@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage } from '../lib/newsFeed';
+import { BLOG_POSTS } from '../data/allBlogs';
+import { getApprovedUserBlogs } from '../lib/blogStore';
+import { blogsToSlides } from '../lib/blogSlides';
 import { ShareButton } from './NewsSwipe';
 import NewsCarousel from './NewsCarousel';
 
@@ -43,6 +46,9 @@ export default function NewsTab() {
   const [items, setItems] = useState(STATIC_NEWS);
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  // Blog slides appended after the news in the carousel reader, so once the RSS
+  // headlines run out the reader keeps going into curated + community blogs.
+  const [blogSlides, setBlogSlides] = useState([]);
   // Index (within `filtered`) of the story to open the full-screen carousel at;
   // null = closed. Clicking any card opens it on both desktop and mobile.
   const [carouselAt, setCarouselAt] = useState(null);
@@ -51,7 +57,7 @@ export default function NewsTab() {
     let alive = true;
     (async () => {
       try {
-        const { items: fresh, live: isLive } = await getNews(24);
+        const { items: fresh, live: isLive } = await getNews();
         if (alive && fresh?.length) { setItems(fresh); setLive(isLive); }
       } catch {
         /* keep static fallback */
@@ -59,6 +65,15 @@ export default function NewsTab() {
         if (alive) setLoading(false);
       }
     })();
+
+    // Build the blog tail for the carousel: newest community posts first, then
+    // the curated library. New approved blogs flow in automatically.
+    const loadBlogs = async () => {
+      const approved = await getApprovedUserBlogs();
+      if (alive) setBlogSlides(blogsToSlides([...approved, ...BLOG_POSTS]));
+    };
+    loadBlogs();
+    window.addEventListener('glancer:blogs-changed', loadBlogs);
     // When a background refresh (live re-pull or image-enrichment) finishes,
     // swap in the newest cached feed and flip the live badge if it went live.
     const onUpdate = () => {
@@ -69,7 +84,11 @@ export default function NewsTab() {
       }
     };
     window.addEventListener('glancer:news-updated', onUpdate);
-    return () => { alive = false; window.removeEventListener('glancer:news-updated', onUpdate); };
+    return () => {
+      alive = false;
+      window.removeEventListener('glancer:news-updated', onUpdate);
+      window.removeEventListener('glancer:blogs-changed', loadBlogs);
+    };
   }, []);
 
   // Show only the chips that actually have stories in the current feed, in the
@@ -80,6 +99,8 @@ export default function NewsTab() {
   const filtered = activeFilter === 'All' ? items : items.filter((i) => i.category === activeFilter);
   const featured = filtered[0];
   const rest = filtered.slice(1);
+  // The reader plays the visible news first, then continues into the blogs.
+  const carouselItems = [...filtered, ...blogSlides];
 
   // Open the full-screen carousel at `idx` within `filtered`. Plain left-clicks
   // open the reader; ⌘/Ctrl/middle-click fall through to the source URL so the
@@ -159,8 +180,13 @@ export default function NewsTab() {
           ))}
         </div>
 
+        <div className="section-site-link">
+          More AI news, tools &amp; insights at{' '}
+          <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
+        </div>
+
         {carouselAt !== null && (
-          <NewsCarousel items={filtered} startIndex={carouselAt} onClose={() => setCarouselAt(null)} />
+          <NewsCarousel items={carouselItems} startIndex={carouselAt} onClose={() => setCarouselAt(null)} />
         )}
       </div>
     </div>

@@ -83,6 +83,11 @@ export default function BlogsTab({ limit }) {
             </Link>
           </div>
         )}
+
+        <div className="section-site-link">
+          More AI news, tools &amp; insights at{' '}
+          <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
+        </div>
       </div>
     </div>
   );

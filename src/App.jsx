@@ -5,6 +5,7 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import OnboardingTour from './components/OnboardingTour';
+import NewsletterPopup from './components/NewsletterPopup';
 import HomePage from './pages/HomePage';
 import MetricsPage from './pages/MetricsPage';
 import GlossaryPage from './pages/GlossaryPage';
@@ -75,6 +76,9 @@ export default function App() {
       </main>
 
       {!isAdmin && <Footer />}
+
+      {/* One-time newsletter invite for unsigned visitors (fires after ~1 min). */}
+      {!isAdmin && <NewsletterPopup />}
     </div>
   );
 }

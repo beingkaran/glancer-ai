@@ -117,14 +117,17 @@ const FEEDS = [
 // abandons every visitor's old cache on their next load — without it, anyone who
 // saw the previous (broken, emoji-only) feed would keep seeing it from cache for
 // up to CACHE_TTL even after a fix ships.
-const CACHE_KEY = 'glancer_news_cache_v5';
-const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours — for a successful LIVE fetch
+const CACHE_KEY = 'glancer_news_cache_v6';
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour — refresh the live feed hourly
 // Static fallback is cached only briefly so a transient feed outage can't pin
-// the emoji placeholders for 12 hours; the next visit retries the live feed.
+// the emoji placeholders for an hour; the next visit retries the live feed.
 const FALLBACK_TTL = 20 * 60 * 1000; // 20 minutes
+// How many headlines to surface on the page (was 24). The diverse selector
+// round-robins across 60+ sources so 50 stays category-balanced and fresh.
+export const NEWS_LIMIT = 50;
 
 // One-time cleanup of older cache keys so they don't linger.
-try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
+try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4', 'glancer_news_cache_v5'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
 
 const GRADIENTS = [
   'linear-gradient(135deg, #1a0533 0%, #4c1d95 50%, #7c3aed 100%)',
@@ -354,7 +357,7 @@ function selectDiverse(items, limit, maxPerSource = 3) {
   return picked;
 }
 
-async function fetchLiveNews(limit = 24) {
+async function fetchLiveNews(limit = NEWS_LIMIT) {
   const results = await runPool(shuffled(FEEDS), fetchFeed, 6);
   const items = results.filter(Boolean).flat();
   if (!items.length) return null;
@@ -459,7 +462,7 @@ function revalidateInBackground(limit) {
  * user last opened the page. With no usable cache it fetches live inline and
  * falls back to the curated static list.
  */
-export async function getNews(limit = 24) {
+export async function getNews(limit = NEWS_LIMIT) {
   const cache = loadCache();
   const ttl = cache?.live ? CACHE_TTL : FALLBACK_TTL;
   const fresh = cache?.items?.length && Date.now() - cache.ts < ttl;

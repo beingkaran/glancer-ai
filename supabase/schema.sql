@@ -375,3 +375,42 @@ $$;
 --   -- turn it back off (open to all signed-in users):
 --   update public.app_config set restrict_writers = false where id = 1;
 -- ============================================================================
+
+-- ============================================================================
+-- NEWSLETTER SUBSCRIBERS
+-- ============================================================================
+-- Captures name + email from the homepage newsletter popup. Stored as plain
+-- text (no auth required to subscribe). Anyone may INSERT a subscription; only
+-- an admin may read/delete the list, so the email list can never be scraped via
+-- the public anon key.
+create table if not exists public.newsletter_subscribers (
+  id           uuid primary key default gen_random_uuid(),
+  name         text,
+  email        text not null,
+  source       text default 'homepage-popup',
+  created_at   timestamptz not null default now()
+);
+-- One row per email (idempotent re-subscribe).
+create unique index if not exists newsletter_email_unique
+  on public.newsletter_subscribers (lower(email));
+
+alter table public.newsletter_subscribers enable row level security;
+
+-- Anyone (anon included) may subscribe.
+drop policy if exists newsletter_insert_anyone on public.newsletter_subscribers;
+create policy newsletter_insert_anyone on public.newsletter_subscribers
+  for insert with check (true);
+
+-- Only admins may read the subscriber list.
+drop policy if exists newsletter_select_admin on public.newsletter_subscribers;
+create policy newsletter_select_admin on public.newsletter_subscribers
+  for select using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin)
+  );
+
+-- Only admins may delete subscribers.
+drop policy if exists newsletter_delete_admin on public.newsletter_subscribers;
+create policy newsletter_delete_admin on public.newsletter_subscribers
+  for delete using (
+    exists (select 1 from public.profiles p where p.id = auth.uid() and p.is_admin)
+  );
