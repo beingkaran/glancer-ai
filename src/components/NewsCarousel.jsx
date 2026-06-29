@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { displayImage } from '../lib/newsFeed';
-import { shareArticle } from '../lib/socialShare';
-import { shareInfographic } from '../lib/infographic';
+import { displayImage, sourceFavicon } from '../lib/newsFeed';
+import { getLike, toggleLike } from '../lib/newsLikes';
+import { useAuth } from '../context/AuthContext';
+import SocialShareSheet from './SocialShareSheet';
 
 /*
- * NewsCarousel — a full-screen, swipeable reader that opens when a reader taps
- * any news card (desktop AND mobile). One story per slide; swipe / arrow-key /
- * button to move left↔right. Each slide can be shared as a link or as a
- * generated infographic carrying the "Visit glancerai.com…" call-to-action.
+ * NewsCarousel — full-screen swipeable reader. Opens when any news card is
+ * tapped (desktop AND mobile). Like/dislike for signed-in users; social share
+ * sheet with platform picker on every slide.
  */
 
 const CloseIcon = () => (
@@ -32,24 +32,42 @@ const ShareIcon = () => (
     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
   </svg>
 );
-const CardIcon = () => (
+const ThumbUpIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="8.5" cy="10" r="1.5" /><path d="M21 15l-5-5L5 19" />
+    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+  </svg>
+);
+const ThumbDownIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
   </svg>
 );
 
-// Cover image with the same proxied → raw → emoji fallback ladder used elsewhere.
+// Cover image with proxied → raw → favicon → emoji fallback ladder.
 function SlideImage({ item }) {
-  const [stage, setStage] = useState(0);
-  useEffect(() => { setStage(0); }, [item.image]);
-  const src = stage === 0 ? displayImage(item.image, 1400) : stage === 1 ? item.image : null;
-  if (item.image && src) {
+  const [stage, setStage] = useState(item.image ? 0 : 2);
+  useEffect(() => { setStage(item.image ? 0 : 2); }, [item.image]);
+
+  const coverSrc = stage === 0 ? displayImage(item.image, 1400) : stage === 1 ? item.image : null;
+  if (coverSrc) {
     return (
       <div className="carousel-img" aria-hidden="true">
-        <img src={src} alt="" referrerPolicy="no-referrer" onError={() => setStage((s) => s + 1)} />
+        <img src={coverSrc} alt="" referrerPolicy="no-referrer" onError={() => setStage((s) => s + 1)} />
       </div>
     );
   }
+
+  const favicon = stage === 2 ? sourceFavicon(item) : null;
+  if (favicon) {
+    return (
+      <div className="carousel-img carousel-img-fallback carousel-img-logo" style={{ background: item.gradient }} aria-hidden="true">
+        <img className="news-source-logo" src={favicon} alt="" onError={() => setStage(3)} />
+      </div>
+    );
+  }
+
   return (
     <div className="carousel-img carousel-img-fallback" style={{ background: item.gradient }} aria-hidden="true">
       <span>{item.emoji}</span>
@@ -57,25 +75,45 @@ function SlideImage({ item }) {
   );
 }
 
-function Slide({ item }) {
-  // 'idle' | 'busy' | 'done' for each share action.
-  const [linkState, setLinkState] = useState('idle');
-  const [cardState, setCardState] = useState('idle');
+function LikeButtons({ item }) {
+  const { isAuthed } = useAuth();
+  const rid = item.rid;
+  const [liked, setLiked] = useState(() => (rid ? getLike(rid) : null));
 
-  const onShareLink = async () => {
-    setLinkState('busy');
-    const r = await shareArticle(item);
-    setLinkState(r === 'copied' ? 'done' : 'idle');
-    if (r === 'copied') setTimeout(() => setLinkState('idle'), 1800);
-    else setLinkState('idle');
+  if (!isAuthed || !rid) return null;
+
+  const onTap = (e, val) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLiked(toggleLike(rid, val));
   };
-  const onShareCard = async () => {
-    setCardState('busy');
-    const r = await shareInfographic(item);
-    setCardState(r === 'downloaded' ? 'done' : 'idle');
-    if (r === 'downloaded') setTimeout(() => setCardState('idle'), 2200);
-    else setCardState('idle');
-  };
+
+  return (
+    <div className="like-btns">
+      <button
+        type="button"
+        className={`like-btn${liked === 'like' ? ' active like' : ''}`}
+        onClick={(e) => onTap(e, 'like')}
+        aria-label="Like this story"
+        aria-pressed={liked === 'like'}
+      >
+        <ThumbUpIcon />
+      </button>
+      <button
+        type="button"
+        className={`like-btn${liked === 'dislike' ? ' active dislike' : ''}`}
+        onClick={(e) => onTap(e, 'dislike')}
+        aria-label="Dislike this story"
+        aria-pressed={liked === 'dislike'}
+      >
+        <ThumbDownIcon />
+      </button>
+    </div>
+  );
+}
+
+function Slide({ item }) {
+  const [shareOpen, setShareOpen] = useState(false);
 
   return (
     <article className="carousel-slide">
@@ -94,18 +132,17 @@ function Slide({ item }) {
             <a className="carousel-btn primary" href={item.url} target={item.internal ? '_self' : '_blank'} rel="noopener noreferrer">
               {item.internal ? 'Read full article' : 'Read full story'} <ExtIcon />
             </a>
-            <button type="button" className="carousel-btn" onClick={onShareCard} disabled={cardState === 'busy'}>
-              <CardIcon /> {cardState === 'busy' ? 'Creating…' : cardState === 'done' ? 'Saved!' : 'Share infographic'}
+            <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>
+              <ShareIcon /> Share
             </button>
-            <button type="button" className="carousel-btn" onClick={onShareLink} disabled={linkState === 'busy'}>
-              <ShareIcon /> {linkState === 'done' ? 'Copied!' : 'Share link'}
-            </button>
+            <LikeButtons item={item} />
           </div>
           <p className="carousel-site-link">
             <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
           </p>
         </div>
       </div>
+      {shareOpen && <SocialShareSheet item={item} onClose={() => setShareOpen(false)} />}
     </article>
   );
 }
@@ -114,7 +151,6 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
   const feedRef = useRef(null);
   const [index, setIndex] = useState(startIndex);
 
-  // Jump to the tapped story on open (no smooth scroll for the initial jump).
   useEffect(() => {
     const feed = feedRef.current;
     if (!feed) return;
@@ -122,7 +158,6 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     setIndex(startIndex);
   }, [startIndex]);
 
-  // Track the centered slide for the "n / total" pill + arrow disabling.
   useEffect(() => {
     const feed = feedRef.current;
     if (!feed) return;
@@ -138,7 +173,6 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     feed.scrollTo({ left: next * feed.clientWidth, behavior: 'smooth' });
   }, [index, items.length]);
 
-  // Keyboard: ← → to move, Esc to close. Lock body scroll while open.
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') onClose?.();
