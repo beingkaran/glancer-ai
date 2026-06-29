@@ -1,10 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://glancerai.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://glancerai.com/ai-tools</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://glancerai.com/blogs</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://glancerai.com/metrics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://glancerai.com/glossary</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://glancerai.com/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://glancerai.com/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://glancerai.com/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blogs</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/ai-tools</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/metrics</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/glossary</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/faq</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/about</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/observability-vs-monitoring</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/observability.svg</image:loc><image:title>Observability vs Monitoring: Why the Difference Actually Matters</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/four-golden-signals</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/golden-signals.svg</image:loc><image:title>The Four Golden Signals: Google&apos;s Framework for SRE Monitoring</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/distributed-tracing-explained</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/tracing.svg</image:loc><image:title>Distributed Tracing Explained: From First Principles</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/aiops-machine-learning-it-operations</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/aiops.svg</image:loc><image:title>AIOps Explained: Where Machine Learning Meets IT Operations</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/slo-sla-sli-practical-guide</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/slo.svg</image:loc><image:title>SLOs, SLAs, and SLIs: A Practical Guide for Engineers</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/datadog-full-stack-observability-2026</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/new-relic-opentelemetry-first-strategy</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/appdynamics-business-iq-apm-revenue</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/datadog-vs-newrelic-vs-splunk-2026</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison.svg</image:loc><image:title>Datadog vs New Relic vs Splunk: Choosing Your APM Stack in 2026</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/broadcom-dx-apm-ca-apm-legacy-cloud</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/datadog-vs-newrelic-deep-comparison-2026</loc>
+    <lastmod>2026-06-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-bars.svg</image:loc><image:title>Datadog vs New Relic (2026): The Definitive Head-to-Head</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/datadog-vs-appdynamics-cloudnative-vs-enterprise</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison.svg</image:loc><image:title>Datadog vs AppDynamics: Cloud-Native Agility vs Enterprise APM Depth</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/newrelic-vs-splunk-observability-comparison-2026</loc>
+    <lastmod>2026-06-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-bars.svg</image:loc><image:title>New Relic vs Splunk: OTel-Native Observability vs Log-First Intelligence</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/appdynamics-vs-broadcom-dxapm-enterprise-showdown</loc>
+    <lastmod>2026-06-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison.svg</image:loc><image:title>AppDynamics vs Broadcom DX APM: The Enterprise APM Showdown</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/ultimate-apm-comparison-datadog-newrelic-splunk-appdynamics-broadcom-2026</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-podium.svg</image:loc><image:title>The Ultimate APM Comparison 2026: Datadog, New Relic, Splunk, AppDynamics &amp; Broadcom DX APM</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/ai-observability-beginner-intro</loc>
+    <lastmod>2026-06-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/ai-observability.svg</image:loc><image:title>What Is AI in Observability? A Complete Beginner&apos;s Guide</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/ai-observability-anomaly-detection-explained</loc>
+    <lastmod>2026-06-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/anomaly.svg</image:loc><image:title>How AI Detects Anomalies: Under the Hood of Intelligent Alerting</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/aiops-alert-correlation-noise-reduction-intermediate</loc>
+    <lastmod>2026-06-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/alert-correlation.svg</image:loc><image:title>AIOps in Practice: Taming the Alert Storm with ML Correlation</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/predictive-monitoring-ml-capacity-forecasting-advanced</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/forecast.svg</image:loc><image:title>Predictive Monitoring: Teaching ML to Forecast Failures Before They Happen</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/ebpf-llms-next-frontier-intelligent-observability-expert</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/ebpf.svg</image:loc><image:title>eBPF + LLMs: The Next Frontier of Intelligent Observability</image:title></image:image>
+  </url>
 </urlset>

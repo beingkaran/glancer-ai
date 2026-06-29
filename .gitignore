@@ -43,3 +43,6 @@ android/captures
 *.njsproj
 *.sln
 *.sw?
+
+# Local maintenance-guide build artifacts (large binaries)
+docs/

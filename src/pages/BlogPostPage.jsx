@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
 import { figuresForPost, injectFiguresIntoHtml } from '../lib/blogImages';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
+import { buildArticleSchema, buildBreadcrumb, useArticleSchema } from '../lib/structuredData';
 import BlogBanner from '../components/BlogBanner';
 import ShareBar from '../components/ShareBar';
 import Comments from '../components/Comments';
@@ -41,6 +43,33 @@ export default function BlogPostPage() {
     })();
     return () => { active = false; };
   }, [id]);
+
+  // Per-article SEO: title/description/canonical/OG + Article & Breadcrumb
+  // JSON-LD. Hooks run every render (no-op while loading) to respect hook order.
+  const path = `/blog/${id}`;
+  useDocumentMeta(
+    post
+      ? {
+          title: post.title,
+          description: post.subtitle || (post.body || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160),
+          path,
+          type: 'article',
+          image: post.bannerImage ? `https://glancerai.com${post.bannerImage}` : undefined,
+        }
+      : {}
+  );
+  useArticleSchema(
+    post
+      ? [
+          buildArticleSchema(post, { type: 'Article', path }),
+          buildBreadcrumb([
+            { name: 'Home', path: '/' },
+            { name: 'Blogs', path: '/blogs' },
+            { name: post.title, path },
+          ]),
+        ]
+      : null
+  );
 
   if (post === undefined) {
     return (

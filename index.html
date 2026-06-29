@@ -20,11 +20,13 @@
     <title>Glancer AI — AI News, Metrics, Free AI Tools & Intelligence Hub</title>
     <meta name="description" content="Stay ahead with AI News, industry metrics, leaderboards, expert blogs and 25+ free in-browser AI tools. Glancer AI (glancerai.com) is your intelligent hub for the AI ecosystem." />
     <meta name="author" content="Glancer AI" />
-    <meta name="robots" content="index, follow" />
+    <!-- max-image-preview:large is REQUIRED for Google Discover large image cards.
+         Without it, Discover cannot render the big visual that drives ~45% of CTR. -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="canonical" href="https://glancerai.com/" />
 
      <!-- Aplu Notification -->
-    <script src='https://push.aplu.io/push-notify.js'></script>
+    <!--script src='https://push.aplu.io/push-notify.js'></script>
 
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
@@ -32,7 +34,40 @@
     <meta property="og:title" content="Glancer AI — AI News, Metrics & Free AI Tools" />
     <meta property="og:description" content="AI News, industry metrics, expert blogs and 25+ free in-browser AI tools — your intelligent hub for the AI ecosystem." />
     <meta property="og:url" content="https://glancerai.com/" />
+    <meta property="og:image" content="https://glancerai.com/icon-1024.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://glancerai.com/icon-1024.png" />
+
+    <!-- Site-wide structured data: identifies the publisher (E-E-A-T signal for
+         Discover) and enables the Google sitelinks search box. Per-article
+         NewsArticle/Article JSON-LD is injected per page (see prerender + React). -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://glancerai.com/#organization",
+          "name": "Glancer AI",
+          "url": "https://glancerai.com/",
+          "logo": "https://glancerai.com/icon-512.png",
+          "description": "AI news, industry metrics, expert blogs and free in-browser AI tools."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://glancerai.com/#website",
+          "url": "https://glancerai.com/",
+          "name": "Glancer AI",
+          "publisher": { "@id": "https://glancerai.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://glancerai.com/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- Google AdSense: verify site ownership. Replace the client id, then it activates. -->
     <meta name="google-adsense-account" content="ca-pub-0000000000000000" />

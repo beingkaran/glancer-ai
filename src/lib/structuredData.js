@@ -1,0 +1,107 @@
+import { useEffect } from 'react';
+
+/*
+ * structuredData — build and inject JSON-LD for individual articles.
+ *
+ * Why this matters for Google Discover (2026): structured data does not
+ * directly rank a page, but Article/NewsArticle markup tells Google the
+ * content type, author, publish date and the large image to feature on the
+ * Discover card. Combined with `max-image-preview:large` (set globally in
+ * index.html) and a 1200px+ banner, it's what lets a page surface with a big
+ * visual instead of a tiny thumbnail.
+ *
+ * The build-time prerender (scripts/prerender-blogs.mjs) bakes the same JSON-LD
+ * into the static HTML so crawlers see it without running JS; this hook keeps
+ * it correct during client-side navigation and for Supabase-backed posts.
+ */
+
+const ORIGIN = 'https://glancerai.com';
+const ORG_ID = `${ORIGIN}/#organization`;
+
+function absUrl(u) {
+  if (!u) return `${ORIGIN}/icon-1024.png`;
+  if (/^https?:\/\//.test(u)) return u;
+  return ORIGIN + (u.startsWith('/') ? u : `/${u}`);
+}
+
+// Strip HTML to a plain-text description (first ~300 chars) for the schema.
+function plainText(html, max = 300) {
+  if (!html) return '';
+  const text = String(html)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+/**
+ * Build an Article (or NewsArticle) JSON-LD object for a post.
+ * @param {object} post  blog/news item
+ * @param {object} opts  { type: 'Article' | 'NewsArticle', path }
+ */
+export function buildArticleSchema(post, { type = 'Article', path } = {}) {
+  if (!post) return null;
+  const url = ORIGIN + (path || `/blog/${post.id}`);
+  const image = absUrl(post.bannerImage || post.image || post.thumbnail);
+  return {
+    '@context': 'https://schema.org',
+    '@type': type,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    headline: (post.title || '').slice(0, 110),
+    description: post.subtitle || plainText(post.body),
+    image: [image],
+    datePublished: post.date || post.publishedAt || undefined,
+    dateModified: post.updatedAt || post.date || undefined,
+    author: {
+      '@type': post.author && /team|glancer/i.test(post.author) ? 'Organization' : 'Person',
+      name: post.author || 'Glancer AI Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': ORG_ID,
+      name: 'Glancer AI',
+      logo: { '@type': 'ImageObject', url: `${ORIGIN}/icon-512.png` },
+    },
+    keywords: Array.isArray(post.tags) ? post.tags.join(', ') : undefined,
+    url,
+  };
+}
+
+export function buildBreadcrumb(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      item: ORIGIN + it.path,
+    })),
+  };
+}
+
+/** Render an object to a clean JSON-LD string (drops undefined keys). */
+export function schemaToJson(obj) {
+  return JSON.stringify(obj, (_k, v) => (v === undefined ? undefined : v));
+}
+
+/**
+ * useArticleSchema — inject one or more JSON-LD blocks for the current article
+ * and remove them on unmount / change, so SPA navigation never stacks stale
+ * markup. Pass already-built schema objects.
+ */
+export function useArticleSchema(schemas) {
+  useEffect(() => {
+    const list = (Array.isArray(schemas) ? schemas : [schemas]).filter(Boolean);
+    if (!list.length) return;
+    const nodes = list.map((s) => {
+      const el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.setAttribute('data-seo-jsonld', '1');
+      el.textContent = schemaToJson(s);
+      document.head.appendChild(el);
+      return el;
+    });
+    return () => nodes.forEach((n) => n.remove());
+  }, [JSON.stringify(schemas)]);
+}
