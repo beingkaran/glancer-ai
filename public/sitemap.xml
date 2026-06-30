@@ -44,6 +44,27 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://glancerai.com/blog/gemini-35-flash-speed-real-time-ai-observability</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>What Gemini 3.5 Flash&apos;s Speed Jump Means for Real-Time AI Observability</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/aiops-autonomous-remediation-self-healing-2026</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>From Noise Reduction to Self-Healing: AIOps Crosses Into Autonomous Remediation in 2026</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/ai-agents-observability-blind-spot</loc>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>Why Every New AI Agent Is an Observability Blind Spot</image:title></image:image>
+  </url>
+  <url>
     <loc>https://glancerai.com/blog/observability-vs-monitoring</loc>
     <lastmod>2026-05-10</lastmod>
     <changefreq>monthly</changefreq>

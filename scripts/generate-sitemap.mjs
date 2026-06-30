@@ -42,13 +42,15 @@ const blogRoutes = BLOG_POSTS.map((p) => ({
   changefreq: 'monthly',
   priority: p.featured ? '0.8' : '0.7',
   lastmod: (p.date || today).slice(0, 10),
-  image: p.bannerImage ? ORIGIN + p.bannerImage : null,
+  // bannerImage may be an absolute URL (e.g. Unsplash) or a site-relative path;
+  // only prefix the origin for relative paths so we don't double it up.
+  image: p.bannerImage ? (/^https?:\/\//.test(p.bannerImage) ? p.bannerImage : ORIGIN + p.bannerImage) : null,
   title: p.title,
 }));
 
 function urlNode(r) {
   const img = r.image
-    ? `\n    <image:image><image:loc>${r.image}</image:loc><image:title>${escapeXml(r.title || '')}</image:title></image:image>`
+    ? `\n    <image:image><image:loc>${escapeXml(r.image)}</image:loc><image:title>${escapeXml(r.title || '')}</image:title></image:image>`
     : '';
   return `  <url>
     <loc>${ORIGIN}${r.loc}</loc>
