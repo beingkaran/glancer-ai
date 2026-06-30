@@ -4,6 +4,7 @@ import { getLike, toggleLike } from '../lib/newsLikes';
 import { useAuth } from '../context/AuthContext';
 import SocialShareSheet from './SocialShareSheet';
 import SaveButton from './SaveButton';
+import NewsReaderFrame from './NewsReaderFrame';
 import { entryForSlide } from '../lib/readLater';
 
 /*
@@ -114,8 +115,20 @@ function LikeButtons({ item }) {
   );
 }
 
-function Slide({ item }) {
+function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
+
+  // Internal slides (blog posts) link to their own route; external news opens
+  // in the in-carousel reader frame so the user never leaves the slideshow.
+  const ReadBtn = item.internal ? (
+    <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
+      Read full article <ExtIcon />
+    </a>
+  ) : (
+    <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
+      Read full story <ExtIcon />
+    </button>
+  );
 
   return (
     <article className="carousel-slide">
@@ -131,9 +144,7 @@ function Slide({ item }) {
           </div>
           <p className="carousel-text">{item.excerpt}</p>
           <div className="carousel-actions">
-            <a className="carousel-btn primary" href={item.url} target={item.internal ? '_self' : '_blank'} rel="noopener noreferrer">
-              {item.internal ? 'Read full article' : 'Read full story'} <ExtIcon />
-            </a>
+            {ReadBtn}
             <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>
               <ShareIcon /> Share
             </button>
@@ -153,6 +164,7 @@ function Slide({ item }) {
 export default function NewsCarousel({ items, startIndex = 0, onClose }) {
   const feedRef = useRef(null);
   const [index, setIndex] = useState(startIndex);
+  const [readerItem, setReaderItem] = useState(null);
 
   useEffect(() => {
     const feed = feedRef.current;
@@ -178,6 +190,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
 
   useEffect(() => {
     const onKey = (e) => {
+      if (readerItem) return; // reader frame handles its own keys
       if (e.key === 'Escape') onClose?.();
       else if (e.key === 'ArrowRight') go(1);
       else if (e.key === 'ArrowLeft') go(-1);
@@ -186,7 +199,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prevOverflow; };
-  }, [go, onClose]);
+  }, [go, onClose, readerItem]);
 
   if (!items.length) return null;
 
@@ -207,7 +220,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
       </button>
 
       <div className="carousel-feed" ref={feedRef}>
-        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} />)}
+        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} onRead={setReaderItem} />)}
       </div>
 
       <div className="carousel-dots" aria-hidden="true">
@@ -215,6 +228,8 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
           <span key={i} className={`carousel-dot${i === Math.min(index, 11) ? ' active' : ''}`} />
         ))}
       </div>
+
+      {readerItem && <NewsReaderFrame item={readerItem} onBack={() => setReaderItem(null)} />}
     </div>
   );
 }

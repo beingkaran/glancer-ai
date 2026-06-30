@@ -22,7 +22,7 @@ import AdminPage from './pages/AdminPage';
 import { recordHit } from './lib/analytics';
 
 export default function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const { pathname } = useLocation();
 
   useEffect(() => {

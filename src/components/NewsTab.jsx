@@ -169,13 +169,17 @@ export default function NewsTab() {
     };
   }, []);
 
-  // On mobile: automatically open the swipe carousel after 5 s so users
-  // immediately experience the immersive reader without needing to tap a card.
+  // First visit only (any device): automatically open the swipe slideshow after
+  // 7 s so new users immediately experience the immersive reader without needing
+  // to tap a card. A localStorage flag ensures it fires just once per browser.
   useEffect(() => {
-    if (window.innerWidth >= 768) return;
+    try {
+      if (localStorage.getItem('glancer:slideshow-autostart')) return;
+    } catch { /* private mode — fall through and still show it */ }
     const t = setTimeout(() => {
       setCarouselAt((cur) => (cur === null ? 0 : cur));
-    }, 5000);
+      try { localStorage.setItem('glancer:slideshow-autostart', '1'); } catch { /* ignore */ }
+    }, 7000);
     return () => clearTimeout(t);
   }, []);
 

@@ -26,8 +26,10 @@ function formatDate(d) {
 
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map((p) => p.category)))];
 
-// Newest first: sort any post list by publish date descending.
-const byNewest = (list) => [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+// Newest first: order by submission time (full timestamp) when available,
+// falling back to the day-precision publish date for curated posts.
+const submittedTime = (p) => new Date(p.submittedAt || p.date).getTime();
+const byNewest = (list) => [...list].sort((a, b) => submittedTime(b) - submittedTime(a));
 
 export default function BlogsPage() {
   const { isAdmin } = useAuth();
@@ -101,9 +103,9 @@ export default function BlogsPage() {
     return catMatch && searchMatch;
   });
 
-  // Spotlight the newest admin-approved community article at the top; fall back
-  // to a curated featured post when there are no community articles yet.
-  const featured = filtered.find((p) => p.isUserBlog) || filtered.find((p) => p.featured);
+  // Spotlight the single newest article at the top (filtered is already sorted
+  // newest-first), so the featured slot always respects the publish date.
+  const featured = filtered[0];
   const rest = filtered.filter((p) => p !== featured);
   const showFeatured = featured && filter === 'All' && !q;
 

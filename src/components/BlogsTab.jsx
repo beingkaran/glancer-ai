@@ -16,6 +16,11 @@ function formatDate(d) {
 
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map(p => p.category)))];
 
+// Newest first: order by submission time (full timestamp) when available,
+// falling back to the day-precision publish date for curated posts.
+const submittedTime = (p) => new Date(p.submittedAt || p.date).getTime();
+const byNewest = (list) => [...list].sort((a, b) => submittedTime(b) - submittedTime(a));
+
 export default function BlogsTab({ limit }) {
   const [filter, setFilter] = useState('All');
   const [userBlogs, setUserBlogs] = useState([]);
@@ -27,7 +32,7 @@ export default function BlogsTab({ limit }) {
     return () => window.removeEventListener('glancer:blogs-changed', refresh);
   }, []);
 
-  const allPosts = [...userBlogs, ...BLOG_POSTS];
+  const allPosts = byNewest([...userBlogs, ...BLOG_POSTS]);
   const filtered = filter === 'All' ? allPosts : allPosts.filter(p => p.category === filter);
   const posts = limit ? filtered.slice(0, limit) : filtered;
 
