@@ -2,7 +2,7 @@
 export const BLOG_POSTS = [
   {
     id: 'observability-vs-monitoring',
-    bannerImage: '/blog-banners/observability.svg',
+    bannerImage: '/blog-banners/observability.jpg',
     title: 'Observability vs Monitoring: Why the Difference Actually Matters',
     subtitle: 'Monitoring tells you something is broken. Observability tells you why. Here\'s how to think about each — and why modern systems need both.',
     category: 'Observability',
@@ -62,7 +62,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 'four-golden-signals',
-    bannerImage: '/blog-banners/golden-signals.svg',
+    bannerImage: '/blog-banners/golden-signals.jpg',
     title: 'The Four Golden Signals: Google\'s Framework for SRE Monitoring',
     subtitle: 'Rate, errors, latency, and saturation. Four numbers that tell you almost everything you need to know about whether a service is healthy.',
     category: 'SRE',
@@ -131,7 +131,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 'distributed-tracing-explained',
-    bannerImage: '/blog-banners/tracing.svg',
+    bannerImage: '/blog-banners/tracing.jpg',
     title: 'Distributed Tracing Explained: From First Principles',
     subtitle: 'When a request touches 12 microservices and fails, how do you know which one is responsible? Distributed tracing is the answer.',
     category: 'Observability',
@@ -210,7 +210,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 'aiops-machine-learning-it-operations',
-    bannerImage: '/blog-banners/aiops.svg',
+    bannerImage: '/blog-banners/aiops.jpg',
     title: 'AIOps Explained: Where Machine Learning Meets IT Operations',
     subtitle: 'AIOps promises to tame the alert storm and find root causes automatically. Here\'s what it actually does — and what it doesn\'t.',
     category: 'AIOps',
@@ -273,7 +273,7 @@ export const BLOG_POSTS = [
   },
   {
     id: 'slo-sla-sli-practical-guide',
-    bannerImage: '/blog-banners/slo.svg',
+    bannerImage: '/blog-banners/slo.jpg',
     title: 'SLOs, SLAs, and SLIs: A Practical Guide for Engineers',
     subtitle: 'Error budgets, reliability targets, and the contracts that govern them. This is the vocabulary of modern SRE — demystified.',
     category: 'SRE',
@@ -570,7 +570,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'datadog-vs-newrelic-vs-splunk-2026',
-    bannerImage: '/blog-banners/comparison.svg',
+    bannerImage: '/blog-banners/comparison.jpg',
     title: 'Datadog vs New Relic vs Splunk: Choosing Your APM Stack in 2026',
     subtitle: 'Three enterprise-grade platforms, three very different philosophies. This head-to-head breaks down what actually matters when your team has to pick one.',
     category: 'APM',
@@ -711,7 +711,7 @@ export const BLOG_POSTS = [
   /* ── Comparison Posts ── */
   {
     id: 'datadog-vs-newrelic-deep-comparison-2026',
-    bannerImage: '/blog-banners/comparison-bars.svg',
+    bannerImage: '/blog-banners/comparison-bars.jpg',
     title: 'Datadog vs New Relic (2026): The Definitive Head-to-Head',
     subtitle: 'Both platforms cover the full observability stack. The differences lie in pricing philosophy, OTel commitment, and where each excels under pressure. Here\'s the unvarnished comparison.',
     category: 'Comparison',
@@ -806,7 +806,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'datadog-vs-appdynamics-cloudnative-vs-enterprise',
-    bannerImage: '/blog-banners/comparison.svg',
+    bannerImage: '/blog-banners/comparison.jpg',
     title: 'Datadog vs AppDynamics: Cloud-Native Agility vs Enterprise APM Depth',
     subtitle: 'Datadog was built for the cloud. AppDynamics was built for the enterprise. When your architecture sits between those worlds, the choice gets interesting.',
     category: 'Comparison',
@@ -883,7 +883,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'newrelic-vs-splunk-observability-comparison-2026',
-    bannerImage: '/blog-banners/comparison-bars.svg',
+    bannerImage: '/blog-banners/comparison-bars.jpg',
     title: 'New Relic vs Splunk: OTel-Native Observability vs Log-First Intelligence',
     subtitle: 'Both platforms handle the full telemetry stack. But New Relic was built for developers debugging services; Splunk was built for operators searching logs. That origin still shapes everything.',
     category: 'Comparison',
@@ -961,7 +961,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'appdynamics-vs-broadcom-dxapm-enterprise-showdown',
-    bannerImage: '/blog-banners/comparison.svg',
+    bannerImage: '/blog-banners/comparison.jpg',
     title: 'AppDynamics vs Broadcom DX APM: The Enterprise APM Showdown',
     subtitle: 'Both target large enterprises. Both dominate Java application monitoring. But one is accelerating into cloud-native; the other is managing a legacy. Which fits your roadmap?',
     category: 'Comparison',
@@ -1032,7 +1032,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'ultimate-apm-comparison-datadog-newrelic-splunk-appdynamics-broadcom-2026',
-    bannerImage: '/blog-banners/comparison-podium.svg',
+    bannerImage: '/blog-banners/comparison-podium.jpg',
     title: 'The Ultimate APM Comparison 2026: Datadog, New Relic, Splunk, AppDynamics & Broadcom DX APM',
     subtitle: 'One table to rule them all. A comprehensive, vendor-neutral scoring of every major APM platform across 20 dimensions — so your team can make a defensible decision.',
     category: 'Comparison',
@@ -1134,7 +1134,7 @@ export const BLOG_POSTS = [
   /* ══ AI in Observability — Beginner-to-Expert Path ══ */
   {
     id: 'ai-observability-beginner-intro',
-    bannerImage: '/blog-banners/ai-observability.svg',
+    bannerImage: '/blog-banners/ai-observability.jpg',
     title: 'What Is AI in Observability? A Complete Beginner\'s Guide',
     subtitle: 'Level 1 of 5 · No prior knowledge needed. Understand why traditional monitoring breaks down and how AI changes the game — explained simply.',
     category: 'AI Observability',
@@ -1231,7 +1231,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'ai-observability-anomaly-detection-explained',
-    bannerImage: '/blog-banners/anomaly.svg',
+    bannerImage: '/blog-banners/anomaly.jpg',
     title: 'How AI Detects Anomalies: Under the Hood of Intelligent Alerting',
     subtitle: 'Level 2 of 5 · You understand the why. Now learn the how — the algorithms and techniques that make anomaly detection work, explained without a maths degree.',
     category: 'AI Observability',
@@ -1329,7 +1329,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'aiops-alert-correlation-noise-reduction-intermediate',
-    bannerImage: '/blog-banners/alert-correlation.svg',
+    bannerImage: '/blog-banners/alert-correlation.jpg',
     title: 'AIOps in Practice: Taming the Alert Storm with ML Correlation',
     subtitle: 'Level 3 of 5 · Your monitoring fires 847 alerts in 90 seconds. How does AI turn that into 3 actionable incidents? This is alert correlation — and it\'s the biggest MTTR reducer in modern ops.',
     category: 'AI Observability',
@@ -1440,7 +1440,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'predictive-monitoring-ml-capacity-forecasting-advanced',
-    bannerImage: '/blog-banners/forecast.svg',
+    bannerImage: '/blog-banners/forecast.jpg',
     title: 'Predictive Monitoring: Teaching ML to Forecast Failures Before They Happen',
     subtitle: 'Level 4 of 5 · Move from reactive to proactive. Learn how ML forecasting models predict capacity exhaustion, reliability degradation, and SLO breaches — hours before users are impacted.',
     category: 'AI Observability',
@@ -1544,7 +1544,7 @@ export const BLOG_POSTS = [
 
   {
     id: 'ebpf-llms-next-frontier-intelligent-observability-expert',
-    bannerImage: '/blog-banners/ebpf.svg',
+    bannerImage: '/blog-banners/ebpf.jpg',
     title: 'eBPF + LLMs: The Next Frontier of Intelligent Observability',
     subtitle: 'Level 5 of 5 · Expert. How kernel-level telemetry and large language models are converging to create self-explaining, self-healing observability systems — and what you can build today.',
     category: 'AI Observability',
