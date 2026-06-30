@@ -3,6 +3,8 @@ import { displayImage, sourceFavicon } from '../lib/newsFeed';
 import { getLike, toggleLike } from '../lib/newsLikes';
 import { useAuth } from '../context/AuthContext';
 import SocialShareSheet from './SocialShareSheet';
+import SaveButton from './SaveButton';
+import { entryForSlide } from '../lib/readLater';
 
 /*
  * NewsCarousel — full-screen swipeable reader. Opens when any news card is
@@ -135,6 +137,7 @@ function Slide({ item }) {
             <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>
               <ShareIcon /> Share
             </button>
+            <SaveButton entry={entryForSlide(item)} className="carousel-btn" />
             <LikeButtons item={item} />
           </div>
           <p className="carousel-site-link">

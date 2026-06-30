@@ -7,6 +7,8 @@ import { useDocumentMeta } from '../lib/useDocumentMeta';
 import { buildArticleSchema, buildBreadcrumb, useArticleSchema } from '../lib/structuredData';
 import BlogBanner from '../components/BlogBanner';
 import ShareBar from '../components/ShareBar';
+import SaveButton from '../components/SaveButton';
+import { entryForBlog } from '../lib/readLater';
 import Comments from '../components/Comments';
 
 function formatDate(d) {
@@ -132,9 +134,10 @@ export default function BlogPostPage() {
         {/* Body */}
         <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
 
-        {/* Share */}
-        <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid var(--glass-border)' }}>
+        {/* Save + Share */}
+        <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <ShareBar post={post} />
+          <div><SaveButton entry={entryForBlog(post)} className="news-share" /></div>
         </div>
 
         {/* Comments */}

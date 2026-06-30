@@ -10,7 +10,7 @@ export const ORIGIN = 'https://glancerai.com';
 
 // A subtle, consistent attribution appended to everything shared from the app.
 // Keeps the brand + domain in front of every new audience without shouting.
-export const SHARE_TAGLINE = 'via Glancer AI · glancerai.com';
+export const SHARE_TAGLINE = 'Glancer AI — your AI News, Blogs & Trends, all in one platform · glancerai.com';
 
 /*
  * shareArticle — open the device's native share sheet for a news article (or any

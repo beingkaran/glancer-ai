@@ -4,6 +4,9 @@ import { BLOG_POSTS } from '../data/allBlogs';
 import { getApprovedUserBlogs, deleteBlog } from '../lib/blogStore';
 import { useAuth } from '../context/AuthContext';
 import BlogBanner from '../components/BlogBanner';
+import SaveButton from '../components/SaveButton';
+import ReadLaterPanel from '../components/ReadLaterPanel';
+import { entryForBlog, getSavedCount } from '../lib/readLater';
 
 const PenIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -23,21 +26,32 @@ function formatDate(d) {
 
 const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map((p) => p.category)))];
 
+// Newest first: sort any post list by publish date descending.
+const byNewest = (list) => [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
+
 export default function BlogsPage() {
   const { isAdmin } = useAuth();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [showSuggest, setShowSuggest] = useState(false);
-  const [posts, setPosts] = useState(BLOG_POSTS);
+  const [posts, setPosts] = useState(() => byNewest(BLOG_POSTS));
   const [busyId, setBusyId] = useState(null);
+  const [readLaterOpen, setReadLaterOpen] = useState(false);
+  const [savedCount, setSavedCount] = useState(() => getSavedCount());
   const boxRef = useRef(null);
+
+  useEffect(() => {
+    const sync = () => setSavedCount(getSavedCount());
+    window.addEventListener('glancer:read-later-changed', sync);
+    return () => window.removeEventListener('glancer:read-later-changed', sync);
+  }, []);
 
   // Merge approved user blogs (newest first) ahead of curated posts; refresh on
   // changes. Tag user blogs so admins can delete them and we can feature them.
   useEffect(() => {
     const refresh = async () => {
       const userBlogs = (await getApprovedUserBlogs()).map((b) => ({ ...b, isUserBlog: true }));
-      setPosts([...userBlogs, ...BLOG_POSTS]);
+      setPosts(byNewest([...userBlogs, ...BLOG_POSTS]));
     };
     refresh();
     window.addEventListener('glancer:blogs-changed', refresh);
@@ -103,8 +117,18 @@ export default function BlogsPage() {
           <p className="hero-sub" style={{ margin: '0 auto 28px' }}>
             Deep dives into AIOps, Observability, APM, and the AI ecosystem — written for practitioners.
           </p>
-          <Link to="/blog/write" className="write-cta-btn"><PenIcon /> Write an Article</Link>
+          <div style={{ display: 'inline-flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link to="/blog/write" className="write-cta-btn"><PenIcon /> Write an Article</Link>
+            <button type="button" className={`read-later-toggle${savedCount ? ' has-saved' : ''}`} onClick={() => setReadLaterOpen(true)} aria-label={`Read later (${savedCount} saved)`}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={savedCount ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              Read Later
+              {savedCount > 0 && <span className="read-later-badge">{savedCount}</span>}
+            </button>
+          </div>
         </div>
+        {readLaterOpen && <ReadLaterPanel onClose={() => setReadLaterOpen(false)} />}
 
         {/* Search — full width with live suggestions */}
         <div className="blog-search-wrap" ref={boxRef}>
@@ -218,6 +242,7 @@ export default function BlogsPage() {
                 <div className="blog-card-footer">
                   <span className="blog-meta">{formatDate(post.date)}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <SaveButton entry={entryForBlog(post)} className="news-share" label={false} />
                     <span className="read-time-badge">{post.readTime} min</span>
                     <span className="read-more-link">Read →</span>
                   </div>

@@ -8,6 +8,9 @@ import { getApprovedUserBlogs } from '../lib/blogStore';
 import { blogsToSlides } from '../lib/blogSlides';
 import NewsCarousel from './NewsCarousel';
 import SocialShareSheet from './SocialShareSheet';
+import SaveButton from './SaveButton';
+import ReadLaterPanel from './ReadLaterPanel';
+import { entryForNews, getSavedCount } from '../lib/readLater';
 
 const ArrowIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -122,6 +125,14 @@ export default function NewsTab() {
   const [loading, setLoading] = useState(true);
   const [blogSlides, setBlogSlides] = useState([]);
   const [carouselAt, setCarouselAt] = useState(null);
+  const [readLaterOpen, setReadLaterOpen] = useState(false);
+  const [savedCount, setSavedCount] = useState(() => getSavedCount());
+
+  useEffect(() => {
+    const sync = () => setSavedCount(getSavedCount());
+    window.addEventListener('glancer:read-later-changed', sync);
+    return () => window.removeEventListener('glancer:read-later-changed', sync);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -196,15 +207,29 @@ export default function NewsTab() {
               {loading ? 'Fetching the latest headlines…' : live ? '🟢 Live feed · 60+ AI sources · refreshes every visit · opens at the source' : 'Curated headlines · opens at the source'}
             </p>
           </div>
-          {categories.length > 1 && (
-            <div className="news-filter" role="group" aria-label="Filter by category">
-              {categories.map((cat) => (
-                <button key={cat} className={`filter-chip${activeFilter === cat ? ' active' : ''}`} onClick={() => setActiveFilter(cat)}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="news-header-right">
+            <button
+              type="button"
+              className={`read-later-toggle${savedCount ? ' has-saved' : ''}`}
+              onClick={() => setReadLaterOpen(true)}
+              aria-label={`Read later (${savedCount} saved)`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={savedCount ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              Read Later
+              {savedCount > 0 && <span className="read-later-badge">{savedCount}</span>}
+            </button>
+            {categories.length > 1 && (
+              <div className="news-filter" role="group" aria-label="Filter by category">
+                {categories.map((cat) => (
+                  <button key={cat} className={`filter-chip${activeFilter === cat ? ' active' : ''}`} onClick={() => setActiveFilter(cat)}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Featured */}
@@ -224,6 +249,7 @@ export default function NewsTab() {
                 <span>{featured.readMin} min read</span>
                 <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                   <LikeBtns item={featured} />
+                  <SaveButton entry={entryForNews(featured)} className="news-share" />
                   <ShareBtn item={featured} className="news-share" />
                   <span className="read-more-link">Read story <ArrowIcon /></span>
                 </span>
@@ -247,6 +273,7 @@ export default function NewsTab() {
                   <span>{item.source}{item.date ? ` · ${item.date}` : ''}</span>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                     <LikeBtns item={item} />
+                    <SaveButton entry={entryForNews(item)} className="news-share" label={false} />
                     <ShareBtn item={item} className="news-share" />
                     <span className="read-more-link">Read <ArrowIcon /></span>
                   </span>
@@ -264,6 +291,8 @@ export default function NewsTab() {
         {carouselAt !== null && (
           <NewsCarousel items={carouselItems} startIndex={carouselAt} onClose={() => setCarouselAt(null)} />
         )}
+
+        {readLaterOpen && <ReadLaterPanel onClose={() => setReadLaterOpen(false)} />}
       </div>
     </div>
   );

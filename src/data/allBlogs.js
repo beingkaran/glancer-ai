@@ -1,6 +1,188 @@
 /* Glancer AI — Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'gemini-35-flash-speed-real-time-ai-observability',
+    bannerImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1600&q=80',
+    title: "What Gemini 3.5 Flash's Speed Jump Means for Real-Time AI Observability",
+    subtitle: "Google's new default model is roughly 4x faster than 3.1 Pro. That's great — right up until you realise the slow part of your stack is no longer the model.",
+    category: 'AI Observability',
+    icon: '⚡',
+    bgGradient: 'linear-gradient(135deg, #0a1628 0%, #1e3a8a 60%, #38bdf8 100%)',
+    author: 'Admin',
+    avatar: '📡',
+    date: '2026-06-30',
+    readTime: 8,
+    tags: ['Gemini 3.5 Flash', 'AI observability', 'inference latency', 'trace sampling', 'token cost'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>Gemini 3.5 Flash — now Google's default — clocks in around <strong>4x faster</strong> than 3.1 Pro at a fraction of the per-token cost.</li>
+    <li>When the model stops being the slow part, your telemetry pipeline quietly becomes the new bottleneck.</li>
+    <li>Cheaper, faster tokens mean <em>more</em> calls and far more spans — the sampling rules you set last year are now wrong.</li>
+    <li>Token cost has graduated from a finance spreadsheet line into a real-time observability signal.</li>
+  </ul>
+</div>
+
+<h2>The speed jump nobody fully priced in</h2>
+<p>I'll admit it: when Google announced at I/O that 3.5 Flash would become the default model, my first reaction was "nice, cheaper bills." It took a couple of days of actually wiring it into a live pipeline before the more interesting consequence sank in.</p>
+<p>The headline number — roughly four times faster than 3.1 Pro — isn't the story on its own. Plenty of models get faster every cycle. The story is what that speed does to everything <em>around</em> the model. WaveSpeed's launch-day latency map put first-token times for Flash in the low hundreds of milliseconds for typical prompts. When a model responds that quickly, the human staring at the screen is no longer waiting on the LLM. They're waiting on your network hop, your auth check, your retrieval step, and — this is the uncomfortable one — your observability layer.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="A monitoring dashboard showing live latency and throughput metrics" loading="lazy" /><figcaption>Once inference drops below ~300ms, the slowest thing on the trace is often the telemetry you bolted on to watch it.</figcaption></figure>
+
+<h2>Where the bottleneck actually moved</h2>
+<p>Here's the mental model that helped me. A year ago, a typical RAG request looked something like: 80ms of retrieval, 60ms of glue code, and then 1,400ms sitting on the model. The model dominated. You could instrument the daylights out of everything else and nobody would notice the overhead, because it was rounding error next to that 1,400ms.</p>
+<p>Flip to Flash. That same request might spend 80ms on retrieval, 60ms on glue, and 350ms on the model. Suddenly your "rounding error" — the synchronous span export, the verbose structured log you write on every call, the trace context you serialise and ship — is a measurable slice of the user's wait. The APM Digest 2026 predictions called this out months ago and I shrugged at the time. They were right. Faster inference doesn't remove latency from the system; it relocates it to whichever component you were least careful about.</p>
+<blockquote><strong>The shift in one line:</strong> we spent a decade optimising around slow models. The models stopped being slow, and a lot of our pipelines were never built for that.</blockquote>
+
+<h2>Your sampling strategy was built for a slower world</h2>
+<p>This is the part that actually costs money if you ignore it. When each model call was expensive and slow, you naturally made fewer of them. Teams batched, cached aggressively, and a single user action might trigger one or two LLM calls. Tracing all of it was fine.</p>
+<p>Cheap, fast tokens change the economics of <em>calling the model at all</em>. Agentic loops that would have been absurd at Pro prices — "let the model re-plan after every tool call" — become totally reasonable at Flash prices. So one user action now fans out into ten, twenty, fifty model calls. If your tracing is still set to "capture everything," your observability bill grows in lockstep with a usage pattern that just got an order of magnitude noisier.</p>
+<ul>
+  <li><strong>Move to tail-based sampling if you haven't.</strong> Head-based sampling decides before the request runs, which means you keep a random 1% — including 1% of the boring successes and only 1% of the rare failures. Tail-based lets you keep every error and every slow trace while dropping the thousands of identical happy paths.</li>
+  <li><strong>Sample by decision, not by call.</strong> In an agent loop, the interesting unit isn't a single model call — it's the whole reasoning chain. Keep traces that changed plan, retried, or hit a tool error; thin out the ones that went straight through.</li>
+  <li><strong>Re-check your retention.</strong> Ten times the spans at the same 30-day retention is ten times the storage. Most teams find 7 days hot + cheap cold archive is plenty.</li>
+</ul>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1280&q=80" alt="Charts and trend lines representing telemetry sampled over time" loading="lazy" /><figcaption>At Flash prices, agent loops fan one user action into dozens of calls. Sample the reasoning chain, not the individual call.</figcaption></figure>
+
+<h2>Token cost is now a latency-adjacent metric</h2>
+<p>For years, token spend lived in a monthly export that someone in finance squinted at. That's no longer good enough. When usage can spike 10x because a single buggy agent got stuck in a planning loop, you need cost on the same dashboard as latency and error rate — updating in something close to real time.</p>
+<p>Treat tokens-per-request the way you treat p99 latency: a first-class signal with an alert attached. A sudden jump in average tokens per session is frequently the earliest sign that an agent is misbehaving, long before it shows up as a user complaint. I've now seen "tokens per request" catch a runaway loop a full fifteen minutes before the error rate budged.</p>
+
+<div class="callout">
+  <div class="callout-title">🛠️ What to instrument this quarter</div>
+  Add three things if you don't have them: (1) <strong>per-request token counts</strong> as a metric, not just a log field, so you can alert on them; (2) <strong>tail-based sampling</strong> keyed on errors, latency, and "the agent changed its plan"; and (3) a <strong>latency budget</strong> for your own observability overhead — if exporting a span costs 40ms on a 350ms request, that's worth fixing.
+</div>
+
+<h2>The takeaway</h2>
+<p>Faster models are an unambiguous win. But "the model got 4x faster" is really an instruction to go look at everything you'd quietly decided didn't matter because the model was slow. Your sampling rules, your synchronous exporters, your token accounting — all of it was tuned for a world that just disappeared. The teams that treat Flash as a prompt to re-tune their telemetry pipeline will feel snappy and spend less. The ones that don't will wonder why their "4x faster model" only made the product feel a little quicker.</p>
+    `
+  },
+  {
+    id: 'aiops-autonomous-remediation-self-healing-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80',
+    title: 'From Noise Reduction to Self-Healing: AIOps Crosses Into Autonomous Remediation in 2026',
+    subtitle: 'Vendors now promise the full incident lifecycle — detect, act, verify — with no human in the loop. Here is a skeptic\'s checklist for telling real autonomy from a confident demo.',
+    category: 'AIOps',
+    icon: '🩹',
+    bgGradient: 'linear-gradient(135deg, #052e16 0%, #166534 60%, #22c55e 100%)',
+    author: 'Admin',
+    avatar: '📡',
+    date: '2026-06-28',
+    readTime: 9,
+    tags: ['AIOps', 'autonomous remediation', 'self-healing', 'incident response', 'automation'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>The 2026 pitch has shifted from "we cut your alert noise" to "we close the incident for you" — detect, act, and verify, autonomously.</li>
+    <li>Real autonomy needs a <strong>causal model</strong> of your system, not just correlation. Acting on correlation is how you make outages worse.</li>
+    <li><strong>Rollback safety</strong> is the line between self-healing and self-harming. If the system can't cleanly undo its own action, it isn't ready to take it.</li>
+    <li>Most "autonomous" products in the wild are really fast suggestion engines with a human still pressing the button. That's fine — just know which one you bought.</li>
+  </ul>
+</div>
+
+<h2>What changed in the pitch</h2>
+<p>If you sat through vendor briefings this year — I sat through too many — you noticed the language move. Two years ago AIOps sold noise reduction: take 10,000 alerts, hand you back the 12 that matter. Genuinely useful, genuinely measurable. This year the decks all say some version of "full incident-lifecycle automation." LogicMonitor's trends report, Dynatrace's 2026 predictions, IBM's observability outlook — they all lean on the same arc: <em>detect → act → verify</em>, with the human moved from operator to spectator.</p>
+<p>I want this to be real. I also spent enough years on call to be deeply suspicious of any system that promises to change production while I'm asleep. So instead of arguing about whether "autonomous" is marketing, here's the checklist I actually use when a vendor claims it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="An operations dashboard tracking incidents and remediation status" loading="lazy" /><figcaption>"Detect → act → verify" is an easy slide to draw. The middle step is where the careers are made or lost.</figcaption></figure>
+
+<h2>Test 1: Does it understand cause, or just correlation?</h2>
+<p>This is the one that separates the serious products from the demos. Correlation says "the database CPU spiked and checkout errors spiked at the same time." Causation says "checkout errors spiked <em>because</em> a slow query saturated the connection pool, and the database CPU is a symptom of the same root cause, not the cause itself."</p>
+<p>The difference is not academic. An autonomous system acting on correlation might "fix" the database CPU by scaling it up — burning money and time — while the actual problem (a missing index shipped in the last deploy) sails on untouched. Worse, it might restart the database, drop the in-flight connections, and turn a degraded checkout into a fully broken one.</p>
+<blockquote><strong>The question to ask the vendor:</strong> "Show me where your system encodes service dependencies and causal direction." If the answer is hand-wavy about machine learning, the system is pattern-matching, not reasoning. Pattern-matching is great for detection. It's dangerous for action.</blockquote>
+
+<h2>Test 2: Can it undo what it just did?</h2>
+<p>Self-healing only deserves the name if the heal is reversible. Every autonomous action falls into one of three buckets, and you should know which is which before you switch anything on:</p>
+<ul>
+  <li><strong>Trivially reversible</strong> — scale a stateless service up, then back down; drain a node; clear a cache. Low blast radius. Let the robot have these.</li>
+  <li><strong>Reversible with care</strong> — roll back a deploy, fail over to a replica, restart a pod. Usually fine, but state and traffic shifting can bite. Automate with guardrails and a verification step.</li>
+  <li><strong>Effectively irreversible</strong> — run a schema migration, delete data, modify a security policy, touch anything with a customer-facing side effect. The robot suggests; a human decides. Full stop.</li>
+</ul>
+<p>A mature platform lets you assign actions to these tiers explicitly and refuses to auto-execute anything you haven't blessed. If a product treats "restart the database" and "scale the web tier" as the same kind of action, that's a red flag waving at you.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1280&q=80" alt="Code and logs representing an automated rollback in progress" loading="lazy" /><figcaption>The honest test of self-healing isn't whether it can act — it's whether it can cleanly take the action back.</figcaption></figure>
+
+<h2>Test 3: How does it verify the fix worked?</h2>
+<p>"Verify" is the step that quietly gets skipped in the demos, and it's the one that matters most. After the system acts, how does it know it helped? A real verification loop re-checks the original failing signal — the SLO that was burning, the golden signal that tripped — and confirms it actually recovered, not that some adjacent metric looks calmer.</p>
+<p>And crucially: what happens when the fix <em>doesn't</em> work? The grown-up answer is "it reverts the action, escalates to a human, and stops trying." The scary answer is "it tries the next remediation in its playbook," because now you've got an automated system improvising on production during an active incident. Ask exactly how many automated attempts it will make before it gives up and pages someone. If there's no hard limit, walk away.</p>
+
+<h2>So where does that leave us in 2026?</h2>
+<p>Honestly, in a good place — as long as you read the label. The detection and correlation layers are genuinely excellent now; the noise reduction wave delivered. Autonomous <em>action</em> is real for the trivially-reversible tier and getting trustworthy for the careful-reversible tier. The "human entirely out of the loop for anything important" version is still mostly a slide.</p>
+<p>That's not a criticism. A system that auto-heals the safe 70% of incidents and hands you a clean, root-caused, one-click suggestion for the scary 30% is a fantastic outcome. The mistake is buying the slide and discovering the limits during your first 3 a.m. page.</p>
+
+<div class="callout">
+  <div class="callout-title">✅ The five-minute vendor screen</div>
+  Before you believe "autonomous," get straight answers to five things: <strong>(1)</strong> Where is the causal/dependency model? <strong>(2)</strong> Which action tiers will it auto-execute? <strong>(3)</strong> Can every auto-action roll back cleanly? <strong>(4)</strong> How does it verify recovery against the original signal? <strong>(5)</strong> How many tries before it escalates to a human? Vague answers to any of these mean you're buying a suggestion engine — which is fine, if that's what you wanted.
+</div>
+    `
+  },
+  {
+    id: 'ai-agents-observability-blind-spot',
+    bannerImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=80',
+    title: 'Why Every New AI Agent Is an Observability Blind Spot',
+    subtitle: 'Each agent you ship adds a chunk of independent, non-deterministic behaviour to your system. Here is a practical way to instrument the decisions — not just the API calls.',
+    category: 'AI Observability',
+    icon: '🕵️',
+    bgGradient: 'linear-gradient(135deg, #2d0a2e 0%, #831843 60%, #ec4899 100%)',
+    author: 'Admin',
+    avatar: '📡',
+    date: '2026-06-26',
+    readTime: 9,
+    tags: ['AI agents', 'observability', 'OpenTelemetry', 'tracing', 'agentic AI'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>Every agent you add is a little non-deterministic black box — same input, different path, and your existing monitoring can't see why.</li>
+    <li>Traditional instrumentation captures the <em>API call</em>. With agents you also have to capture the <em>decision</em>: what it chose, why, and what it considered.</li>
+    <li>OpenTelemetry is quietly becoming the default data layer for this — GenAI semantic conventions give you a standard place to put agent telemetry.</li>
+    <li>The unit of debugging shifts from "the failing request" to "the reasoning trace." Instrument accordingly or you'll be reading tea leaves.</li>
+  </ul>
+</div>
+
+<h2>The blind spot, stated plainly</h2>
+<p>A normal microservice is boring in the best way. Same input, same output, every time. When it breaks, you read the logs, find the bad branch, fix it. Predictable systems are observable systems.</p>
+<p>An agent breaks that contract on purpose. Give it the same request twice and it might take two completely different routes — call a different tool, re-plan after a bad result, decide it has enough information and stop early. That non-determinism is the whole point; it's also exactly what your monitoring was never designed for. DataBahn's state-of-observability report this year had a line that stuck with me: most teams adopting agents are flying with instrumentation built for software that doesn't make choices. The surge in agentic AI is, quietly, a surge in un-observed decision-making running in production.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1280&q=80" alt="Abstract neural-network visual representing an AI agent's decision space" loading="lazy" /><figcaption>An agent is a service that makes choices. If your telemetry only records the calls, you've recorded the symptoms and missed the cause.</figcaption></figure>
+
+<h2>Why "trace the API calls" isn't enough</h2>
+<p>Here's a concrete failure I watched happen. A support agent kept giving users slightly wrong refund amounts. The API traces were spotless — every call returned 200, latency was fine, no errors anywhere. By the old playbook, the system was healthy. The bug was in the agent's <em>reasoning</em>: it was pulling the order total instead of the refundable subtotal, then confidently calling a perfectly functional API with the wrong number.</p>
+<p>No amount of API-level observability would have caught that, because nothing failed at the API level. The decision failed. If you only instrument the calls, you can see <em>what</em> the agent did but never <em>why</em> it thought that was the right thing to do — and "why" is the entire debugging surface for an agent.</p>
+<blockquote><strong>The reframe:</strong> for a deterministic service, the request is the thing you debug. For an agent, the reasoning chain is the thing you debug. Instrument the chain.</blockquote>
+
+<h2>A practical framework for instrumenting decisions</h2>
+<p>You don't need a PhD or a fancy platform to start. You need to capture, on every agent run, four things beyond the usual spans:</p>
+<ul>
+  <li><strong>The plan.</strong> What did the agent decide to do, and in what order? If it re-planned mid-run, capture the before and after. This is your single most valuable signal.</li>
+  <li><strong>The inputs to each choice.</strong> What context, retrieved documents, and prior tool outputs were in front of the model when it made each decision? Most bad decisions are actually bad inputs wearing a disguise.</li>
+  <li><strong>The tool selection rationale.</strong> Not just "called search_orders" but the alternatives it had and (where the model exposes it) why it picked that one. Wrong-tool-selection is one of the most common agent failure modes.</li>
+  <li><strong>Confidence and stop conditions.</strong> Why did it decide it was done? An agent that stops too early and an agent that loops forever are the same bug from opposite ends — a broken stop condition.</li>
+</ul>
+<p>Capture those and your debugging session changes character entirely. Instead of "the output was wrong, let me guess," you get "on step three it retrieved the wrong document, which made step four's reasoning correct given bad inputs." That's a fix you can actually ship.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1280&q=80" alt="Layered trace and span data visualised as a timeline" loading="lazy" /><figcaption>A reasoning trace: plan, inputs, tool choices, and stop conditions — laid out so a wrong answer has a visible cause.</figcaption></figure>
+
+<h2>OpenTelemetry is becoming the default data layer</h2>
+<p>The good news is you don't have to invent a format. OpenTelemetry's GenAI semantic conventions have matured to the point where there's now a standard, vendor-neutral place to record model calls, token usage, tool invocations, and agent spans. Monte Carlo's roundup of AI observability tools and the latest APM Digest agent coverage both point the same direction: the winners are building <em>on</em> OTel rather than around it.</p>
+<p>Why that matters practically: if you instrument your agents with OTel GenAI conventions, you stay portable. You can send the same telemetry to whichever backend you like, switch vendors without re-instrumenting, and benefit from a shared vocabulary as the ecosystem standardises. Rolling your own agent telemetry format in 2026 is choosing to maintain a dialect nobody else speaks.</p>
+
+<div class="callout">
+  <div class="callout-title">🚀 Where to start this week</div>
+  Pick your highest-traffic agent. Add OTel GenAI spans around (1) each model call with token counts, (2) each tool invocation, and (3) the planning step — log the plan as a span attribute. Then deliberately break it in staging: feed it an input you know is ambiguous and confirm you can reconstruct, from telemetry alone, exactly why it chose what it chose. If you can't, you've found your blind spot before production did.
+</div>
+
+<h2>The bottom line</h2>
+<p>Agents aren't just another service to add to the dashboard. They're a different <em>kind</em> of thing — non-deterministic, decision-making, and opaque by default. Every one you deploy without decision-level instrumentation is a blind spot you're choosing to live with. The teams pulling ahead aren't the ones with the most agents; they're the ones who can answer "why did it do that?" in minutes instead of days. Build for the reasoning trace, lean on OpenTelemetry, and the blind spot turns back into a system you can actually run.</p>
+    `
+  },
+  {
     id: 'observability-vs-monitoring',
     bannerImage: '/blog-banners/observability.jpg',
     title: 'Observability vs Monitoring: Why the Difference Actually Matters',
@@ -8,7 +190,7 @@ export const BLOG_POSTS = [
     category: 'Observability',
     icon: '🔭',
     bgGradient: 'linear-gradient(135deg, #0a1628 0%, #1e3a8a 60%, #2563eb 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-05-10',
     readTime: 8,
@@ -68,7 +250,7 @@ export const BLOG_POSTS = [
     category: 'SRE',
     icon: '📊',
     bgGradient: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 60%, #7c3aed 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-05-24',
     readTime: 7,
@@ -137,7 +319,7 @@ export const BLOG_POSTS = [
     category: 'Observability',
     icon: '🕸️',
     bgGradient: 'linear-gradient(135deg, #042f2e 0%, #115e59 60%, #0d9488 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-05',
     readTime: 10,
@@ -216,7 +398,7 @@ export const BLOG_POSTS = [
     category: 'AIOps',
     icon: '🤖',
     bgGradient: 'linear-gradient(135deg, #052e16 0%, #166534 60%, #16a34a 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-12',
     readTime: 9,
@@ -279,7 +461,7 @@ export const BLOG_POSTS = [
     category: 'SRE',
     icon: '🎯',
     bgGradient: 'linear-gradient(135deg, #431407 0%, #9a3412 60%, #ea580c 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-19',
     readTime: 11,
@@ -369,7 +551,7 @@ export const BLOG_POSTS = [
     icon: '🐶',
     logo: '/logos/datadog.svg',
     bgGradient: 'linear-gradient(135deg, #1a0533 0%, #6b21a8 60%, #a855f7 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-05-20',
     readTime: 10,
@@ -435,7 +617,7 @@ export const BLOG_POSTS = [
     icon: '🌐',
     logo: '/logos/newrelic.svg',
     bgGradient: 'linear-gradient(135deg, #003d2b 0%, #007e58 60%, #00b386 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-05-28',
     readTime: 9,
@@ -508,7 +690,7 @@ export const BLOG_POSTS = [
     icon: '💼',
     logo: '/logos/appdynamics.svg',
     bgGradient: 'linear-gradient(135deg, #0c1a3a 0%, #1d4ed8 60%, #60a5fa 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-03',
     readTime: 9,
@@ -576,7 +758,7 @@ export const BLOG_POSTS = [
     category: 'APM',
     icon: '⚖️',
     bgGradient: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #334155 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-10',
     readTime: 11,
@@ -648,7 +830,7 @@ export const BLOG_POSTS = [
     icon: '🏛️',
     logo: '/logos/broadcom.svg',
     bgGradient: 'linear-gradient(135deg, #2d0a0a 0%, #991b1b 60%, #dc2626 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-17',
     readTime: 10,
@@ -717,7 +899,7 @@ export const BLOG_POSTS = [
     category: 'Comparison',
     icon: '⚔️',
     bgGradient: 'linear-gradient(135deg, #1a0533 0%, #1e1b4b 40%, #003d2b 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-18',
     readTime: 13,
@@ -812,7 +994,7 @@ export const BLOG_POSTS = [
     category: 'Comparison',
     icon: '🆚',
     bgGradient: 'linear-gradient(135deg, #1a0533 0%, #2d1b69 50%, #0c1a3a 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-19',
     readTime: 11,
@@ -889,7 +1071,7 @@ export const BLOG_POSTS = [
     category: 'Comparison',
     icon: '🔬',
     bgGradient: 'linear-gradient(135deg, #003d2b 0%, #064e3b 40%, #431407 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-21',
     readTime: 11,
@@ -967,7 +1149,7 @@ export const BLOG_POSTS = [
     category: 'Comparison',
     icon: '🏢',
     bgGradient: 'linear-gradient(135deg, #0c1a3a 0%, #1e2d5a 50%, #2d0a0a 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-23',
     readTime: 10,
@@ -1038,7 +1220,7 @@ export const BLOG_POSTS = [
     category: 'Comparison',
     icon: '🏆',
     bgGradient: 'linear-gradient(135deg, #0a0a1a 0%, #1e3a8a 35%, #6b21a8 65%, #003d2b 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-25',
     readTime: 15,
@@ -1140,7 +1322,7 @@ export const BLOG_POSTS = [
     category: 'AI Observability',
     icon: '🌱',
     bgGradient: 'linear-gradient(135deg, #052e16 0%, #166534 60%, #22c55e 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-24',
     readTime: 7,
@@ -1237,7 +1419,7 @@ export const BLOG_POSTS = [
     category: 'AI Observability',
     icon: '🔍',
     bgGradient: 'linear-gradient(135deg, #042f2e 0%, #115e59 60%, #0d9488 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-24',
     readTime: 9,
@@ -1335,7 +1517,7 @@ export const BLOG_POSTS = [
     category: 'AI Observability',
     icon: '⚡',
     bgGradient: 'linear-gradient(135deg, #0c1a3a 0%, #312e81 60%, #4f46e5 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-24',
     readTime: 10,
@@ -1446,7 +1628,7 @@ export const BLOG_POSTS = [
     category: 'AI Observability',
     icon: '🎯',
     bgGradient: 'linear-gradient(135deg, #431407 0%, #9a3412 60%, #ea580c 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-25',
     readTime: 11,
@@ -1550,7 +1732,7 @@ export const BLOG_POSTS = [
     category: 'AI Observability',
     icon: '🧬',
     bgGradient: 'linear-gradient(135deg, #1a0533 0%, #4c1d95 60%, #7c3aed 100%)',
-    author: 'Glancer AI Team',
+    author: 'Admin',
     avatar: '📡',
     date: '2026-06-25',
     readTime: 14,

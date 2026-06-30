@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { PLATFORMS, ORIGIN, SHARE_TAGLINE } from '../lib/socialShare';
+import { ORIGIN, SHARE_TAGLINE, shareArticle } from '../lib/socialShare';
 import { shareInfographic } from '../lib/infographic';
 
-const SHOWN_PLATFORMS = ['x', 'linkedin', 'whatsapp', 'telegram', 'facebook', 'reddit', 'bluesky', 'email'];
-const platforms = PLATFORMS.filter((p) => SHOWN_PLATFORMS.includes(p.id));
+/*
+ * SocialShareSheet — one reliable share button (plus an infographic + copy
+ * helper). The old per-network buttons opened empty compose windows because the
+ * platforms dropped the pre-filled text params; this uses the native share sheet
+ * so the headline, link and tagline always travel together.
+ */
 
 const CloseIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+const ShareIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
   </svg>
 );
 const CopyIcon = () => (
@@ -23,19 +33,20 @@ const CardIcon = () => (
 
 export default function SocialShareSheet({ item, onClose }) {
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
   const [cardState, setCardState] = useState('idle');
 
   const articleUrl = item.url || ORIGIN;
-  const shareText = `${item.title}\n\n${articleUrl}\n\nDiscover more AI news at glancerai.com\n\n${SHARE_TAGLINE}`;
 
-  const onPlatform = (platform) => {
-    const href = platform.buildUrl(shareText, articleUrl, item.title);
-    window.open(href, '_blank', 'noopener,noreferrer,width=620,height=680');
+  const onShare = async () => {
+    const r = await shareArticle(item);
+    if (r === 'shared') { onClose(); return; }
+    if (r === 'copied') { setShared(true); setTimeout(() => setShared(false), 1800); }
   };
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`${item.title}\n\n${articleUrl}\n\nglancerai.com\n\n${SHARE_TAGLINE}`);
+      await navigator.clipboard.writeText(`${item.title}\n\n${articleUrl}\n\n${SHARE_TAGLINE}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {}
@@ -68,24 +79,22 @@ export default function SocialShareSheet({ item, onClose }) {
           </div>
         </div>
 
-        {/* Platform grid */}
-        <div className="share-sheet-platforms">
-          {platforms.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className="share-platform-btn"
-              style={{ '--p-color': p.color }}
-              onClick={() => onPlatform(p)}
-              aria-label={`Share on ${p.name}`}
-            >
-              <span className="share-platform-icon">{p.icon}</span>
-              <span className="share-platform-name">{p.name.split(' ')[0]}</span>
-            </button>
-          ))}
-        </div>
+        {/* Primary share — native share sheet (content never disappears) */}
+        <button
+          type="button"
+          onClick={onShare}
+          aria-label="Share"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
+            padding: '13px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
+            fontSize: '0.95rem', fontWeight: 700, color: '#fff',
+            background: 'linear-gradient(135deg,#7C3AED,#06B6D4)', boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
+          }}
+        >
+          <ShareIcon /> {shared ? 'Copied to clipboard!' : 'Share'}
+        </button>
 
-        {/* Bottom actions */}
+        {/* Secondary actions */}
         <div className="share-sheet-actions">
           <button type="button" className="share-action-btn" onClick={onShareCard} disabled={cardState === 'busy'}>
             <CardIcon />
@@ -96,6 +105,18 @@ export default function SocialShareSheet({ item, onClose }) {
             {copied ? 'Copied!' : 'Copy link'}
           </button>
         </div>
+
+        <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)', margin: '14px 0 2px', lineHeight: 1.5 }}>
+          Your AI — News, Blogs &amp; Trends, all in one platform ·{' '}
+          {/* button, not <a>: this sheet can render inside a news-card link and nested anchors are invalid */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); window.open('https://glancerai.com', '_blank', 'noopener,noreferrer'); }}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--cyan)', fontWeight: 600, fontSize: 'inherit', fontFamily: 'inherit' }}
+          >
+            glancerai.com
+          </button>
+        </p>
       </div>
     </div>
   );

@@ -126,7 +126,9 @@ function normalize(item, i) {
   return {
     id: item.guid || item.link || `live-${i}`,
     title,
-    excerpt: text.length > 180 ? text.slice(0, 177) + '…' : text,
+    // Keep a full paragraph of context (~360 chars) so readers can judge from
+    // the card whether the story is worth opening, not just a one-line teaser.
+    excerpt: text.length > 360 ? text.slice(0, 357).replace(/\s+\S*$/, '') + '…' : text,
     html,
     url: item.link,
     source: item._source,
