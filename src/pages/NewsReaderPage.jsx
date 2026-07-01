@@ -1,7 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
-import { fetchArticle } from '../lib/articleReader';
+import { useState, useEffect } from 'react';
+
+/*
+ * NewsReaderPage — a preview page for one story. Glancer AI is a news
+ * *aggregator*: we show the publisher-provided headline, a short RSS summary and
+ * a link-preview image, then send the reader to the original article on the
+ * source's own site. We deliberately do NOT reproduce the full article text —
+ * that content belongs to the publisher.
+ */
 
 const BackIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -14,12 +22,13 @@ const ExtIcon = () => (
   </svg>
 );
 
-// Strip scripts/styles from RSS HTML so it can be shown immediately and safely.
-function cleanRssHtml(html = '') {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
+// Turn the RSS summary HTML into a plain-text snippet, capped so we only ever
+// show a brief excerpt (never the publisher's full body).
+function summaryText(item) {
+  const raw = item.excerpt || item.html || '';
+  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  return text.length > 600 ? `${text.slice(0, 600).trim()}…` : text;
 }
 
 // stage 0 → proxied image (past hot-link/CORS blocks), 1 → raw URL, 2 → emoji.
@@ -48,23 +57,7 @@ function HeroImage({ src, gradient, emoji }) {
 export default function NewsReaderPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // Memoize so the object reference is stable across renders (otherwise the
-  // effect below would re-fire on every render and never settle).
   const item = useMemo(() => getCachedNewsItem(id), [id]);
-
-  const [state, setState] = useState('loading'); // loading | ready | error
-  const [article, setArticle] = useState(null);
-
-  useEffect(() => {
-    if (!item) return;
-    let alive = true;
-    setState('loading');
-    setArticle(null);
-    fetchArticle(item.url)
-      .then((res) => { if (alive) { setArticle(res); setState('ready'); } })
-      .catch(() => { if (alive) setState('error'); });
-    return () => { alive = false; };
-  }, [item]);
 
   // Robust back: go to the previous page if there is one, else the news feed.
   const goBack = () => {
@@ -88,8 +81,7 @@ export default function NewsReaderPage() {
     );
   }
 
-  const heroSrc = article?.heroImage || item.image;
-  const rssHtml = cleanRssHtml(item.html || `<p>${item.excerpt || ''}</p>`);
+  const summary = summaryText(item);
 
   return (
     <div className="page-section">
@@ -104,7 +96,7 @@ export default function NewsReaderPage() {
           </a>
         </div>
 
-        <HeroImage src={heroSrc} gradient={item.gradient} emoji={item.emoji} />
+        <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
 
         <div style={{ marginBottom: 24 }}>
           <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '0 0 14px' }}>{item.source}</span>
@@ -114,38 +106,20 @@ export default function NewsReaderPage() {
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', paddingBottom: 20, borderBottom: '1px solid var(--glass-border)' }}>
             <span>{item.source}</span>
             {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
-            <span className="news-meta-dot" /><span>{item.readMin} min read</span>
+            {item.readMin && <><span className="news-meta-dot" /><span>{item.readMin} min read</span></>}
           </div>
         </div>
 
-        {/* Body — full extracted article when ready, otherwise the RSS summary
-            (so the page is always visual and never blank). */}
+        {/* Body — a short summary only. The full article lives on the source's
+            site; we link there rather than reproducing their content. */}
         <div className="blog-read-content reader-content">
-          {state === 'ready' ? (
-            article.blocks.map((b, i) => {
-              if (b.type === 'img') return <img key={i} src={b.src} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />;
-              if (b.type === 'h2') return <h2 key={i}>{b.text}</h2>;
-              if (b.type === 'h3') return <h3 key={i}>{b.text}</h3>;
-              if (b.type === 'quote') return <blockquote key={i}>{b.text}</blockquote>;
-              return <p key={i}>{b.text}</p>;
-            })
-          ) : (
-            <>
-              {state === 'loading' && (
-                <div className="reader-loading-pill">
-                  <span className="reader-spinner" /> Loading the full story…
-                </div>
-              )}
-              {/* RSS summary shown immediately so there's always something visible */}
-              <div className="reader-rss" dangerouslySetInnerHTML={{ __html: rssHtml }} />
-              <div className="reader-fallback-note">
-                <p>{state === 'error' ? 'The full article couldn\'t be loaded inside Glancer AI for this source.' : 'Showing the summary while the full story loads…'}</p>
-                <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
-                  Read the full story at {item.source} <ExtIcon />
-                </a>
-              </div>
-            </>
-          )}
+          {summary && <p>{summary}</p>}
+          <div className="reader-fallback-note">
+            <p>This is a short summary. Read the full article on {item.source}:</p>
+            <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
+              Read the full story at {item.source} <ExtIcon />
+            </a>
+          </div>
         </div>
 
         {/* Footer nav */}

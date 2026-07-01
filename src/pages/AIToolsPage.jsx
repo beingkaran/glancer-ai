@@ -308,6 +308,13 @@ export default function AIToolsPage() {
           </p>
         </div>
 
+        <p className="tools-disclaimer">
+          These tools run heuristics and estimates in your browser and are provided for general
+          guidance only — results may be inaccurate. In particular, the <strong>AI Detector</strong> gives a
+          probabilistic estimate, not proof, and should never be used to make consequential decisions
+          about a person (e.g. academic or hiring penalties). See our <a href="/terms">Terms of Use</a>.
+        </p>
+
         <AdSlot slot={AD_SLOTS.toolsTop} className="ad-leaderboard" />
 
         {/* Tool picker cards */}

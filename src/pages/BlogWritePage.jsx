@@ -93,6 +93,8 @@ export default function BlogWritePage() {
   const [readTime, setReadTime] = useState(5);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Editing an already-approved post doesn't re-require the rights agreement.
+  const [agreed, setAgreed] = useState(isEditing);
   const [canWrite, setCanWrite] = useState(null); // null = checking
   const [loadingPost, setLoadingPost] = useState(isEditing);
   const [error, setError] = useState('');
@@ -210,6 +212,7 @@ export default function BlogWritePage() {
     setError('');
     if (!title.trim()) { setError('Please enter a title.'); return; }
     if (!editor || editor.isEmpty) { setError('Please write some content.'); return; }
+    if (!agreed) { setError('Please confirm you own the rights to this content and accept the Terms of Use.'); return; }
 
     const blog = {
       title: title.trim(),
@@ -530,6 +533,17 @@ export default function BlogWritePage() {
             <div style={{ color: '#EF4444', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: '0.875rem' }}>
               {error}
             </div>
+          )}
+
+          {!isEditing && (
+            <label className="rights-agree">
+              <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+              <span>
+                I confirm this is my own work or that I have the rights to publish it, it doesn't
+                infringe anyone's copyright, and I agree to the{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.
+              </span>
+            </label>
           )}
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>

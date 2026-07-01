@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale, BarElement, LineElement,
@@ -21,27 +21,29 @@ const LEADERBOARD = [
   { rank: 7, model: 'Grok 3',             org: 'xAI',        score: 82.1, bar: 82 },
 ];
 
-// Each KPI carries a numeric `base` + a formatter so it can wobble live, plus a
-// `source` (name + public URL) revealed when the card is clicked.
+// Each KPI carries a numeric `base` + a formatter, plus a `source` (name +
+// public URL) revealed when the card is clicked. Values are the latest figures
+// compiled from the cited public reports — they are indicative estimates, not
+// live telemetry, so they are rendered exactly as sourced (no synthetic jitter).
 const STATS = [
   {
     key: 'funding', base: 47, label: 'Q1 2026 VC Funding', delta: '+38% YoY',
-    format: (v) => `$${v.toFixed(0)}B`, wobble: 0.6,
+    format: (v) => `$${v.toFixed(0)}B`,
     source: { name: 'CB Insights — State of AI', url: 'https://www.cbinsights.com/research/report/ai-trends-q1-2026/' },
   },
   {
     key: 'models', base: 2400, label: 'Foundation Models', delta: '+180 since Jan',
-    format: (v) => `${(Math.round(v / 10) * 10).toLocaleString()}+`, wobble: 6, drift: 0.4,
+    format: (v) => `${(Math.round(v / 10) * 10).toLocaleString()}+`,
     source: { name: 'Stanford HAI — AI Index', url: 'https://aiindex.stanford.edu/report/' },
   },
   {
     key: 'swe', base: 72.5, label: 'SWE-Bench (SOTA)', delta: '↑ from 68.1%',
-    format: (v) => `${v.toFixed(1)}%`, wobble: 0.15,
+    format: (v) => `${v.toFixed(1)}%`,
     source: { name: 'SWE-bench Leaderboard', url: 'https://www.swebench.com/' },
   },
   {
     key: 'adoption', base: 34, label: 'Fortune 500 AI Adoption', delta: '+9pp YoY',
-    format: (v) => `${v.toFixed(0)}%`, wobble: 0.4,
+    format: (v) => `${v.toFixed(0)}%`,
     source: { name: 'McKinsey — State of AI', url: 'https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai' },
   },
 ];
@@ -73,14 +75,12 @@ const CHART_DEFAULTS = {
   },
 };
 
-function fundingData(tick = 0) {
-  // The latest quarter ticks up live (rounds of fresh deal data coming in).
-  const latest = 47 + Math.round(((Math.sin(tick) + 1) / 2) * 3);
+function fundingData() {
   return {
     labels: ['Q1\'24', 'Q2\'24', 'Q3\'24', 'Q4\'24', 'Q1\'25', 'Q2\'25', 'Q3\'25', 'Q4\'25', 'Q1\'26'],
     datasets: [{
       label: 'AI VC Funding ($B)',
-      data: [18, 22, 21, 29, 31, 35, 33, 41, latest],
+      data: [18, 22, 21, 29, 31, 35, 33, 41, 47],
       borderColor: '#A855F7',
       backgroundColor: 'rgba(168,85,247,0.12)',
       borderWidth: 2.5,
@@ -178,41 +178,22 @@ function SourceLink({ source }) {
 }
 
 export default function MetricsTab() {
-  // `tick` advances every few seconds to drive the live wobble; `openStat`
-  // tracks which KPI's source row is expanded. A live clock shows freshness.
-  const [tick, setTick] = useState(0);
+  // `openStat` tracks which KPI's source row is expanded. Values are rendered
+  // as sourced — no synthetic movement — so nothing on screen is fabricated.
   const [openStat, setOpenStat] = useState(null);
-  const [secondsAgo, setSecondsAgo] = useState(0);
-  const lastUpdate = useRef(Date.now());
 
-  useEffect(() => {
-    // Nudge the numbers on a gentle cadence so the dashboard reads as "live".
-    const data = setInterval(() => { setTick((t) => t + 1); lastUpdate.current = Date.now(); setSecondsAgo(0); }, 5000);
-    // Separate 1s clock so "updated Ns ago" counts up smoothly between nudges.
-    const clock = setInterval(() => setSecondsAgo(Math.round((Date.now() - lastUpdate.current) / 1000)), 1000);
-    return () => { clearInterval(data); clearInterval(clock); };
-  }, []);
-
-  // Compute the live-wobbled display value for a KPI. `drift` lets a metric
-  // (e.g. model count) trend upward over the session; `wobble` is the jitter.
-  const liveValue = (s) => {
-    const drift = (s.drift || 0) * tick;
-    const jitter = (Math.random() - 0.5) * 2 * (s.wobble || 0);
-    return s.format(s.base + drift + jitter);
-  };
-
-  const freshness = secondsAgo < 3 ? 'just now' : `${secondsAgo}s ago`;
+  const statValue = (s) => s.format(s.base);
 
   return (
     <div className="content-section">
       <div className="container">
         <div className="news-header" style={{ marginBottom: 28 }}>
           <div>
-            <p className="section-label">Live Dashboard</p>
+            <p className="section-label">Industry Dashboard</p>
             <h2 className="section-title-lg">AI Industry Metrics</h2>
           </div>
-          <span className="metrics-live-badge" title="Auto-updating">
-            <span className="metrics-live-dot" /> Live · updated {freshness}
+          <span className="metrics-live-badge" title="Figures compiled from public reports">
+            <span className="metrics-live-dot" /> Indicative · tap any metric for its source
           </span>
         </div>
 
@@ -226,7 +207,7 @@ export default function MetricsTab() {
               onClick={() => setOpenStat(openStat === s.key ? null : s.key)}
               aria-expanded={openStat === s.key}
             >
-              <div className="metric-stat-value">{liveValue(s)}</div>
+              <div className="metric-stat-value">{statValue(s)}</div>
               <div className="metric-stat-label">{s.label}</div>
               <div className={`metric-stat-delta${s.down ? ' down' : ''}`}>{s.delta}</div>
               {openStat === s.key ? (
@@ -246,7 +227,7 @@ export default function MetricsTab() {
             <div className="chart-title">Global AI VC Funding</div>
             <div className="chart-subtitle">Quarterly investment ($B) — 2024–2026</div>
             <div className="chart-wrap">
-              <Line data={fundingData(tick)} options={lineOpts} />
+              <Line data={fundingData()} options={lineOpts} />
             </div>
             <SourceLink source={CHART_SOURCES.funding} />
           </div>
@@ -292,6 +273,12 @@ export default function MetricsTab() {
             <SourceLink source={CHART_SOURCES.leaderboard} />
           </div>
         </div>
+
+        <p className="metrics-disclaimer">
+          Figures are indicative estimates compiled from the public sources linked on each card and
+          are refreshed periodically — not real-time telemetry. They are provided for general
+          information only and should not be relied on for investment or business decisions.
+        </p>
       </div>
     </div>
   );

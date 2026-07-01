@@ -9,7 +9,6 @@
  */
 
 import { ORIGIN, SHARE_TAGLINE } from './socialShare';
-import { displayImage } from './newsFeed';
 
 const SIZE = 1080;
 const CTA = 'Visit glancerai.com for catching up to AI updates mentioned';
@@ -64,30 +63,6 @@ function wrapLines(ctx, text, maxWidth, maxLines) {
   return lines;
 }
 
-// Load the article's cover image (proxied so CORS/hot-link blocks don't taint
-// the canvas). Resolves to null on any failure so the card still renders.
-function loadCover(url) {
-  return new Promise((resolve) => {
-    if (!url) return resolve(null);
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.referrerPolicy = 'no-referrer';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = displayImage(url, 1080);
-  });
-}
-
-// Cover-fit draw: fill the (x,y,w,h) box, cropping overflow, preserving aspect.
-function drawCover(ctx, img, x, y, w, h) {
-  const ir = img.width / img.height;
-  const br = w / h;
-  let sw = img.width, sh = img.height, sx = 0, sy = 0;
-  if (ir > br) { sw = img.height * br; sx = (img.width - sw) / 2; }
-  else { sh = img.width / br; sy = (img.height - sh) / 2; }
-  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-}
-
 /**
  * Build the infographic for one story. Returns a PNG Blob (1080×1080).
  */
@@ -124,24 +99,21 @@ export async function buildInfographicBlob(item = {}) {
   ctx.textAlign = 'left';
   y += 92;
 
-  // Cover image band (rounded).
-  const cover = await loadCover(item.image);
+  // Artwork band (rounded). We render our OWN generated artwork — a branded
+  // gradient with the category emoji — rather than the publisher's photo, so
+  // the shared card never redistributes third-party copyrighted images.
   const imgH = 360;
   ctx.save();
   roundRect(ctx, PAD, y, SIZE - PAD * 2, imgH, 28);
   ctx.clip();
-  if (cover) {
-    drawCover(ctx, cover, PAD, y, SIZE - PAD * 2, imgH);
-  } else {
-    const ig = ctx.createLinearGradient(PAD, y, SIZE - PAD, y + imgH);
-    ig.addColorStop(0, c1); ig.addColorStop(1, c2);
-    ctx.fillStyle = ig;
-    ctx.fillRect(PAD, y, SIZE - PAD * 2, imgH);
-    ctx.font = '160px serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(item.emoji || '🧠', SIZE / 2, y + imgH / 2 - 96);
-    ctx.textAlign = 'left';
-  }
+  const ig = ctx.createLinearGradient(PAD, y, SIZE - PAD, y + imgH);
+  ig.addColorStop(0, c1); ig.addColorStop(1, c2);
+  ctx.fillStyle = ig;
+  ctx.fillRect(PAD, y, SIZE - PAD * 2, imgH);
+  ctx.font = '160px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(item.emoji || '🧠', SIZE / 2, y + imgH / 2 - 96);
+  ctx.textAlign = 'left';
   ctx.restore();
   y += imgH + 40;
 

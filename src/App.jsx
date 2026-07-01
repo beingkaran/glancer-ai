@@ -18,7 +18,9 @@ import NewsReaderPage from './pages/NewsReaderPage';
 import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import AdminPage from './pages/AdminPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
 
 export default function App() {
@@ -34,11 +36,13 @@ export default function App() {
 
   // Count this page view (anonymous, fire-and-forget). Admin pages are excluded
   // so the dashboard's own traffic doesn't inflate the public visit stats.
+  // Visitors who declined cookies are not counted.
   useEffect(() => {
-    if (!pathname.startsWith('/_glancer')) recordHit(pathname);
+    if (pathname.startsWith('/_glancer')) return;
+    if (getCookieConsent() === 'declined') return;
+    recordHit(pathname);
   }, [pathname]);
 
-  const isAdmin = pathname === '/_glancer/admin';
   const isBlogs = pathname === '/blogs';
   const isHome = pathname === '/';
 
@@ -52,7 +56,7 @@ export default function App() {
         <div className="bg-grid" />
       </div>
 
-      {!isAdmin && !isBlogs && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
+      {!isBlogs && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       {/* First-visit guided tour (home page only) + a "Show me" replay button. */}
       {isHome && <OnboardingTour onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
@@ -72,14 +76,18 @@ export default function App() {
           <Route path="/reset-password"    element={<ResetPasswordPage />} />
           <Route path="/about"             element={<AboutPage />} />
           <Route path="/faq"               element={<FAQPage />} />
-          <Route path="/_glancer/admin"    element={<AdminPage />} />
+          <Route path="/privacy"           element={<PrivacyPage />} />
+          <Route path="/terms"             element={<TermsPage />} />
         </Routes>
       </main>
 
-      {!isAdmin && <Footer />}
+      <Footer />
 
       {/* One-time newsletter invite for unsigned visitors (fires after ~1 min). */}
-      {!isAdmin && <NewsletterPopup />}
+      <NewsletterPopup />
+
+      {/* First-visit cookie/consent banner. */}
+      <CookieConsent />
     </div>
   );
 }

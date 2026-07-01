@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { fetchArticle } from '../lib/articleReader';
 import { displayImage } from '../lib/newsFeed';
 
 /*
- * NewsReaderFrame — an in-carousel reader. Opens on top of the slideshow when a
- * story's "Read full story" is tapped, loads the linked article natively (via
- * fetchArticle) and renders it in a polished frame. A back button or the small
- * cross returns the user to the slideshow without leaving Glancer AI.
+ * NewsReaderFrame — an in-carousel preview. Opens on top of the slideshow when a
+ * story's "Read full story" is tapped. Glancer AI is an aggregator, so this shows
+ * the publisher-provided headline, a short RSS summary and a link-preview image,
+ * then links out to the original article on the source's own site. It does NOT
+ * reproduce the publisher's full article text.
  */
 
 const BackIcon = () => (
@@ -25,12 +25,13 @@ const ExtIcon = () => (
   </svg>
 );
 
-// Strip scripts/styles/iframes from RSS HTML so the summary renders safely.
-function cleanRssHtml(html = '') {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
+// Turn the RSS summary HTML into a plain-text snippet, capped so we only ever
+// show a brief excerpt (never the publisher's full body).
+function summaryText(item) {
+  const raw = item.excerpt || item.html || '';
+  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  return text.length > 600 ? `${text.slice(0, 600).trim()}…` : text;
 }
 
 function HeroImage({ src, gradient, emoji }) {
@@ -50,20 +51,6 @@ function HeroImage({ src, gradient, emoji }) {
 }
 
 export default function NewsReaderFrame({ item, onBack }) {
-  const [state, setState] = useState('loading'); // loading | ready | error
-  const [article, setArticle] = useState(null);
-
-  useEffect(() => {
-    if (!item) return;
-    let alive = true;
-    setState('loading');
-    setArticle(null);
-    fetchArticle(item.url)
-      .then((res) => { if (alive) { setArticle(res); setState('ready'); } })
-      .catch(() => { if (alive) setState('error'); });
-    return () => { alive = false; };
-  }, [item]);
-
   // Esc returns to the slideshow rather than closing the whole reader.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); onBack?.(); } };
@@ -71,8 +58,7 @@ export default function NewsReaderFrame({ item, onBack }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
-  const heroSrc = article?.heroImage || item.image;
-  const rssHtml = cleanRssHtml(item.html || `<p>${item.excerpt || ''}</p>`);
+  const summary = summaryText(item);
 
   return (
     <div className="reader-frame" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
@@ -94,7 +80,7 @@ export default function NewsReaderFrame({ item, onBack }) {
 
       <div className="reader-frame-scroll">
         <article className="reader-frame-inner">
-          <HeroImage src={heroSrc} gradient={item.gradient} emoji={item.emoji} />
+          <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
 
           <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '18px 0 12px' }}>{item.category}</span>
           <h1 className="reader-frame-title">{item.title}</h1>
@@ -105,30 +91,13 @@ export default function NewsReaderFrame({ item, onBack }) {
           </div>
 
           <div className="blog-read-content reader-content">
-            {state === 'ready' ? (
-              article.blocks.map((b, i) => {
-                if (b.type === 'img') return <img key={i} src={b.src} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />;
-                if (b.type === 'h2') return <h2 key={i}>{b.text}</h2>;
-                if (b.type === 'h3') return <h3 key={i}>{b.text}</h3>;
-                if (b.type === 'quote') return <blockquote key={i}>{b.text}</blockquote>;
-                return <p key={i}>{b.text}</p>;
-              })
-            ) : (
-              <>
-                {state === 'loading' && (
-                  <div className="reader-loading-pill">
-                    <span className="reader-spinner" /> Loading the full story…
-                  </div>
-                )}
-                <div className="reader-rss" dangerouslySetInnerHTML={{ __html: rssHtml }} />
-                <div className="reader-fallback-note">
-                  <p>{state === 'error' ? "The full article couldn't be loaded inside Glancer AI for this source." : 'Showing the summary while the full story loads…'}</p>
-                  <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
-                    Read the full story at {item.source} <ExtIcon />
-                  </a>
-                </div>
-              </>
-            )}
+            {summary && <p>{summary}</p>}
+            <div className="reader-fallback-note">
+              <p>This is a short summary. Read the full article on {item.source}:</p>
+              <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
+                Read the full story at {item.source} <ExtIcon />
+              </a>
+            </div>
           </div>
 
           <div className="reader-frame-footer">

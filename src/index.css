@@ -436,8 +436,10 @@ button { font-family: var(--font-body); }
   background: var(--glass-bg); border: 1px solid var(--glass-border);
   padding: 5px 12px; border-radius: 999px; white-space: nowrap;
 }
-.metrics-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 0 rgba(34,197,94,0.6); animation: metrics-pulse 1.8s infinite; }
-@keyframes metrics-pulse { 0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); } 70% { box-shadow: 0 0 0 7px rgba(34,197,94,0); } 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); } }
+/* Neutral (non-"live") indicator dot — the figures are periodic, not streamed. */
+.metrics-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); opacity: 0.7; }
+/* Disclaimer under the metrics dashboard clarifying the figures are estimates. */
+.metrics-disclaimer { max-width: 760px; margin: 32px auto 0; font-size: 0.75rem; line-height: 1.6; color: var(--text-muted); text-align: center; }
 /* Clickable "Source:" link under each chart card. */
 .chart-source { display: inline-block; margin-top: 14px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: color 0.15s ease; }
 .chart-source:hover { color: var(--purple); }
@@ -2098,3 +2100,55 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   .tool-cards { grid-template-columns: 1fr; }
   .tool-field-row { grid-template-columns: 1fr; }
 }
+
+/* ---------------------------------------------------------------------------
+ * Legal pages (Privacy Policy, Terms of Use) + cookie-consent banner
+ * ------------------------------------------------------------------------- */
+.legal-section { margin-bottom: 18px; }
+.legal-section h2 {
+  font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700;
+  color: var(--text-primary); margin: 0 0 12px;
+}
+.legal-section p { color: var(--text-secondary); line-height: 1.75; margin: 0 0 12px; }
+.legal-section p:last-child { margin-bottom: 0; }
+.legal-section ul { margin: 0 0 12px; padding-left: 20px; }
+.legal-section li { color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+.legal-section a { color: var(--purple); text-decoration: none; }
+.legal-section a:hover { text-decoration: underline; }
+
+/* Cookie-consent banner */
+.cookie-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 1200;
+  max-width: 780px; margin: 0 auto;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md);
+  border-radius: 16px; padding: 16px 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+.cookie-banner p { margin: 0; flex: 1 1 320px; font-size: 0.82rem; line-height: 1.6; color: var(--text-secondary); }
+.cookie-banner a { color: var(--purple); text-decoration: none; }
+.cookie-banner a:hover { text-decoration: underline; }
+.cookie-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-btn {
+  padding: 9px 18px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--glass-border); background: transparent; color: var(--text-secondary);
+}
+.cookie-btn.accept { border: none; color: #fff; background: linear-gradient(135deg,#7C3AED,#06B6D4); }
+.cookie-btn:hover { filter: brightness(1.08); }
+
+/* Disclaimer banner shown above the AI tools */
+.tools-disclaimer {
+  max-width: 760px; margin: 0 auto 22px; padding: 12px 18px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px;
+  font-size: 0.78rem; line-height: 1.6; color: var(--text-muted); text-align: center;
+}
+
+/* Rights agreement checkbox on the blog submit form */
+.rights-agree {
+  display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 18px;
+  font-size: 0.82rem; line-height: 1.55; color: var(--text-secondary);
+}
+.rights-agree input { margin-top: 3px; flex-shrink: 0; }
+.rights-agree a { color: var(--purple); text-decoration: none; }
+.rights-agree a:hover { text-decoration: underline; }
