@@ -5,6 +5,7 @@ import GreetingBanner from '../components/GreetingBanner';
 import NewsTab from '../components/NewsTab';
 import BlogsTab from '../components/BlogsTab';
 import SearchSection from '../components/SearchSection';
+import NewsFaq from '../components/NewsFaq';
 
 const HOME_TABS = new Set(['news', 'blogs']);
 
@@ -51,6 +52,7 @@ export default function HomePage() {
       {activeTab === 'blogs' && <BlogsTab />}
       <div className="section-divider" aria-hidden="true" />
       <SearchSection />
+      <NewsFaq />
     </>
   );
 }

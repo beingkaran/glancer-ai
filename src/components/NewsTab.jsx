@@ -208,10 +208,14 @@ export default function NewsTab() {
       <div className="container">
         <div className="news-header">
           <div>
-            <p className="section-label">Latest Updates</p>
-            <h2 className="section-title-lg">AI News &amp; Breakthroughs</h2>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4 }}>
-              {loading ? 'Fetching the latest headlines…' : live ? '🟢 Live feed · 60+ AI sources · refreshes every visit · opens at the source' : 'Curated headlines · opens at the source'}
+            <p className="section-label">Latest AI News · Updated Today</p>
+            <h2 className="section-title-lg">AI News Today</h2>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginTop: 6, maxWidth: '62ch', lineHeight: 1.55 }}>
+              The latest AI news today from 100+ sources — Google, NVIDIA, OpenAI, FTC AI policy,
+              model releases, research and tools. Scan the day&apos;s top AI stories and read each one in place.
+            </p>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 6 }}>
+              {loading ? 'Fetching the latest AI headlines…' : live ? '🟢 Live feed · 100+ AI sources · refreshes every visit' : 'Curated AI headlines · opens at the source'}
             </p>
           </div>
         </div>
