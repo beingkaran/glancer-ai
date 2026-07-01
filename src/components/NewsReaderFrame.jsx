@@ -1,17 +1,15 @@
-import { useState, useEffect } from 'react';
-import { displayImage } from '../lib/newsFeed';
+import { useState, useEffect, useRef } from 'react';
 import { useSwipeDown } from '../lib/useSwipeDown';
 
 /*
  * NewsReaderFrame — an in-carousel reader. Opens on top of the slideshow when a
- * story's "Read full story" is tapped.
+ * story's "Read Story" is tapped.
  *
- * For sources verified NOT to block third-party framing (item.frameable, see
- * src/data/newsFeeds.js + scripts/check-frameable.mjs), this loads the source's
- * own page LIVE in an <iframe> — unmodified, exactly as published, nothing
- * scraped or re-rendered. For every other source we never work around their
- * X-Frame-Options/CSP — instead we show a short summary and a link to read it
- * on their site.
+ * It loads the source's own page LIVE in an <iframe> — unmodified, exactly as
+ * published, nothing scraped or re-rendered — and lets the reader interact with
+ * it in place. If the page hasn't loaded within 15s (blocked by
+ * X-Frame-Options/CSP, or too slow), the reader redirects to the original URL
+ * instead of sitting on a blank frame.
  *
  * Swipe down on the top bar, or the X, returns to the slideshow.
  */
@@ -32,37 +30,12 @@ const ExtIcon = () => (
   </svg>
 );
 
-// Turn the RSS summary HTML into a plain-text snippet, capped so we only ever
-// show a brief excerpt (never the publisher's full body) for non-frameable sources.
-function summaryText(item) {
-  const raw = item.excerpt || item.html || '';
-  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!text) return '';
-  return text.length > 600 ? `${text.slice(0, 600).trim()}…` : text;
-}
-
-function HeroImage({ src, gradient, emoji }) {
-  const [stage, setStage] = useState(0);
-  useEffect(() => { setStage(0); }, [src]);
-  const shown = stage === 0 ? displayImage(src, 1400) : stage === 1 ? src : null;
-  if (src && shown) {
-    return (
-      <img className="frame-hero-img" src={shown} alt="" referrerPolicy="no-referrer" onError={() => setStage((s) => s + 1)} />
-    );
-  }
-  return (
-    <div className="frame-hero-fallback" style={{ background: gradient }}>
-      <span>{emoji}</span>
-    </div>
-  );
-}
 
 export default function NewsReaderFrame({ item, onBack }) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  // Many publishers block third-party framing (X-Frame-Options / CSP). We always
-  // TRY the live iframe, but if it hasn't fired `load` within a few seconds it's
-  // almost certainly blocked, so we surface a fallback card with the source link.
-  const [blocked, setBlocked] = useState(false);
+  // Ref mirror of "loaded" so the 15s timer reads the latest value without a
+  // stale closure.
+  const loadedRef = useRef(false);
   const swipe = useSwipeDown(onBack);
 
   // Esc returns to the slideshow rather than closing the whole reader.
@@ -72,15 +45,18 @@ export default function NewsReaderFrame({ item, onBack }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
+  // Give the source 15s to load inside the frame. If it loads, do nothing — the
+  // user reads and interacts with the live page in the frame. If it hasn't
+  // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), redirect
+  // the reader to the original article instead of leaving a blank frame.
   useEffect(() => {
     setIframeLoaded(false);
-    setBlocked(false);
-    const t = setTimeout(() => setBlocked((b) => (iframeLoaded ? b : true)), 4500);
+    loadedRef.current = false;
+    const t = setTimeout(() => {
+      if (!loadedRef.current) window.location.href = item.url;
+    }, 15000);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item]);
-
-  const summary = summaryText(item);
 
   return (
     <div className="reader-frame reader-frame-live" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
@@ -104,44 +80,24 @@ export default function NewsReaderFrame({ item, onBack }) {
       </div>
 
       <div className="reader-frame-live-body">
-        {!iframeLoaded && !blocked && (
+        {!iframeLoaded && (
           <div className="reader-loading-pill reader-frame-live-loading">
             <span className="reader-spinner" /> Loading {item.source}…
           </div>
         )}
 
-        {/* The live source page, unmodified — nothing scraped or re-rendered. */}
+        {/* The live source page, unmodified — nothing scraped or re-rendered.
+            The sandbox permits scripts/forms/popups so the page is fully
+            interactive, but withholds top-navigation so the site can't frame-bust
+            the reader out from under the user. */}
         <iframe
           className="reader-frame-iframe"
           src={item.url}
           title={item.title}
           referrerPolicy="no-referrer"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-          onLoad={() => { setIframeLoaded(true); setBlocked(false); }}
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
+          onLoad={() => { loadedRef.current = true; setIframeLoaded(true); }}
         />
-
-        {/* Shown only if the publisher blocks embedding (iframe never loaded). */}
-        {blocked && !iframeLoaded && (
-          <div className="reader-frame-blocked">
-            <article className="reader-frame-blocked-card">
-              <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
-              <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '16px 0 10px' }}>{item.category}</span>
-              <h1 className="reader-frame-title">{item.title}</h1>
-              <div className="reader-frame-meta">
-                <span>{item.source}</span>
-                {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
-              </div>
-              {summary && <p className="reader-frame-blocked-summary">{summary}</p>}
-              <p className="reader-frame-blocked-note">
-                {item.source} doesn’t allow embedding. Open the original article:
-              </p>
-              <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer">
-                Read at {item.source} <ExtIcon />
-              </a>
-              <div className="reader-frame-blocked-url">{item.url}</div>
-            </article>
-          </div>
-        )}
       </div>
     </div>
   );
