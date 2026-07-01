@@ -105,4 +105,54 @@ export const NEWS_FEEDS = [
   { url: 'https://importai.substack.com/feed', source: 'Import AI', category: 'Policy', frameable: false },
   { url: 'https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss', source: 'IEEE Spectrum', category: 'Policy', frameable: false },
   { url: 'https://lastweekin.ai/feed', source: 'Last Week in AI', category: 'Policy', frameable: false },
+
+  // --- Batch added 2026-07: 40 AI feeds verified frameable (valid RSS + no
+  //     X-Frame-Options / restrictive CSP). Probed with scripts/find-frameable-feeds.mjs;
+  //     re-run scripts/check-frameable.mjs periodically as policies change. ---
+  // Research / practitioner blogs
+  { url: 'https://lilianweng.github.io/index.xml', source: "Lil'Log", category: 'Research', frameable: true },
+  { url: 'https://jalammar.github.io/feed.xml', source: 'Jay Alammar', category: 'Research', frameable: true },
+  { url: 'https://huyenchip.com/feed.xml', source: 'Chip Huyen', category: 'Research', frameable: true },
+  { url: 'https://eugeneyan.com/rss/', source: 'Eugene Yan', category: 'Research', frameable: true },
+  { url: 'https://sebastianraschka.com/rss_feed.xml', source: 'Sebastian Raschka', category: 'Research', frameable: true },
+  { url: 'https://www.ruder.io/rss/', source: 'Sebastian Ruder', category: 'Research', frameable: true },
+  { url: 'https://karpathy.github.io/feed.xml', source: 'Andrej Karpathy', category: 'Research', frameable: true },
+  { url: 'https://colah.github.io/rss.xml', source: 'Chris Olah', category: 'Research', frameable: true },
+  { url: 'https://sander.ai/feed.xml', source: 'Sander Dieleman', category: 'Research', frameable: true },
+  { url: 'https://www.philschmid.de/rss', source: 'Phil Schmid', category: 'Research', frameable: true },
+  { url: 'https://ai.stanford.edu/blog/feed.xml', source: 'Stanford AI Lab', category: 'Research', frameable: true },
+  { url: 'https://crfm.stanford.edu/feed.xml', source: 'Stanford CRFM', category: 'Research', frameable: true },
+  { url: 'https://nlp.seas.harvard.edu/feed.xml', source: 'Harvard NLP', category: 'Research', frameable: true },
+  { url: 'https://www.fast.ai/index.xml', source: 'fast.ai', category: 'Research', frameable: true },
+  { url: 'https://www.answer.ai/index.xml', source: 'Answer.AI', category: 'Research', frameable: true },
+  { url: 'https://research.atspotify.com/feed/', source: 'Spotify Research', category: 'Research', frameable: true },
+  { url: 'https://victorzhou.com/rss.xml', source: 'Victor Zhou', category: 'Research', frameable: true },
+  // Open source / model & infra labs
+  { url: 'https://blog.eleuther.ai/index.xml', source: 'EleutherAI', category: 'Open Source', frameable: true },
+  { url: 'https://www.together.ai/blog/rss.xml', source: 'Together AI', category: 'Open Source', frameable: true },
+  { url: 'https://explosion.ai/feed', source: 'Explosion / spaCy', category: 'Open Source', frameable: true },
+  { url: 'https://snorkel.ai/feed/', source: 'Snorkel AI', category: 'Open Source', frameable: true },
+  { url: 'https://weaviate.io/blog/rss.xml', source: 'Weaviate', category: 'Open Source', frameable: true },
+  // Tools / applied
+  { url: 'https://blog.paperspace.com/rss/', source: 'Paperspace', category: 'Tools', frameable: true },
+  { url: 'https://pyimagesearch.com/feed/', source: 'PyImageSearch', category: 'Tools', frameable: true },
+  { url: 'https://www.louisbouchard.ai/rss/', source: 'Louis Bouchard', category: 'Tools', frameable: true },
+  { url: 'https://hamel.dev/index.xml', source: 'Hamel Husain', category: 'Tools', frameable: true },
+  // Industry / news
+  { url: 'https://dataconomy.com/feed/', source: 'Dataconomy', category: 'Industry', frameable: true },
+  { url: 'https://readwrite.com/feed/', source: 'ReadWrite', category: 'Industry', frameable: true },
+  { url: 'https://www.geeky-gadgets.com/feed/', source: 'Geeky Gadgets', category: 'Industry', frameable: true },
+  { url: 'https://thenextweb.com/neural/feed', source: 'TNW Neural', category: 'Industry', frameable: true },
+  { url: 'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml', source: 'ScienceDaily AI', category: 'Industry', frameable: true },
+  { url: 'https://hackernoon.com/tagged/ai/feed', source: 'HackerNoon AI', category: 'Industry', frameable: true },
+  { url: 'https://gradientflow.com/feed/', source: 'Gradient Flow', category: 'Industry', frameable: true },
+  { url: 'https://twimlai.com/feed/', source: 'TWIML', category: 'Industry', frameable: true },
+  { url: 'https://blog.cloudflare.com/tag/ai/rss/', source: 'Cloudflare AI', category: 'Industry', frameable: true },
+  { url: 'https://blog.gdeltproject.org/feed/', source: 'GDELT', category: 'Industry', frameable: true },
+  // Hardware
+  { url: 'https://semiengineering.com/feed/', source: 'Semiconductor Eng', category: 'Hardware', frameable: true },
+  // Policy / ethics
+  { url: 'https://montrealethics.ai/feed/', source: 'Montreal AI Ethics', category: 'Policy', frameable: true },
+  { url: 'https://ainowinstitute.org/feed', source: 'AI Now', category: 'Policy', frameable: true },
+  { url: 'https://thezvi.wordpress.com/feed/', source: 'Zvi Mowshowitz', category: 'Policy', frameable: true },
 ];
