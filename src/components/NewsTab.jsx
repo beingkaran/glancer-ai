@@ -181,10 +181,18 @@ export default function NewsTab() {
   const present = new Set(items.map((i) => i.category));
   const categories = NEWS_CATEGORIES.filter((c) => c === 'All' || present.has(c));
 
-  // Sort so items with a real cover image always appear before emoji/gradient
-  // placeholders, preserving the original feed order within each group.
+  // Ordering (front grid + slideshow share this):
+  //   1. Sources whose pages CAN load in the in-app iframe reader come first;
+  //      publishers that block embedding (frameable: false — they'd only open in
+  //      a new tab) are pushed to the end.
+  //   2. Within each group, real cover images beat emoji/gradient placeholders.
+  // Feed order is otherwise preserved (Array.sort is stable).
   const base = activeFilter === 'All' ? items : items.filter((i) => i.category === activeFilter);
-  const sorted = [...base].sort((a, b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
+  const sorted = [...base].sort((a, b) => {
+    const frame = (b.frameable ? 1 : 0) - (a.frameable ? 1 : 0);
+    if (frame !== 0) return frame;
+    return (b.image ? 1 : 0) - (a.image ? 1 : 0);
+  });
   const featured = sorted[0];
   const rest = sorted.slice(1);
   const carouselItems = [...sorted, ...blogSlides];
