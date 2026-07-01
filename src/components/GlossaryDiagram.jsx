@@ -5,7 +5,7 @@
  * from Data → Model → Inference → Agents. Pure SVG, theme-aware via currentColor
  * and CSS variables, responsive through viewBox scaling.
  */
-export default function GlossaryDiagram() {
+export default function GlossaryDiagram({ termCount, categoryCount }) {
   return (
     <div className="glossary-diagram glass">
       <div className="glossary-diagram-head">
@@ -80,8 +80,11 @@ export default function GlossaryDiagram() {
       </svg>
 
       <p className="glossary-diagram-note">
-        Tap a category below to dive into the terms behind each box — {`from `}<em>SLO</em> and <em>eBPF</em> to
-        {' '}<em>RAG</em>, <em>embeddings</em> and <em>AI agents</em>.
+        {termCount ? (
+          <>{termCount.toLocaleString()} terms across {categoryCount || 28} categories — from <em>SLO</em> and <em>eBPF</em> to <em>RAG</em>, <em>PromQL</em> and <em>AI agents</em>. Pick a category below to browse.</>
+        ) : (
+          <>Tap a category below to dive into the terms behind each box — from <em>SLO</em> and <em>eBPF</em> to <em>RAG</em> and <em>AI agents</em>.</>
+        )}
       </p>
     </div>
   );

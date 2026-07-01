@@ -31,6 +31,8 @@ const ALL_CATEGORIES = ['All', ...Array.from(new Set(BLOG_POSTS.map((p) => p.cat
 const submittedTime = (p) => new Date(p.submittedAt || p.date).getTime();
 const byNewest = (list) => [...list].sort((a, b) => submittedTime(b) - submittedTime(a));
 
+const BLOG_LINK_STATE = { from: '/blogs' };
+
 export default function BlogsPage() {
   const { isAdmin } = useAuth();
   const [filter, setFilter] = useState('All');
@@ -154,7 +156,7 @@ export default function BlogsPage() {
                 <div className="search-suggest-empty">No articles match "{search}"</div>
               ) : (
                 suggestions.map((p) => (
-                  <Link key={p.id} to={`/blog/${p.id}`} className="search-suggest-item" role="option" onClick={() => setShowSuggest(false)}>
+                  <Link key={p.id} to={`/blog/${p.id}`} state={BLOG_LINK_STATE} className="search-suggest-item" role="option" onClick={() => setShowSuggest(false)}>
                     <span className="search-suggest-icon" style={p.bannerImage ? null : { background: p.bgGradient || p.gradient }}>
                       {p.bannerImage
                         ? <img className="blog-banner-img" src={p.bannerImage} alt="" />
@@ -186,7 +188,7 @@ export default function BlogsPage() {
 
         {/* Featured */}
         {showFeatured && (
-          <Link to={`/blog/${featured.id}`} className="news-featured news-link" style={{ marginBottom: 32, position: 'relative' }} aria-label={`Read: ${featured.title}`}>
+          <Link to={`/blog/${featured.id}`} state={BLOG_LINK_STATE} className="news-featured news-link" style={{ marginBottom: 32, position: 'relative' }} aria-label={`Read: ${featured.title}`}>
             {isAdmin && featured.isUserBlog && (
               <button
                 onClick={(e) => handleDelete(e, featured)}
@@ -219,7 +221,7 @@ export default function BlogsPage() {
         {/* Grid */}
         <div className="blogs-grid">
           {(showFeatured ? rest : filtered).map((post) => (
-            <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none', position: 'relative' }}>
+            <Link key={post.id} to={`/blog/${post.id}`} state={BLOG_LINK_STATE} className="blog-card news-link" style={{ textDecoration: 'none', position: 'relative' }}>
               {isAdmin && post.isUserBlog && (
                 <button
                   onClick={(e) => handleDelete(e, post)}

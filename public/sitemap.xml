@@ -29,7 +29,8 @@
     <loc>https://glancerai.com/glossary</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://glancerai.com/glossary-infographic.jpg</image:loc><image:title>AI, AIOps &amp; Observability Glossary Map — 2,200+ Terms</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/faq</loc>

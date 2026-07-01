@@ -30,7 +30,14 @@ const staticRoutes = [
   { loc: '/blogs', changefreq: 'daily', priority: '0.9', lastmod: today },
   { loc: '/ai-tools', changefreq: 'weekly', priority: '0.9', lastmod: today },
   { loc: '/metrics', changefreq: 'daily', priority: '0.7', lastmod: today },
-  { loc: '/glossary', changefreq: 'weekly', priority: '0.6', lastmod: today },
+  {
+    loc: '/glossary',
+    changefreq: 'weekly',
+    priority: '0.8',
+    lastmod: today,
+    image: `${ORIGIN}/glossary-infographic.jpg`,
+    title: 'AI, AIOps & Observability Glossary Map — 2,200+ Terms',
+  },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5', lastmod: today },
   { loc: '/about', changefreq: 'monthly', priority: '0.4', lastmod: today },
 ];

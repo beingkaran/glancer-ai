@@ -50,7 +50,7 @@ export default function ReadLaterPanel({ onClose }) {
     return (
       <div className="read-later-item">
         {it.type === 'blog'
-          ? <Link to={it.url} className="read-later-link" onClick={onClose}>{body}</Link>
+          ? <Link to={it.url} state={{ from: 'home-blogs' }} className="read-later-link" onClick={onClose}>{body}</Link>
           : <a href={it.url} target="_blank" rel="noopener noreferrer" className="read-later-link">{body}</a>}
         <button type="button" className="read-later-remove" onClick={() => removeSaved(it.key)} aria-label="Remove" title="Remove">
           <TrashIcon />

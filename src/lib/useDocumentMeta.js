@@ -51,5 +51,6 @@ export function useDocumentMeta({ title, description, path = '', type = 'website
     upsertMeta('name', 'twitter:card', 'summary_large_image');
     upsertMeta('name', 'twitter:title', fullTitle);
     upsertMeta('name', 'twitter:description', description);
+    if (image) upsertMeta('name', 'twitter:image', image);
   }, [title, description, path, type, image]);
 }

@@ -55,7 +55,7 @@ export default function BlogsTab({ limit }) {
 
         <div className="blogs-grid">
           {posts.map(post => (
-            <Link key={post.id} to={`/blog/${post.id}`} className="blog-card news-link" style={{ textDecoration: 'none' }}>
+            <Link key={post.id} to={`/blog/${post.id}`} state={{ from: 'home-blogs' }} className="blog-card news-link" style={{ textDecoration: 'none' }}>
               <BlogBanner post={post} className="blog-card-banner" />
               <div className="blog-card-body">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>

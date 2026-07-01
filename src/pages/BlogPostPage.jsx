@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
 import { figuresForPost, injectFiguresIntoHtml } from '../lib/blogImages';
@@ -17,8 +17,22 @@ function formatDate(d) {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
+const BackIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+
+function blogsReturnPath(from) {
+  if (from === '/blogs') return '/blogs';
+  if (from === '/profile') return '/profile';
+  return '/?tab=blogs';
+}
+
 export default function BlogPostPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [post, setPost] = useState(undefined); // undefined = loading, null = not found
   const [more, setMore] = useState([]);
 
@@ -45,6 +59,13 @@ export default function BlogPostPage() {
     })();
     return () => { active = false; };
   }, [id]);
+
+  const goBack = () => {
+    const from = location.state?.from;
+    navigate(from ? blogsReturnPath(from) : '/?tab=blogs');
+  };
+
+  const backLabel = location.state?.from === '/blogs' ? 'Back to all articles' : 'Back to Blogs';
 
   // Per-article SEO: title/description/canonical/OG + Article & Breadcrumb
   // JSON-LD. Hooks run every render (no-op while loading) to respect hook order.
@@ -92,7 +113,7 @@ export default function BlogPostPage() {
           <p className="hero-sub" style={{ margin: '0 auto 28px' }}>
             This article may not exist, or it hasn't been approved for publication yet.
           </p>
-          <Link to="/blogs" className="write-cta-btn">← Back to all articles</Link>
+          <button type="button" className="write-cta-btn" onClick={goBack}>← Back to Blogs</button>
         </div>
       </div>
     );
@@ -101,6 +122,12 @@ export default function BlogPostPage() {
   return (
     <div className="page-section">
       <article className="container" style={{ maxWidth: 760 }}>
+        <div className="reader-backbar">
+          <button type="button" className="reader-back-btn" onClick={goBack}>
+            <BackIcon /> {backLabel}
+          </button>
+        </div>
+
         {/* Banner */}
         <BlogBanner post={post} className="blog-read-banner" emojiSize="5rem" />
 
@@ -149,7 +176,7 @@ export default function BlogPostPage() {
             <h2 className="section-title-lg" style={{ marginBottom: 20 }}>More Articles</h2>
             <div className="blogs-grid">
               {more.map((b) => (
-                <Link key={b.id} to={`/blog/${b.id}`} className="blog-card" style={{ textDecoration: 'none' }}>
+                <Link key={b.id} to={`/blog/${b.id}`} state={{ from: location.state?.from || 'home-blogs' }} className="blog-card" style={{ textDecoration: 'none' }}>
                   <BlogBanner post={b} className="blog-card-banner" emojiSize="2.6rem" />
                   <div className="blog-card-body">
                     <span className="news-category-tag tag-purple" style={{ fontSize: '0.66rem' }}>{b.category}</span>
