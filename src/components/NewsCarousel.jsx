@@ -138,19 +138,37 @@ function twoParagraphs(item) {
 function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
 
-  // "Read Story" opens the in-app reader — an <iframe> of the original page,
-  // never leaving glancerai.com. Internal (blog) slides go to their own route.
-  const openReader = () => onRead(item);
+  // "Read Story" behaviour depends on the source:
+  //  • internal blog  → its own in-app route
+  //  • frameable news → in-app iframe reader (never leaves glancerai.com)
+  //  • blocked news   → opens the original in a NEW tab (publisher forbids
+  //    embedding via X-Frame-Options/CSP, so an iframe would just show
+  //    "refused to connect"). frameable is precomputed in src/data/newsFeeds.js.
+  const openReader = () => {
+    if (item.internal) return;
+    if (item.frameable) onRead(item);
+    else window.open(item.url, '_blank', 'noopener,noreferrer');
+  };
   const paras = twoParagraphs(item);
 
   const ReadBtn = item.internal ? (
     <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
       Read full article <ExtIcon />
     </a>
-  ) : (
-    <button type="button" className="carousel-btn primary" onClick={openReader}>
+  ) : item.frameable ? (
+    <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
       Read Story <ExtIcon />
     </button>
+  ) : (
+    <a
+      className="carousel-btn primary"
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      Read Story <ExtIcon />
+    </a>
   );
 
   return (
