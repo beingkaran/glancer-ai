@@ -3,45 +3,66 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://glancerai.com/</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://glancerai.com/blogs</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://glancerai.com/ai-tools</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://glancerai.com/metrics</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/glossary</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://glancerai.com/faq</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://glancerai.com/about</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/gpt-56-coding-leap-telemetry-problem</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>The GPT-5.6 Coding Leap Is a Telemetry Problem Waiting to Happen</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/four-percent-operationalized-aiops-adoption-gap</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>Only 4% Have Operationalized AIOps — Here&apos;s the Adoption Gap Nobody Names</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/aws-devops-agent-vs-azure-sre-agent-remediation-faceoff</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>AWS DevOps Agent vs Azure SRE Agent: The First Real Autonomous-Remediation Face-Off</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/gemini-35-flash-speed-real-time-ai-observability</loc>
@@ -104,18 +125,21 @@
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/datadog-full-stack-observability-2026.jpg</image:loc><image:title>Datadog in 2026: A Full-Stack Observability Deep Dive</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/new-relic-opentelemetry-first-strategy</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/new-relic-opentelemetry-first-strategy.jpg</image:loc><image:title>New Relic Goes OpenTelemetry-First: What It Means for Your Stack</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/appdynamics-business-iq-apm-revenue</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/appdynamics-business-iq-apm-revenue.jpg</image:loc><image:title>AppDynamics Business iQ: When APM Meets Revenue Intelligence</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/datadog-vs-newrelic-vs-splunk-2026</loc>
@@ -129,6 +153,7 @@
     <lastmod>2026-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/broadcom-dx-apm-ca-apm-legacy-cloud.jpg</image:loc><image:title>Broadcom DX APM: The Enterprise Giant Navigating a Cloud-Native World</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/datadog-vs-newrelic-deep-comparison-2026</loc>
