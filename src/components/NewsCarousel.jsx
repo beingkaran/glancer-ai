@@ -119,28 +119,38 @@ function LikeButtons({ item }) {
   );
 }
 
+// Two short paragraphs of the story summary, so each slide shows a real preview
+// (not a single line). Splits the RSS summary on a sentence boundary near the
+// middle; falls back to one paragraph when there isn't enough text.
+function twoParagraphs(item) {
+  const raw = item.excerpt || item.html || item.summary || '';
+  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return [];
+  const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g);
+  if (!sentences || sentences.length < 2) return [text];
+  const mid = Math.ceil(sentences.length / 2);
+  const p1 = sentences.slice(0, mid).join(' ').trim();
+  let p2 = sentences.slice(mid).join(' ').trim();
+  if (p2.length > 420) p2 = `${p2.slice(0, 420).trim()}…`;
+  return [p1, p2].filter(Boolean);
+}
+
 function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
 
-  // Internal slides (blog posts) link to their own route. External news has no
-  // labeled "read in app" button — tapping the cover image or title opens the
-  // in-app reader (iframe, never leaves glancerai.com) directly; "Read on
-  // Source" is the one explicit action that jumps to the original.
+  // "Read Story" opens the in-app reader — an <iframe> of the original page,
+  // never leaving glancerai.com. Internal (blog) slides go to their own route.
   const openReader = () => onRead(item);
+  const paras = twoParagraphs(item);
+
   const ReadBtn = item.internal ? (
     <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
       Read full article <ExtIcon />
     </a>
   ) : (
-    <a
-      className="carousel-btn"
-      href={item.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-    >
-      Read on Source <ExtIcon />
-    </a>
+    <button type="button" className="carousel-btn primary" onClick={openReader}>
+      Read Story <ExtIcon />
+    </button>
   );
 
   return (
@@ -160,7 +170,9 @@ function Slide({ item, onRead }) {
             {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
             {item.readMin && <><span className="news-meta-dot" /><span>{item.readMin} min read</span></>}
           </div>
-          <p className="carousel-text">{item.excerpt}</p>
+          <div className="carousel-text">
+            {(paras.length ? paras : [item.excerpt]).map((p, i) => <p key={i}>{p}</p>)}
+          </div>
           <div className="carousel-actions">
             {ReadBtn}
             <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>

@@ -19,11 +19,12 @@ import ProfilePage from './pages/ProfilePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+import AdminPage from './pages/AdminPage';
 import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -43,6 +44,8 @@ export default function App() {
   }, [pathname]);
 
   const isBlogs = pathname === '/blogs';
+  // Admin dashboard renders its own full-screen chrome (no public navbar/footer).
+  const isAdmin = pathname.startsWith('/_glancer-admin');
 
   return (
     <div className="app" data-theme={theme}>
@@ -54,7 +57,7 @@ export default function App() {
         <div className="bg-grid" />
       </div>
 
-      {!isBlogs && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
+      {!isBlogs && !isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       <main>
         <Routes>
@@ -73,10 +76,11 @@ export default function App() {
           <Route path="/faq"               element={<FAQPage />} />
           <Route path="/privacy"           element={<PrivacyPage />} />
           <Route path="/terms"             element={<TermsPage />} />
+          <Route path="/_glancer-admin"    element={<AdminPage />} />
         </Routes>
       </main>
 
-      <Footer />
+      {!isAdmin && <Footer />}
 
       {/* One-time newsletter invite for unsigned visitors (fires after ~1 min). */}
       <NewsletterPopup />

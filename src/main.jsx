@@ -1,16 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-// Geist — Vercel's clean geometric typeface, self-hosted via Fontsource so the
-// site no longer depends on Google Fonts for its primary type.
-import '@fontsource/geist-sans/300.css'
-import '@fontsource/geist-sans/400.css'
-import '@fontsource/geist-sans/500.css'
-import '@fontsource/geist-sans/600.css'
-import '@fontsource/geist-sans/700.css'
-import '@fontsource/geist-sans/800.css'
-import '@fontsource/geist-mono/400.css'
-import '@fontsource/geist-mono/500.css'
+// Editorial type system (Newsreader serif + IBM Plex Sans/Mono) is loaded via
+// Google Fonts in index.html — see the "Intelligence Desk" comment there.
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'

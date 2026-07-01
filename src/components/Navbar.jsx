@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import SignalTicker from './SignalTicker';
 
 const SunIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,7 +56,10 @@ export default function Navbar({ theme, onToggleTheme }) {
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { user, isAuthed } = useAuth();
+  // Signal ticker lives in the masthead on the front page only.
+  const showTicker = pathname === '/';
 
   // Slide the floating menu up out of the way when the reader scrolls down into
   // page content (e.g. the Write editor), and bring it back on scroll up. Keeps
@@ -90,13 +94,11 @@ export default function Navbar({ theme, onToggleTheme }) {
     <header className={`navbar${hidden ? ' navbar-hidden' : ''}`}>
       <div className="navbar-inner">
         <Link className="nav-logo" to="/" aria-label="Glancer AI home">
-          <div className="nav-logo-icon">
-            <img src="/glancer-mark.svg" alt="" width="26" height="26" />
-          </div>
-          <span>
+          <span className="nav-logo-word">
             <span className="nav-logo-text">Glancer</span>
             <span className="nav-logo-dot"> AI</span>
           </span>
+          <span className="nav-logo-sub">The AI Intelligence Desk</span>
         </Link>
 
         <nav className="nav-links" aria-label="Main navigation">
@@ -171,6 +173,8 @@ export default function Navbar({ theme, onToggleTheme }) {
           {isAuthed ? 'My Profile' : 'Sign In'}
         </Link>
       </nav>
+
+      {showTicker && <SignalTicker />}
     </header>
   );
 }

@@ -27,3 +27,37 @@ export const supabase = isSupabaseConfigured
       auth: { persistSession: true, autoRefreshToken: true },
     })
   : null;
+
+/*
+ * createAdminUser — create a new admin account (email + password) from inside
+ * the admin dashboard. Only meaningful when called by a signed-in admin.
+ *
+ * The signup runs on a THROWAWAY client (persistSession:false) so it does not
+ * replace the current admin's session (client-side signUp otherwise switches the
+ * active user). The is_admin promotion then runs on the main (admin-session)
+ * client, so it succeeds only if RLS lets admins update profiles.is_admin.
+ */
+export async function createAdminUser({ name, email, password }) {
+  if (!isSupabaseConfigured) {
+    throw new Error('Supabase is not configured — set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+  }
+  const em = (email || '').trim().toLowerCase();
+  const tmp = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await tmp.auth.signUp({
+    email: em,
+    password,
+    options: { data: { name: (name || '').trim() } },
+  });
+  if (error) throw error;
+  const uid = data.user?.id;
+  if (!uid) {
+    throw new Error('Account created — the user must confirm their email before admin can be granted.');
+  }
+  const { error: pErr } = await supabase.from('profiles').update({ is_admin: true }).eq('id', uid);
+  if (pErr) {
+    throw new Error(`User "${em}" was created, but granting admin failed: ${pErr.message}. Set is_admin=true for them in the database.`);
+  }
+  return { email: em };
+}

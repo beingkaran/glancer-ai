@@ -59,6 +59,10 @@ function HeroImage({ src, gradient, emoji }) {
 
 export default function NewsReaderFrame({ item, onBack }) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  // Many publishers block third-party framing (X-Frame-Options / CSP). We always
+  // TRY the live iframe, but if it hasn't fired `load` within a few seconds it's
+  // almost certainly blocked, so we surface a fallback card with the source link.
+  const [blocked, setBlocked] = useState(false);
   const swipe = useSwipeDown(onBack);
 
   // Esc returns to the slideshow rather than closing the whole reader.
@@ -68,19 +72,27 @@ export default function NewsReaderFrame({ item, onBack }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
-  useEffect(() => { setIframeLoaded(false); }, [item]);
+  useEffect(() => {
+    setIframeLoaded(false);
+    setBlocked(false);
+    const t = setTimeout(() => setBlocked((b) => (iframeLoaded ? b : true)), 4500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item]);
 
   const summary = summaryText(item);
 
   return (
-    <div className={`reader-frame${item.frameable ? ' reader-frame-live' : ''}`} role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
+    <div className="reader-frame reader-frame-live" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
       {/* Sticky frame bar — our own chrome, doubles as the swipe-down handle */}
       <div className="reader-frame-bar" onTouchStart={swipe.onTouchStart} onTouchEnd={swipe.onTouchEnd}>
         <span className="reader-frame-grabber" aria-hidden="true" />
         <button type="button" className="reader-frame-back" onClick={onBack} aria-label="Back to slideshow">
           <BackIcon /> Slideshow
         </button>
-        <span className="reader-frame-source">{item.source}</span>
+        <a className="reader-frame-source-link" href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
+          {item.source}
+        </a>
         <div className="reader-frame-bar-right">
           <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open original article">
             Original <ExtIcon />
@@ -91,54 +103,46 @@ export default function NewsReaderFrame({ item, onBack }) {
         </div>
       </div>
 
-      {item.frameable ? (
-        <div className="reader-frame-live-body">
-          {!iframeLoaded && (
-            <div className="reader-loading-pill reader-frame-live-loading">
-              <span className="reader-spinner" /> Loading {item.source}…
-            </div>
-          )}
-          <iframe
-            className="reader-frame-iframe"
-            src={item.url}
-            title={item.title}
-            onLoad={() => setIframeLoaded(true)}
-          />
-        </div>
-      ) : (
-        <div className="reader-frame-scroll">
-          <article className="reader-frame-inner">
-            <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
+      <div className="reader-frame-live-body">
+        {!iframeLoaded && !blocked && (
+          <div className="reader-loading-pill reader-frame-live-loading">
+            <span className="reader-spinner" /> Loading {item.source}…
+          </div>
+        )}
 
-            <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '18px 0 12px' }}>{item.category}</span>
-            <h1 className="reader-frame-title">{item.title}</h1>
-            <div className="reader-frame-meta">
-              <span>{item.source}</span>
-              {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
-              {item.readMin && <><span className="news-meta-dot" /><span>{item.readMin} min read</span></>}
-            </div>
+        {/* The live source page, unmodified — nothing scraped or re-rendered. */}
+        <iframe
+          className="reader-frame-iframe"
+          src={item.url}
+          title={item.title}
+          referrerPolicy="no-referrer"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          onLoad={() => { setIframeLoaded(true); setBlocked(false); }}
+        />
 
-            <div className="blog-read-content reader-content">
-              {summary && <p>{summary}</p>}
-              <div className="reader-fallback-note">
-                <p>This is a short summary. Read the full article on {item.source}:</p>
-                <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
-                  Read the full story at {item.source} <ExtIcon />
-                </a>
+        {/* Shown only if the publisher blocks embedding (iframe never loaded). */}
+        {blocked && !iframeLoaded && (
+          <div className="reader-frame-blocked">
+            <article className="reader-frame-blocked-card">
+              <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
+              <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '16px 0 10px' }}>{item.category}</span>
+              <h1 className="reader-frame-title">{item.title}</h1>
+              <div className="reader-frame-meta">
+                <span>{item.source}</span>
+                {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
               </div>
-            </div>
-
-            <div className="reader-frame-footer">
-              <button type="button" className="reader-frame-back" onClick={onBack}>
-                <BackIcon /> Back to slideshow
-              </button>
-              <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer">
-                View source: {item.source} <ExtIcon />
+              {summary && <p className="reader-frame-blocked-summary">{summary}</p>}
+              <p className="reader-frame-blocked-note">
+                {item.source} doesn’t allow embedding. Open the original article:
+              </p>
+              <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer">
+                Read at {item.source} <ExtIcon />
               </a>
-            </div>
-          </article>
-        </div>
-      )}
+              <div className="reader-frame-blocked-url">{item.url}</div>
+            </article>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
