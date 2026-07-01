@@ -329,8 +329,8 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 .section-title-lg { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
 
 /* News header */
-.news-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-.news-filter { display: flex; gap: 8px; flex-wrap: wrap; }
+.news-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+.news-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
 .filter-chip {
   padding: 6px 14px; border-radius: var(--border-radius-pill); border: 1px solid var(--glass-border);
   background: var(--surface); color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;
