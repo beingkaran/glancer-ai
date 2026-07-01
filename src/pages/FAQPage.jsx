@@ -67,6 +67,37 @@ const FAQS = [
   },
 ];
 
+// Broad "AI news" FAQ — targets high-volume informational searches (what is AI
+// news, generative AI, AGI, AI agents, LLMs, AI trends…) for topical authority.
+// `items` render as a bulleted list and are flattened into the JSON-LD answer.
+const AI_NEWS_FAQS = [
+  { q: 'What is AI news?', a: 'AI news covers the latest developments in artificial intelligence, including new models, research breakthroughs, company announcements, regulations, startups, and AI-powered products.' },
+  { q: 'Where can I find the latest AI news?', a: 'You can follow dedicated AI news websites, technology publications, research labs, and official announcements from companies like OpenAI, Google, Microsoft, Meta, Anthropic, and NVIDIA. Glancer AI brings the latest AI news from 100+ of these sources into one live feed.' },
+  { q: 'Why is AI news important?', a: 'AI is transforming industries such as healthcare, finance, education, manufacturing, and software development. Keeping up with AI news helps individuals and businesses stay competitive.' },
+  { q: 'Which companies are leading AI development?', a: 'Some of the leading AI companies include OpenAI, Google DeepMind, Microsoft, Anthropic, Meta, NVIDIA, Amazon, IBM, and xAI.' },
+  { q: 'How often is AI news updated?', a: 'Major AI news is published daily. Significant product launches, research papers, and funding announcements happen throughout the week. Glancer AI refreshes its feed on every visit.' },
+  { q: 'What are the biggest AI trends in 2025?', a: 'Current trends include:', items: ['Agentic AI', 'Multimodal AI models', 'AI coding assistants', 'Enterprise AI adoption', 'AI-powered search', 'Robotics and autonomous systems', 'AI regulation and governance'] },
+  { q: 'Is AI replacing jobs?', a: 'AI is automating certain repetitive tasks while also creating new roles in AI engineering, prompt engineering, data science, AI governance, and machine learning operations.' },
+  { q: 'What is generative AI?', a: 'Generative AI is a type of artificial intelligence that creates new content such as text, images, videos, music, and computer code from user prompts.' },
+  { q: 'What is the difference between AI and machine learning?', a: 'Artificial intelligence is the broader field focused on making machines perform intelligent tasks, while machine learning is a subset of AI that enables systems to learn from data without explicit programming.' },
+  { q: 'Which industries are adopting AI the fastest?', a: 'Industries rapidly adopting AI include:', items: ['Healthcare', 'Banking and Finance', 'Retail', 'Manufacturing', 'Customer Service', 'Marketing', 'Education', 'Cybersecurity', 'Logistics', 'Software Development'] },
+  { q: 'What are AI agents?', a: 'AI agents are systems capable of planning, reasoning, using tools, and completing multi-step tasks with minimal human intervention.' },
+  { q: 'What is AGI?', a: 'Artificial General Intelligence (AGI) refers to AI that can perform intellectual tasks across multiple domains at a level comparable to humans.' },
+  { q: 'Is AI regulated?', a: 'Many countries are introducing AI regulations focused on transparency, safety, privacy, copyright, and responsible AI development.' },
+  { q: 'How can businesses use AI?', a: 'Businesses use AI for:', items: ['Customer support', 'Content creation', 'Sales automation', 'Data analysis', 'Fraud detection', 'Predictive analytics', 'Process automation', 'Personalized marketing'] },
+  { q: 'What skills are needed for a career in AI?', a: 'Popular AI skills include:', items: ['Python programming', 'Machine learning', 'Deep learning', 'Prompt engineering', 'Data analysis', 'SQL', 'Cloud computing', 'MLOps', 'Large Language Models (LLMs)'] },
+  { q: 'What are Large Language Models (LLMs)?', a: 'LLMs are AI models trained on massive datasets to understand and generate human-like text. They power modern AI assistants, chatbots, and coding tools.' },
+  { q: 'What is multimodal AI?', a: 'Multimodal AI can process and generate multiple forms of content, including text, images, audio, and video within a single model.' },
+  { q: 'Can AI create images and videos?', a: 'Yes. Modern generative AI models can create realistic images, videos, animations, and digital artwork from natural language prompts.' },
+  { q: 'How can I stay updated with AI news?', a: 'You can subscribe to AI newsletters, follow AI researchers and companies on social media, monitor GitHub projects, read research publications, and bookmark trusted AI news websites like Glancer AI.' },
+  { q: 'What is the future of artificial intelligence?', a: 'AI is expected to become increasingly integrated into everyday applications, driving advances in automation, healthcare, education, scientific research, robotics, and personalized digital experiences.' },
+];
+
+// Flatten an answer (+ optional bullet list) to the plain text used in JSON-LD.
+function faqAnswerText({ a, items }) {
+  return items && items.length ? `${a} ${items.join(', ')}.` : a;
+}
+
 function ChevronIcon() {
   return (
     <svg className="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -77,23 +108,24 @@ function ChevronIcon() {
 
 export default function FAQPage() {
   useDocumentMeta({
-    title: 'FAQ — AI News, Free AI Tools, AIOps & Observability',
-    description: 'Frequently asked questions about Glancer AI: what AIOps, observability and APM mean, the 25+ free in-browser AI tools, how AI news and metrics are updated, and how to publish your own blog. Clear answers for engineers and learners.',
+    title: 'AI News FAQ — AI, LLMs, AI Agents, AGI & 2025 Trends',
+    description: 'AI news FAQ: what is AI news, where to find the latest AI news, generative AI, AI agents, LLMs, AGI, AI regulation and the biggest AI trends of 2025 — plus questions about Glancer AI, free AI tools and the AIOps glossary.',
     path: '/faq',
   });
 
-  const [open, setOpen] = useState(0);
+  // One open item at a time, keyed by "group-index" so the two lists don't clash.
+  const [openKey, setOpenKey] = useState('site-0');
 
   // Inject FAQPage structured data for Google rich results. Answers mirror the
-  // visible text exactly, as required by Google's structured-data guidelines.
+  // visible text exactly (bullet lists flattened), as Google requires.
   useEffect(() => {
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: FAQS.map(({ q, a }) => ({
+      mainEntity: [...FAQS, ...AI_NEWS_FAQS].map((f) => ({
         '@type': 'Question',
-        name: q,
-        acceptedAnswer: { '@type': 'Answer', text: a },
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: faqAnswerText(f) },
       })),
     };
     const script = document.createElement('script');
@@ -107,42 +139,57 @@ export default function FAQPage() {
     };
   }, []);
 
+  const renderList = (list, group) => (
+    <div style={{ marginBottom: 40 }}>
+      {list.map((item, i) => {
+        const key = `${group}-${i}`;
+        const isOpen = openKey === key;
+        return (
+          <div key={item.q} className={`faq-item${isOpen ? ' faq-item-open' : ''}`}>
+            <h2 style={{ margin: 0 }}>
+              <button
+                type="button"
+                className="faq-question"
+                aria-expanded={isOpen}
+                onClick={() => setOpenKey(isOpen ? '' : key)}
+              >
+                <span>{item.q}</span>
+                <ChevronIcon />
+              </button>
+            </h2>
+            <div className="faq-answer" hidden={!isOpen}>
+              <p>{item.a}</p>
+              {item.items && (
+                <ul className="faq-answer-list">
+                  {item.items.map((li) => <li key={li}>{li}</li>)}
+                </ul>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="page-section">
       <div className="container" style={{ maxWidth: 820 }}>
         {/* Hero */}
         <div className="page-hero" style={{ paddingTop: 'calc(var(--navbar-h) + 60px)', paddingBottom: 36, textAlign: 'center' }}>
           <p className="section-label" style={{ marginBottom: 12 }}>Help Center</p>
-          <h1 className="page-hero-title">Frequently Asked Questions</h1>
+          <h1 className="page-hero-title">AI News — Frequently Asked Questions</h1>
           <p className="hero-sub" style={{ margin: '0 auto' }}>
-            Everything you need to know about Glancer AI — our free AI tools, the AIOps &amp; observability glossary, AI news, metrics, and how to contribute.
+            Clear answers to the most-searched questions about AI news, generative AI, AI agents, LLMs and 2025 AI trends — plus how Glancer AI, its free tools and glossary work.
           </p>
         </div>
 
-        {/* FAQ accordion */}
-        <div style={{ marginBottom: 40 }}>
-          {FAQS.map((item, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={item.q} className={`faq-item${isOpen ? ' faq-item-open' : ''}`}>
-                <h2 style={{ margin: 0 }}>
-                  <button
-                    type="button"
-                    className="faq-question"
-                    aria-expanded={isOpen}
-                    onClick={() => setOpen(isOpen ? -1 : i)}
-                  >
-                    <span>{item.q}</span>
-                    <ChevronIcon />
-                  </button>
-                </h2>
-                <div className="faq-answer" hidden={!isOpen}>
-                  <p>{item.a}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* AI news questions (broad search intent) */}
+        <p className="section-label" style={{ marginBottom: 14 }}>AI News &amp; Artificial Intelligence</p>
+        {renderList(AI_NEWS_FAQS, 'ai')}
+
+        {/* Site / product questions */}
+        <p className="section-label" style={{ marginBottom: 14 }}>About Glancer AI</p>
+        {renderList(FAQS, 'site')}
 
         {/* Still have questions CTA */}
         <div className="chart-card" style={{ marginBottom: 80, textAlign: 'center', padding: 40 }}>

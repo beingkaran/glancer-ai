@@ -1,0 +1,5 @@
+# Cloudflare Pages SPA fallback: serve the app for client-side routes.
+# Static assets (incl. prerendered /blog/*.html) are matched first and take
+# precedence, so only unmatched paths fall through to the SPA, where the
+# React Router catch-all renders the 404 page.
+/*    /index.html    200

@@ -20,6 +20,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import AdminPage from './pages/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
 
@@ -60,6 +62,7 @@ export default function App() {
       {!isBlogs && !isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       <main>
+        <ErrorBoundary>
         <Routes>
           <Route path="/"                  element={<HomePage />} />
           <Route path="/blogs"             element={<BlogsPage />} />
@@ -77,7 +80,9 @@ export default function App() {
           <Route path="/privacy"           element={<PrivacyPage />} />
           <Route path="/terms"             element={<TermsPage />} />
           <Route path="/_glancer-admin"    element={<AdminPage />} />
+          <Route path="*"                  element={<NotFoundPage />} />
         </Routes>
+        </ErrorBoundary>
       </main>
 
       {!isAdmin && <Footer />}
