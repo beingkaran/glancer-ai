@@ -330,7 +330,10 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 
 /* News header */
 .news-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
-.news-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+/* Filter bar: category chips flow on the left, Read Later flush to the right. */
+.news-filter-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+.news-filter { display: flex; gap: 8px; flex-wrap: wrap; flex: 1 1 auto; }
+.news-filter-bar .read-later-toggle { margin-left: auto; flex-shrink: 0; }
 .filter-chip {
   padding: 6px 14px; border-radius: var(--border-radius-pill); border: 1px solid var(--glass-border);
   background: var(--surface); color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;

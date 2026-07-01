@@ -206,6 +206,19 @@ export default function NewsTab() {
               {loading ? 'Fetching the latest headlines…' : live ? '🟢 Live feed · 60+ AI sources · refreshes every visit · opens at the source' : 'Curated headlines · opens at the source'}
             </p>
           </div>
+        </div>
+
+        {/* Category filter bar — chips on the left, Read Later flush right, one row. */}
+        <div className="news-filter-bar">
+          {categories.length > 1 && (
+            <div className="news-filter" role="group" aria-label="Filter by category">
+              {categories.map((cat) => (
+                <button key={cat} className={`filter-chip${activeFilter === cat ? ' active' : ''}`} onClick={() => setActiveFilter(cat)}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
           <button
             type="button"
             className={`read-later-toggle${savedCount ? ' has-saved' : ''}`}
@@ -219,17 +232,6 @@ export default function NewsTab() {
             {savedCount > 0 && <span className="read-later-badge">{savedCount}</span>}
           </button>
         </div>
-
-        {/* Full-width category filter bar (chips span the row; no dead space). */}
-        {categories.length > 1 && (
-          <div className="news-filter" role="group" aria-label="Filter by category">
-            {categories.map((cat) => (
-              <button key={cat} className={`filter-chip${activeFilter === cat ? ' active' : ''}`} onClick={() => setActiveFilter(cat)}>
-                {cat}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Featured */}
         {featured && (
