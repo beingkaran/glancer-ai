@@ -9,7 +9,7 @@ import Turnstile, { isCaptchaEnabled } from './Turnstile';
  * can sign in as another, and no user data is visible without a valid session.
  * Optionally protected by a Cloudflare Turnstile CAPTCHA (see Turnstile.jsx).
  */
-export default function AuthForm({ onSuccess }) {
+export default function AuthForm({ onSuccess, loginOnly = false }) {
   const { signIn, signUp, resetPassword, configured } = useAuth();
   const [mode, setMode] = useState('signin'); // 'signin' | 'signup' | 'forgot'
   const [name, setName] = useState('');
@@ -99,8 +99,8 @@ export default function AuthForm({ onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
-      {/* Tabs (hidden in forgot mode) */}
-      {mode !== 'forgot' && (
+      {/* Tabs (hidden in forgot mode, and entirely when loginOnly) */}
+      {!loginOnly && mode !== 'forgot' && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, background: 'var(--surface)', padding: 4, borderRadius: 10 }}>
           {['signin', 'signup'].map((m) => (
             <button
@@ -168,8 +168,8 @@ export default function AuthForm({ onSuccess }) {
         </div>
       )}
 
-      {/* Forgot-password link (sign-in only) */}
-      {mode === 'signin' && (
+      {/* Forgot-password link (sign-in only; hidden when loginOnly) */}
+      {mode === 'signin' && !loginOnly && (
         <div style={{ textAlign: 'right', marginBottom: 14 }}>
           <button type="button" onClick={() => switchMode('forgot')}
             style={{ background: 'none', border: 'none', color: 'var(--purple)', cursor: 'pointer', fontSize: '0.8rem', padding: 0 }}>

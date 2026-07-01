@@ -23,6 +23,51 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+/* ---------- Change-password card (self, post-login) ---------- */
+function ChangePasswordCard() {
+  const { updatePassword } = useAuth();
+  const [pw, setPw] = useState('');
+  const [pw2, setPw2] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  async function submit(e) {
+    e.preventDefault();
+    setMsg(null);
+    if (pw.length < 8) { setMsg({ ok: false, text: 'Password must be at least 8 characters.' }); return; }
+    if (pw !== pw2) { setMsg({ ok: false, text: 'Passwords do not match.' }); return; }
+    setBusy(true);
+    try {
+      await updatePassword(pw);
+      setMsg({ ok: true, text: 'Your password has been updated.' });
+      setPw(''); setPw2('');
+    } catch (err) {
+      setMsg({ ok: false, text: err?.message || 'Could not update password.' });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="chart-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+      <h3 className="chart-title">Change your password</h3>
+      {[
+        { k: 'pw', label: 'New password', val: pw, set: setPw },
+        { k: 'pw2', label: 'Confirm new password', val: pw2, set: setPw2 },
+      ].map((f) => (
+        <label key={f.k} style={{ display: 'block' }}>
+          <span style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.64rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>{f.label}</span>
+          <input className="field-input" type="password" value={f.val} onChange={(e) => f.set(e.target.value)} placeholder="At least 8 characters" style={{ width: '100%' }} />
+        </label>
+      ))}
+      <button type="submit" className="btn-grad" disabled={busy} style={{ alignSelf: 'flex-start', padding: '10px 22px' }}>
+        {busy ? 'Updating…' : 'Update password'}
+      </button>
+      {msg && <p style={{ fontSize: '0.82rem', color: msg.ok ? '#22C55E' : '#EF4444', lineHeight: 1.5 }}>{msg.text}</p>}
+    </form>
+  );
+}
+
 /* ---------- Create-admin panel (only rendered once an admin is signed in) ---------- */
 function AdminsPanel() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -72,6 +117,8 @@ function AdminsPanel() {
           <p style={{ fontSize: '0.82rem', color: msg.ok ? '#22C55E' : '#EF4444', lineHeight: 1.5 }}>{msg.text}</p>
         )}
       </form>
+
+      <ChangePasswordCard />
     </div>
   );
 }
@@ -184,7 +231,7 @@ export default function AdminPage() {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Sign in with your admin email &amp; password.</p>
           </div>
           <div className="chart-card" style={{ padding: 28 }}>
-            <AuthForm />
+            <AuthForm loginOnly />
           </div>
           <p style={{ textAlign: 'center', marginTop: 20 }}>
             <Link to="/" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to Glancer AI</Link>
