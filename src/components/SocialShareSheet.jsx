@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ORIGIN, SHARE_TAGLINE, shareArticle } from '../lib/socialShare';
+import { SHARE_TAGLINE, shareArticle, shareUrlFor } from '../lib/socialShare';
 import { shareInfographic } from '../lib/infographic';
 
 /*
@@ -36,10 +36,12 @@ export default function SocialShareSheet({ item, onClose }) {
   const [shared, setShared] = useState(false);
   const [cardState, setCardState] = useState('idle');
 
-  const articleUrl = item.url || ORIGIN;
+  // Always the glancerai.com preview link — never the external publisher URL —
+  // so every share surface drives traffic back to our own site.
+  const articleUrl = shareUrlFor(item);
 
   const onShare = async () => {
-    const r = await shareArticle(item);
+    const r = await shareArticle({ ...item, url: articleUrl });
     if (r === 'shared') { onClose(); return; }
     if (r === 'copied') { setShared(true); setTimeout(() => setShared(false), 1800); }
   };

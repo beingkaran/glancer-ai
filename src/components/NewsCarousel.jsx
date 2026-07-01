@@ -118,16 +118,28 @@ function LikeButtons({ item }) {
 function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
 
-  // Internal slides (blog posts) link to their own route; external news opens
-  // in the in-carousel reader frame so the user never leaves the slideshow.
-  const ReadBtn = item.internal ? (
+  // Internal slides (blog posts) link to their own route — no external source,
+  // so a single button is enough. External news gets two distinct actions: read
+  // it in-app (reader frame, never leaves glancerai.com) or jump to the source.
+  const ReadBtns = item.internal ? (
     <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
       Read full article <ExtIcon />
     </a>
   ) : (
-    <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
-      Read full story <ExtIcon />
-    </button>
+    <>
+      <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
+        Read on GlancerAI.com <ExtIcon />
+      </button>
+      <a
+        className="carousel-btn"
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        Read on Source <ExtIcon />
+      </a>
+    </>
   );
 
   return (
@@ -144,7 +156,7 @@ function Slide({ item, onRead }) {
           </div>
           <p className="carousel-text">{item.excerpt}</p>
           <div className="carousel-actions">
-            {ReadBtn}
+            {ReadBtns}
             <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>
               <ShareIcon /> Share
             </button>

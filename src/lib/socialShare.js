@@ -52,6 +52,19 @@ export function blogPostUrl(post) {
   return `${ORIGIN}/blog/${encodeURIComponent(String(id))}`;
 }
 
+/**
+ * shareUrlFor — the glancerai.com link to share for a carousel/card item,
+ * NEVER the external publisher URL. Blog slides (item.internal) point at
+ * their own /blog/:id; real news items point at our /news/:rid preview page.
+ * Every share surface (native share sheet, copy-link, infographic) must route
+ * through this so shared links always land back on glancerai.com.
+ */
+export function shareUrlFor(item = {}) {
+  if (item.internal && item.url) return `${ORIGIN}${item.url}`;
+  if (item.rid) return `${ORIGIN}/news/${encodeURIComponent(String(item.rid))}`;
+  return ORIGIN;
+}
+
 /** Offline hook templates when AI is unavailable. */
 export function offlineHooks(post) {
   const t = post?.title || 'New on Glancer AI';

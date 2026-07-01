@@ -8,7 +8,7 @@
  *   "Visit glancerai.com for catching up to AI updates mentioned"
  */
 
-import { ORIGIN, SHARE_TAGLINE } from './socialShare';
+import { SHARE_TAGLINE, shareUrlFor } from './socialShare';
 
 const SIZE = 1080;
 const CTA = 'Visit glancerai.com for catching up to AI updates mentioned';
@@ -182,7 +182,8 @@ export async function shareInfographic(item = {}) {
 
   const safe = (item.title || 'glancer-ai').replace(/[^a-z0-9]+/gi, '-').slice(0, 60).toLowerCase();
   const file = new File([blob], `${safe}.png`, { type: 'image/png' });
-  const url = item.url || ORIGIN;
+  // Always the glancerai.com preview link — never the external publisher URL.
+  const url = shareUrlFor(item);
   const text = `${item.title || 'AI update'}\n\n${CTA}\n${SHARE_TAGLINE}`;
 
   // Native share with file (mobile + supported desktop browsers).
