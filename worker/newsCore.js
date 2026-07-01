@@ -112,6 +112,7 @@ function parseFeed(xml, feed) {
       image: image || null,
       _source: feed.source,
       _category: feed.category,
+      _frameable: feed.frameable === true,
     };
   }).filter((it) => it.title && it.link);
 }

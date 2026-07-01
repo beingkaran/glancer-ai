@@ -140,6 +140,11 @@ function normalize(item, i) {
     readMin: Math.max(2, Math.round((text.split(' ').length || 200) / 200)),
     image,
     live: true,
+    // Only true for sources verified (scripts/check-frameable.mjs) not to block
+    // third-party framing — gates whether the reader opens a live iframe of the
+    // source or falls back to a summary + link-out. Never bypass this to work
+    // around a publisher's X-Frame-Options/CSP.
+    frameable: item._frameable === true,
   };
 }
 
@@ -164,7 +169,7 @@ async function fetchViaRss2Json(feed) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   if (data.status !== 'ok' || !Array.isArray(data.items)) throw new Error('bad feed');
-  return data.items.map((it) => ({ ...it, _source: feed.source, _category: feed.category }));
+  return data.items.map((it) => ({ ...it, _source: feed.source, _category: feed.category, _frameable: feed.frameable === true }));
 }
 
 async function fetchViaProxy(feed) {
@@ -195,6 +200,7 @@ async function fetchViaProxy(feed) {
       image,
       _source: feed.source,
       _category: feed.category,
+      _frameable: feed.frameable === true,
     };
   });
 }

@@ -101,7 +101,6 @@ export default function Navbar({ theme, onToggleTheme }) {
             <NavLink
               key={link.label}
               to={link.to.startsWith('/#') ? '/' : link.to}
-              data-tour={link.to === '/ai-tools' ? 'tools' : link.to === '/glossary' ? 'glossary' : undefined}
               className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
               onClick={() => {
                 if (link.to === '/#news') {
@@ -116,7 +115,7 @@ export default function Navbar({ theme, onToggleTheme }) {
         </nav>
 
         <div className="nav-actions">
-          <Link to="/blog/write" className="write-btn" data-tour="write" aria-label="Publish your own blogs" title="Publish your own blogs" onClick={handleWrite}>
+          <Link to="/blog/write" className="write-btn" aria-label="Publish your own blogs" title="Publish your own blogs" onClick={handleWrite}>
             <PenIcon />
           </Link>
           {isAuthed ? (
@@ -132,7 +131,6 @@ export default function Navbar({ theme, onToggleTheme }) {
           )}
           <button
             className="icon-btn"
-            data-tour="theme"
             onClick={onToggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >

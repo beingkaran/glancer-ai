@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import { displayImage } from '../lib/newsFeed';
+import { useSwipeDown } from '../lib/useSwipeDown';
 
 /*
- * NewsReaderFrame — an in-carousel preview. Opens on top of the slideshow when a
- * story's "Read full story" is tapped. Glancer AI is an aggregator, so this shows
- * the publisher-provided headline, a short RSS summary and a link-preview image,
- * then links out to the original article on the source's own site. It does NOT
- * reproduce the publisher's full article text.
+ * NewsReaderFrame — an in-carousel reader. Opens on top of the slideshow when a
+ * story's "Read full story" is tapped.
+ *
+ * For sources verified NOT to block third-party framing (item.frameable, see
+ * src/data/newsFeeds.js + scripts/check-frameable.mjs), this loads the source's
+ * own page LIVE in an <iframe> — unmodified, exactly as published, nothing
+ * scraped or re-rendered. For every other source we never work around their
+ * X-Frame-Options/CSP — instead we show a short summary and a link to read it
+ * on their site.
+ *
+ * Swipe down on the top bar, or the X, returns to the slideshow.
  */
 
 const BackIcon = () => (
@@ -26,7 +33,7 @@ const ExtIcon = () => (
 );
 
 // Turn the RSS summary HTML into a plain-text snippet, capped so we only ever
-// show a brief excerpt (never the publisher's full body).
+// show a brief excerpt (never the publisher's full body) for non-frameable sources.
 function summaryText(item) {
   const raw = item.excerpt || item.html || '';
   const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -51,6 +58,9 @@ function HeroImage({ src, gradient, emoji }) {
 }
 
 export default function NewsReaderFrame({ item, onBack }) {
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const swipe = useSwipeDown(onBack);
+
   // Esc returns to the slideshow rather than closing the whole reader.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); onBack?.(); } };
@@ -58,12 +68,15 @@ export default function NewsReaderFrame({ item, onBack }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
+  useEffect(() => { setIframeLoaded(false); }, [item]);
+
   const summary = summaryText(item);
 
   return (
-    <div className="reader-frame" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
-      {/* Sticky frame bar — back + small cross both return to the slideshow */}
-      <div className="reader-frame-bar">
+    <div className={`reader-frame${item.frameable ? ' reader-frame-live' : ''}`} role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
+      {/* Sticky frame bar — our own chrome, doubles as the swipe-down handle */}
+      <div className="reader-frame-bar" onTouchStart={swipe.onTouchStart} onTouchEnd={swipe.onTouchEnd}>
+        <span className="reader-frame-grabber" aria-hidden="true" />
         <button type="button" className="reader-frame-back" onClick={onBack} aria-label="Back to slideshow">
           <BackIcon /> Slideshow
         </button>
@@ -78,38 +91,54 @@ export default function NewsReaderFrame({ item, onBack }) {
         </div>
       </div>
 
-      <div className="reader-frame-scroll">
-        <article className="reader-frame-inner">
-          <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
+      {item.frameable ? (
+        <div className="reader-frame-live-body">
+          {!iframeLoaded && (
+            <div className="reader-loading-pill reader-frame-live-loading">
+              <span className="reader-spinner" /> Loading {item.source}…
+            </div>
+          )}
+          <iframe
+            className="reader-frame-iframe"
+            src={item.url}
+            title={item.title}
+            onLoad={() => setIframeLoaded(true)}
+          />
+        </div>
+      ) : (
+        <div className="reader-frame-scroll">
+          <article className="reader-frame-inner">
+            <HeroImage src={item.image} gradient={item.gradient} emoji={item.emoji} />
 
-          <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '18px 0 12px' }}>{item.category}</span>
-          <h1 className="reader-frame-title">{item.title}</h1>
-          <div className="reader-frame-meta">
-            <span>{item.source}</span>
-            {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
-            {item.readMin && <><span className="news-meta-dot" /><span>{item.readMin} min read</span></>}
-          </div>
+            <span className={`news-category-tag ${item.categoryClass}`} style={{ margin: '18px 0 12px' }}>{item.category}</span>
+            <h1 className="reader-frame-title">{item.title}</h1>
+            <div className="reader-frame-meta">
+              <span>{item.source}</span>
+              {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
+              {item.readMin && <><span className="news-meta-dot" /><span>{item.readMin} min read</span></>}
+            </div>
 
-          <div className="blog-read-content reader-content">
-            {summary && <p>{summary}</p>}
-            <div className="reader-fallback-note">
-              <p>This is a short summary. Read the full article on {item.source}:</p>
-              <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
-                Read the full story at {item.source} <ExtIcon />
+            <div className="blog-read-content reader-content">
+              {summary && <p>{summary}</p>}
+              <div className="reader-fallback-note">
+                <p>This is a short summary. Read the full article on {item.source}:</p>
+                <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
+                  Read the full story at {item.source} <ExtIcon />
+                </a>
+              </div>
+            </div>
+
+            <div className="reader-frame-footer">
+              <button type="button" className="reader-frame-back" onClick={onBack}>
+                <BackIcon /> Back to slideshow
+              </button>
+              <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer">
+                View source: {item.source} <ExtIcon />
               </a>
             </div>
-          </div>
-
-          <div className="reader-frame-footer">
-            <button type="button" className="reader-frame-back" onClick={onBack}>
-              <BackIcon /> Back to slideshow
-            </button>
-            <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer">
-              View source: {item.source} <ExtIcon />
-            </a>
-          </div>
-        </article>
-      </div>
+          </article>
+        </div>
+      )}
     </div>
   );
 }

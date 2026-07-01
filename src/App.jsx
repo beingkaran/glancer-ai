@@ -4,7 +4,6 @@ import './index.css';
 import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import OnboardingTour from './components/OnboardingTour';
 import NewsletterPopup from './components/NewsletterPopup';
 import HomePage from './pages/HomePage';
 import MetricsPage from './pages/MetricsPage';
@@ -44,7 +43,6 @@ export default function App() {
   }, [pathname]);
 
   const isBlogs = pathname === '/blogs';
-  const isHome = pathname === '/';
 
   return (
     <div className="app" data-theme={theme}>
@@ -57,9 +55,6 @@ export default function App() {
       </div>
 
       {!isBlogs && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
-
-      {/* First-visit guided tour (home page only) + a "Show me" replay button. */}
-      {isHome && <OnboardingTour onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       <main>
         <Routes>

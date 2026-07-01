@@ -170,11 +170,11 @@ export default function NewsTab() {
   }, []);
 
   // Any device, every visit, all users: automatically open the swipe slideshow
-  // after 11 s so users experience the immersive reader without tapping a card.
+  // after 13 s so users experience the immersive reader without tapping a card.
   useEffect(() => {
     const t = setTimeout(() => {
       setCarouselAt((cur) => (cur === null ? 0 : cur));
-    }, 11000);
+    }, 13000);
     return () => clearTimeout(t);
   }, []);
 

@@ -1,14 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
-import { useState, useEffect } from 'react';
 
 /*
- * NewsReaderPage — a preview page for one story. Glancer AI is a news
- * *aggregator*: we show the publisher-provided headline, a short RSS summary and
- * a link-preview image, then send the reader to the original article on the
- * source's own site. We deliberately do NOT reproduce the full article text —
- * that content belongs to the publisher.
+ * NewsReaderPage — a preview page for one story (/news/:id).
+ *
+ * For sources verified NOT to block third-party framing (item.frameable, see
+ * src/data/newsFeeds.js + scripts/check-frameable.mjs), this loads the source's
+ * own page LIVE in an <iframe> — unmodified, exactly as published. For every
+ * other source we never work around their X-Frame-Options/CSP — instead we
+ * show a short summary and a link to read it on their site.
  */
 
 const BackIcon = () => (
@@ -23,7 +24,7 @@ const ExtIcon = () => (
 );
 
 // Turn the RSS summary HTML into a plain-text snippet, capped so we only ever
-// show a brief excerpt (never the publisher's full body).
+// show a brief excerpt (never the publisher's full body) for non-frameable sources.
 function summaryText(item) {
   const raw = item.excerpt || item.html || '';
   const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -58,6 +59,9 @@ export default function NewsReaderPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const item = useMemo(() => getCachedNewsItem(id), [id]);
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  useEffect(() => { setIframeLoaded(false); }, [item]);
 
   // Robust back: go to the previous page if there is one, else the news feed.
   const goBack = () => {
@@ -76,6 +80,35 @@ export default function NewsReaderPage() {
             Head back to the news feed and open it from there.
           </p>
           <Link to="/" className="write-cta-btn">← Back to News</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (item.frameable) {
+    return (
+      <div className="page-section reader-page-live">
+        <div className="reader-backbar reader-backbar-live">
+          <button className="reader-back-btn" onClick={goBack}>
+            <BackIcon /> Back
+          </button>
+          <span className="reader-frame-source">{item.source}</span>
+          <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
+            Open original <ExtIcon />
+          </a>
+        </div>
+        <div className="reader-page-live-body">
+          {!iframeLoaded && (
+            <div className="reader-loading-pill reader-frame-live-loading">
+              <span className="reader-spinner" /> Loading {item.source}…
+            </div>
+          )}
+          <iframe
+            className="reader-frame-iframe"
+            src={item.url}
+            title={item.title}
+            onLoad={() => setIframeLoaded(true)}
+          />
         </div>
       </div>
     );
