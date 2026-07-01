@@ -384,32 +384,22 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 }
 .news-card:hover { transform: translateY(-4px); border-color: var(--glass-border-strong); box-shadow: var(--shadow-glow), var(--shadow-card); }
 
-/* Glass "mirror" hover — a soft diagonal reflection sweeps across the card and a
-   faint glass sheen settles over it. Applied to every news / blog card. */
-.news-card, .news-featured, .blog-card { position: relative; }
-.news-card::after, .news-featured::after, .blog-card::after {
-  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  border-radius: inherit; opacity: 0; transition: opacity 0.4s ease;
-  background:
-    linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.14) 45%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.14) 55%, transparent 70%),
-    linear-gradient(160deg, rgba(255,255,255,0.06), transparent 40%);
-  background-size: 220% 220%, 100% 100%;
-  background-position: 120% 0, 0 0;
+/* Subtle glass sheen — confined to the IMAGE only, sweeps once on card hover. */
+.news-card-thumb, .news-featured-img { position: relative; overflow: hidden; }
+.news-card-thumb::before, .news-featured-img::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  opacity: 0; transform: translateX(-70%);
+  transition: opacity 0.35s ease, transform 0.7s ease;
+  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.10) 48%, rgba(255,255,255,0.16) 50%, rgba(255,255,255,0.10) 52%, transparent 62%);
 }
-.news-card:hover::after, .news-featured:hover::after, .blog-card:hover::after {
-  opacity: 1;
-  background-position: -20% 0, 0 0;
-  transition: opacity 0.3s ease, background-position 0.7s ease;
-}
-[data-theme="light"] .news-card::after, [data-theme="light"] .news-featured::after, [data-theme="light"] .blog-card::after {
-  background:
-    linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.5) 55%, transparent 70%),
-    linear-gradient(160deg, rgba(255,255,255,0.4), transparent 40%);
-  background-size: 220% 220%, 100% 100%;
+.news-card:hover .news-card-thumb::before,
+.news-featured:hover .news-featured-img::before {
+  opacity: 1; transform: translateX(70%);
+  transition: opacity 0.2s ease, transform 0.85s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .news-card::after, .news-featured::after, .blog-card::after { transition: opacity 0.2s ease; }
-  .news-card:hover::after, .news-featured:hover::after, .blog-card:hover::after { background-position: 50% 0, 0 0; }
+  .news-card-thumb::before, .news-featured-img::before { transition: opacity 0.2s ease; transform: none; }
+  .news-card:hover .news-card-thumb::before, .news-featured:hover .news-featured-img::before { transform: none; }
 }
 .news-card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; overflow: hidden; }
 .news-card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
