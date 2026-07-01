@@ -48,15 +48,19 @@ const ThumbDownIcon = () => (
   </svg>
 );
 
-// Cover image with proxied → raw → favicon → emoji fallback ladder.
-function SlideImage({ item }) {
+// Cover image with proxied → raw → favicon → emoji fallback ladder. Tapping it
+// opens the in-app reader directly (no separate "read" button needed).
+function SlideImage({ item, onOpen }) {
   const [stage, setStage] = useState(item.image ? 0 : 2);
   useEffect(() => { setStage(item.image ? 0 : 2); }, [item.image]);
+
+  const canOpen = !item.internal && !!onOpen;
+  const openProps = canOpen ? { onClick: onOpen, role: 'button', tabIndex: 0, 'aria-label': `Read: ${item.title}` } : { 'aria-hidden': true };
 
   const coverSrc = stage === 0 ? displayImage(item.image, 1400) : stage === 1 ? item.image : null;
   if (coverSrc) {
     return (
-      <div className="carousel-img" aria-hidden="true">
+      <div className={`carousel-img${canOpen ? ' carousel-img-tap' : ''}`} {...openProps}>
         <img src={coverSrc} alt="" referrerPolicy="no-referrer" onError={() => setStage((s) => s + 1)} />
       </div>
     );
@@ -65,14 +69,14 @@ function SlideImage({ item }) {
   const favicon = stage === 2 ? sourceFavicon(item) : null;
   if (favicon) {
     return (
-      <div className="carousel-img carousel-img-fallback carousel-img-logo" style={{ background: item.gradient }} aria-hidden="true">
+      <div className={`carousel-img carousel-img-fallback carousel-img-logo${canOpen ? ' carousel-img-tap' : ''}`} style={{ background: item.gradient }} {...openProps}>
         <img className="news-source-logo" src={favicon} alt="" onError={() => setStage(3)} />
       </div>
     );
   }
 
   return (
-    <div className="carousel-img carousel-img-fallback" style={{ background: item.gradient }} aria-hidden="true">
+    <div className={`carousel-img carousel-img-fallback${canOpen ? ' carousel-img-tap' : ''}`} style={{ background: item.gradient }} {...openProps}>
       <span>{item.emoji}</span>
     </div>
   );
@@ -118,37 +122,39 @@ function LikeButtons({ item }) {
 function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
 
-  // Internal slides (blog posts) link to their own route — no external source,
-  // so a single button is enough. External news gets two distinct actions: read
-  // it in-app (reader frame, never leaves glancerai.com) or jump to the source.
-  const ReadBtns = item.internal ? (
+  // Internal slides (blog posts) link to their own route. External news has no
+  // labeled "read in app" button — tapping the cover image or title opens the
+  // in-app reader (iframe, never leaves glancerai.com) directly; "Read on
+  // Source" is the one explicit action that jumps to the original.
+  const openReader = () => onRead(item);
+  const ReadBtn = item.internal ? (
     <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
       Read full article <ExtIcon />
     </a>
   ) : (
-    <>
-      <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
-        Read on GlancerAI.com <ExtIcon />
-      </button>
-      <a
-        className="carousel-btn"
-        href={item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={(e) => e.stopPropagation()}
-      >
-        Read on Source <ExtIcon />
-      </a>
-    </>
+    <a
+      className="carousel-btn"
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      Read on Source <ExtIcon />
+    </a>
   );
 
   return (
     <article className="carousel-slide">
       <div className="carousel-slide-inner">
-        <SlideImage item={item} />
+        <SlideImage item={item} onOpen={openReader} />
         <div className="carousel-body">
           <span className={`news-category-tag ${item.categoryClass}`}>{item.category}</span>
-          <h2 className="carousel-title">{item.title}</h2>
+          <h2
+            className={`carousel-title${item.internal ? '' : ' carousel-title-tap'}`}
+            {...(item.internal ? {} : { role: 'button', tabIndex: 0, onClick: openReader })}
+          >
+            {item.title}
+          </h2>
           <div className="carousel-meta">
             <span>{item.source}</span>
             {item.date && <><span className="news-meta-dot" /><span>{item.date}</span></>}
@@ -156,7 +162,7 @@ function Slide({ item, onRead }) {
           </div>
           <p className="carousel-text">{item.excerpt}</p>
           <div className="carousel-actions">
-            {ReadBtns}
+            {ReadBtn}
             <button type="button" className="carousel-btn" onClick={() => setShareOpen(true)}>
               <ShareIcon /> Share
             </button>
