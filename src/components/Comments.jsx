@@ -159,7 +159,7 @@ export default function Comments({ postId }) {
             return (
               <div key={c.id} className="chart-card" style={{ padding: 16, opacity: busyId === c.id ? 0.5 : 1 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#7C3AED,#06B6D4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                     {initialsOf(c.author)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>

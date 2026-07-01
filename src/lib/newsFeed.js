@@ -38,13 +38,15 @@ export const NEWS_LIMIT = 50;
 // One-time cleanup of older cache keys so they don't linger.
 try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4', 'glancer_news_cache_v5', 'glancer_news_cache_v6'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
 
+// Restrained, technical card headers — deep desaturated slate/teal/blue/amber,
+// no purple/magenta. Keeps category differentiation without the "AI slop" look.
 const GRADIENTS = [
-  'linear-gradient(135deg, #1a0533 0%, #4c1d95 50%, #7c3aed 100%)',
-  'linear-gradient(135deg, #0a2240 0%, #0e4d8a 50%, #0284c7 100%)',
-  'linear-gradient(135deg, #2d0a2e 0%, #831843 50%, #ec4899 100%)',
-  'linear-gradient(135deg, #0d2400 0%, #166534 50%, #16a34a 100%)',
-  'linear-gradient(135deg, #1c1200 0%, #78350f 50%, #d97706 100%)',
-  'linear-gradient(135deg, #000f40 0%, #1e3a8a 50%, #3b82f6 100%)',
+  'linear-gradient(150deg, #0B1220 0%, #12303a 55%, #16a9c4 100%)',
+  'linear-gradient(150deg, #0A1420 0%, #103048 55%, #2a7fb8 100%)',
+  'linear-gradient(150deg, #0B141C 0%, #14343a 55%, #2cc9e0 100%)',
+  'linear-gradient(150deg, #0E1510 0%, #143a2a 55%, #2f9e6e 100%)',
+  'linear-gradient(150deg, #171208 0%, #3a2a12 55%, #d0a23b 100%)',
+  'linear-gradient(150deg, #0B0E14 0%, #1a2432 55%, #4a5c72 100%)',
 ];
 const EMOJIS = ['🧠', '⚡', '🤖', '🚀', '💡', '🔬', '📡', '🌐', '🛰️', '💬'];
 const TAG_CLASSES = ['tag-purple', 'tag-cyan', 'tag-pink', 'tag-blue', 'tag-orange'];

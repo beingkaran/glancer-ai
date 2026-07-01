@@ -32,9 +32,12 @@ const PenIcon = () => (
   </svg>
 );
 
+// Primary nav leads with the dev/enterprise thesis. "Free AI Tools" is demoted
+// to a secondary utility link (mobile menu + footer) so it still gets crawled
+// for long-tail SEO without diluting the observability positioning.
 const NAV_LINKS = [
-  { label: 'AI News', to: '/#news' },
-  { label: 'Free AI Tools', to: '/ai-tools' },
+  { label: 'News', to: '/#news' },
+  { label: 'Analysis', to: '/blogs' },
   { label: 'Glossary', to: '/glossary' },
   { label: 'About', to: '/about' },
 ];
@@ -158,6 +161,9 @@ export default function Navbar({ theme, onToggleTheme }) {
             {link.label}
           </NavLink>
         ))}
+        <Link to="/ai-tools" className="nav-link" onClick={() => setMobileOpen(false)}>
+          Free AI Tools
+        </Link>
         <Link to="/blog/write" className="nav-link" onClick={(e) => { setMobileOpen(false); handleWrite(e); }}>
           Write a Blog
         </Link>

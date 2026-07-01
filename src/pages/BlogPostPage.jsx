@@ -10,6 +10,21 @@ import ShareBar from '../components/ShareBar';
 import SaveButton from '../components/SaveButton';
 import { entryForBlog } from '../lib/readLater';
 import Comments from '../components/Comments';
+import AdSlot from '../components/AdSlot';
+import StickyAnchorAd from '../components/StickyAnchorAd';
+import { AD_SLOTS } from '../lib/adsense';
+
+// Split article HTML roughly in half on a paragraph boundary, so a single
+// in-content ad can sit in the natural flow of reading (mid-article).
+function splitHtmlForMidAd(html) {
+  if (!html) return [html, ''];
+  const parts = html.split('</p>');
+  if (parts.length < 4) return [html, '']; // too short to break sensibly
+  const mid = Math.ceil(parts.length / 2);
+  const first = parts.slice(0, mid).join('</p>') + '</p>';
+  const second = parts.slice(mid).join('</p>');
+  return [first, second];
+}
 
 function formatDate(d) {
   const date = new Date(d);
@@ -44,6 +59,9 @@ export default function BlogPostPage() {
     if (base.includes('<img')) return base;
     return injectFiguresIntoHtml(base, figuresForPost(post));
   }, [post]);
+
+  // Halves of the body for a single mid-article ad in the reading flow.
+  const [bodyFirst, bodySecond] = useMemo(() => splitHtmlForMidAd(bodyHtml), [bodyHtml]);
 
   useEffect(() => {
     let active = true;
@@ -146,7 +164,7 @@ export default function BlogPostPage() {
             <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>{post.subtitle}</p>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 24, borderBottom: '1px solid var(--glass-border)' }}>
-            <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,#7C3AED,#06B6D4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
+            <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
               {post.avatar || '👤'}
             </div>
             <div>
@@ -158,14 +176,29 @@ export default function BlogPostPage() {
           </div>
         </div>
 
-        {/* Body */}
-        <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+        {/* ① Ad — after the intro/byline, top viewability */}
+        <AdSlot slot={AD_SLOTS.articleTop} className="ad-in-article" />
+
+        {/* Body — split so a mid-article ad sits in the reading flow */}
+        {bodySecond ? (
+          <>
+            <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodyFirst }} />
+            {/* ② Ad — mid-article */}
+            <AdSlot slot={AD_SLOTS.articleMid} className="ad-in-article" />
+            <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodySecond }} />
+          </>
+        ) : (
+          <div className="blog-read-content" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+        )}
 
         {/* Save + Share */}
         <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <ShareBar post={post} />
           <div><SaveButton entry={entryForBlog(post)} className="news-share" /></div>
         </div>
+
+        {/* ③ Ad — end of article, high completion intent */}
+        <AdSlot slot={AD_SLOTS.articleEnd} className="ad-in-article" />
 
         {/* Comments */}
         <Comments postId={post.id} />
@@ -192,6 +225,9 @@ export default function BlogPostPage() {
           </div>
         )}
       </article>
+
+      {/* ④ Sticky bottom anchor ad (mobile) */}
+      <StickyAnchorAd />
     </div>
   );
 }

@@ -20,7 +20,7 @@ function ProfilePhoto() {
     return (
       <div style={{
         width: 88, height: 88, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #7C3AED, #06B6D4)',
+        background: 'var(--accent)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: '2.2rem', fontWeight: 700, color: '#fff', margin: '0 auto 20px',
       }}>KS</div>
@@ -40,7 +40,7 @@ function ProfilePhoto() {
         decoding="async"
         fetchpriority="high"
         onError={() => setBroken(true)}
-        style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 20px', display: 'block', border: '3px solid rgba(168,85,247,0.4)', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}
+        style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 20px', display: 'block', border: '3px solid rgba(44,201,224,0.4)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
       />
     </picture>
   );

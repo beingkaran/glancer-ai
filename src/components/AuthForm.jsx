@@ -110,7 +110,7 @@ export default function AuthForm({ onSuccess }) {
               style={{
                 flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
                 fontSize: '0.875rem', fontWeight: 600,
-                background: mode === m ? 'linear-gradient(135deg,#7C3AED,#06B6D4)' : 'transparent',
+                background: mode === m ? 'var(--accent)' : 'transparent',
                 color: mode === m ? '#fff' : 'var(--text-secondary)',
               }}
             >

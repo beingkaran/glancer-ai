@@ -42,8 +42,8 @@ export default function ShareBar({ post }) {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 9, padding: '11px 20px',
           borderRadius: 12, border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
-          color: '#fff', background: 'linear-gradient(135deg,#7C3AED,#06B6D4)', lineHeight: 1,
-          boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
+          color: '#fff', background: 'var(--accent)', lineHeight: 1,
+          boxShadow: 'none',
         }}
       >
         <ShareIcon /> {label}

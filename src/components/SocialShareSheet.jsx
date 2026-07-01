@@ -90,7 +90,7 @@ export default function SocialShareSheet({ item, onClose }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%',
             padding: '13px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
             fontSize: '0.95rem', fontWeight: 700, color: '#fff',
-            background: 'linear-gradient(135deg,#7C3AED,#06B6D4)', boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
+            background: 'var(--accent)', boxShadow: 'none',
           }}
         >
           <ShareIcon /> {shared ? 'Copied to clipboard!' : 'Share'}

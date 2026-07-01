@@ -103,7 +103,7 @@ export default function SocialSharePanel({ post, open, onClose, autoOpen = false
         <div style={{
           padding: '20px 24px', borderBottom: '1px solid var(--glass-border)',
           display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16,
-          background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(34,211,238,0.06))',
+          background: 'var(--accent-soft)',
         }}>
           <div>
             <p style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: 6 }}>

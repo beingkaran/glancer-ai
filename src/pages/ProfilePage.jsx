@@ -25,7 +25,7 @@ function Avatar({ user, size = 88 }) {
       style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }} />;
   }
   return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: 'linear-gradient(135deg,#7C3AED,#06B6D4)',
+    <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--accent)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.32, fontWeight: 700, color: '#fff' }}>
       {initials}
     </div>
