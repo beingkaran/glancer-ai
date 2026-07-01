@@ -11,9 +11,18 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except ModuleNotFoundError:
+    # Pillow isn't installed (e.g. the CI build image ships only Node + python3).
+    # The infographic at public/glossary-infographic.jpg is committed, so skip
+    # regeneration instead of failing the build. Run `npm run build:infographic`
+    # locally (with Pillow) when the glossary changes.
+    print("[glossary-infographic] Pillow not available — using committed image, skipping regen.")
+    sys.exit(0)
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "public" / "glossary-infographic.jpg"

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-sitemap.mjs && python3 scripts/generate-glossary-infographic.py && vite build && node scripts/prerender-blogs.mjs",
+    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/prerender-blogs.mjs",
     "build:vite": "vite build",
+    "build:infographic": "python3 scripts/generate-glossary-infographic.py",
     "lint": "oxlint",
     "preview": "vite preview"
   },
