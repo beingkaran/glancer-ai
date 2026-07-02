@@ -1,6 +1,69 @@
 /* Glancer AI — Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'openai-gpt-56-sol-cerebras-750-tokens-second',
+    bannerImage: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=1600&q=80',
+    title: "OpenAI's 750 Tokens/Second Bet: What GPT-5.6 Sol on Cerebras Actually Unlocks",
+    subtitle: 'GPT-5.6 Sol is being previewed on Cerebras hardware at up to 750 tokens a second, roughly 10 to 15 times typical API speed. This is not a demo stunt. It is a direct move on the verticals where latency beats raw intelligence.',
+    category: 'AI Infrastructure',
+    icon: '⚡',
+    bgGradient: 'linear-gradient(135deg, #0a0f2e 0%, #0e7490 55%, #22d3ee 100%)',
+    author: 'Karan Shah',
+    avatar: '✍️',
+    date: '2026-07-02',
+    readTime: 9,
+    tags: ['GPT-5.6 Sol', 'Cerebras', 'inference speed', 'latency', 'real-time AI', 'OpenAI'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>OpenAI is previewing <strong>GPT-5.6 Sol</strong> on Cerebras wafer-scale hardware at up to <strong>750 tokens/second</strong>, about 10 to 15 times the speed most of us see from a normal API call.</li>
+    <li>Speed at this level is not a nice-to-have, it changes which products are even possible. Below a certain latency, an AI stops feeling like a form you submit and starts feeling like a conversation.</li>
+    <li>The early access list is tiny, around 20 organizations, and who is on it tells you exactly which markets OpenAI is chasing first: live support, real-time copilots, and financial decisioning.</li>
+    <li>If your product lives or dies on response time, now is the moment to figure out what you would build if the model answered instantly.</li>
+  </ul>
+</div>
+
+<h2>The number that made me sit up</h2>
+<p>Every few months there is a benchmark that everyone screenshots, and most of them are about how <em>smart</em> a model is. This one is different. GPT-5.6 Sol running on Cerebras is being clocked at up to 750 tokens per second in the preview, and the reporting from VentureBeat and the walkthroughs on ExplainX line up on that figure. For context, a lot of production API traffic today sits somewhere in the 30 to 80 tokens/second range depending on load. So we are not talking about a small bump. We are talking about an order of magnitude, and then some.</p>
+<p>My first reaction was honestly a shrug, because faster tokens sound like an engineering footnote. But the more I sat with it, the more I realized speed at this scale is not a footnote at all. It quietly moves the line between "AI you wait for" and "AI you talk to." And that line is where alot of product categories are hiding.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="Close-up of a large processor and circuitry on a server board" loading="lazy" /><figcaption>Cerebras runs the whole model on a single wafer-scale chip, which is a big part of why the tokens come out so fast. Different silicon, different rules.</figcaption></figure>
+
+<h2>Why speed is a different axis than intelligence</h2>
+<p>We have spent two years arguing about capability. Can it reason, can it code, can it pass the bar exam. Those are real questions and they matter. But capability and latency are two separate dials, and for a surprising number of real products the latency dial is the one that decides whether anyone actually uses the thing.</p>
+<p>Think about a live phone support agent. A model that is 3% smarter but answers in four seconds loses to a model that is slightly dumber but answers in 400 milliseconds, because the human on the other end of the line will not sit in silence. The same is true for a coding copilot that is supposed to keep up with your typing, or a trading desk tool that has to surface a read before the window closes. In these worlds, speed <em>is</em> the capability.</p>
+<blockquote><strong>The reframe:</strong> for latency-sensitive products, a fast good-enough model beats a slow brilliant one. GPT-5.6 Sol on Cerebras is OpenAI planting a flag on the fast side of that trade.</blockquote>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1280&q=80" alt="Rows of servers glowing in a data center" loading="lazy" /><figcaption>The verticals OpenAI seems to be courting first all share one trait: the user is waiting in real time, and every extra second costs them something.</figcaption></figure>
+
+<h2>Who actually gets to touch it, and what that tells us</h2>
+<p>Here is the part I find most interesting. Access to the Sol preview is not open. By the current reporting only around 20 organizations have it, which is a deliberately small circle. When a company hands a scarce, latency-crushing model to a hand-picked group, the composition of that group is basically a roadmap.</p>
+<p>You do not give ultra-low-latency inference to a team writing marketing copy, because they genuinely do not care if the paragraph shows up in two seconds or six. You give it to the people for whom milliseconds convert directly into money or trust. Read the tea leaves and its pretty clearly three buckets:</p>
+<ul>
+  <li><strong>Live customer support.</strong> Voice and chat agents where a pause reads as the bot being broken. Sub-second responses are the whole game, and slow models simply can't play it.</li>
+  <li><strong>Real-time copilots.</strong> Coding, writing, and design assistants that need to feel like they are thinking <em>with</em> you, not catching up to you a sentence later.</li>
+  <li><strong>Financial decisioning.</strong> Fraud checks, pricing, and trading support where the answer is worthless if it arrives after the moment its meant to inform.</li>
+</ul>
+<p>Notice what is missing from that list: batch summarization, offline analysis, long-form generation. Those are exactly the workloads where nobody cares about 750 tokens/second. The absence is as telling as the presence.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80" alt="A developer working across multiple screens of code" loading="lazy" /><figcaption>A copilot that answers before you finish the thought is a different product than one you wait on. Same model, completely different feel.</figcaption></figure>
+
+<h2>What this means for the rest of us</h2>
+<p>Most teams reading this will not be in the 20-org preview, and that is fine. The signal still matters. OpenAI is telling the market that inference speed is about to become a competitive axis of its own, separate from the usual capability leaderboard. When this capability generalizes, and it will, the products that already know what they would do with instant responses are going to move first.</p>
+<p>So the useful exercise right now is a thought experiment. Assume the model answers effectively instantly. What changes about your product? For a support tool, maybe you stop showing a typing indicator and just stream a real conversation. For a copilot, maybe you move from "suggest on pause" to "suggest continuously." Teams that have done this thinking will ship faster the day the latency shows up in their tier. Teams that haven't will spend a quarter figuring out that their whole UX assumed a two second wait.</p>
+
+<div class="callout">
+  <div class="callout-title">🛠️ Three moves while you wait for access</div>
+  <strong>(1)</strong> Audit where latency, not intelligence, is your real bottleneck. Be honest, it is more places than you think. <strong>(2)</strong> Prototype the "instant response" version of your core flow even on today's slower models, so the UX is ready. <strong>(3)</strong> Watch the Cerebras and OpenAI announcements for when Sol-class speed moves from preview to general availability, because that is your starting gun.
+</div>
+
+<h2>The takeaway</h2>
+<p>GPT-5.6 Sol at 750 tokens/second is easy to file under "cool benchmark" and scroll past. I think that undersells it. This is OpenAI making a bet that the next wave of valuable AI products are not the smartest ones, their the fastest ones, in the narrow set of verticals where a human is waiting in real time. The tiny preview list is a map of where they think that value lives. Whether or not you are on it, the smart move is to start designing for a world where the model answers before you finish asking.</p>
+    `
+  },
+  {
     id: 'gpt-56-coding-leap-telemetry-problem',
     bannerImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=1600&q=80',
     title: 'The GPT-5.6 Coding Leap Is a Telemetry Problem Waiting to Happen',
