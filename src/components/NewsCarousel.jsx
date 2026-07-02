@@ -212,7 +212,10 @@ function Slide({ item, onRead }) {
 export default function NewsCarousel({ items, startIndex = 0, onClose }) {
   const feedRef = useRef(null);
   const [index, setIndex] = useState(startIndex);
-  const [readerItem, setReaderItem] = useState(null);
+  // Which slide the in-frame reader is showing (null = reader closed). Tracking
+  // the index (not the item) lets the Next button walk forward through the feed.
+  const [readerIndex, setReaderIndex] = useState(null);
+  const readerItem = readerIndex != null ? items[readerIndex] : null;
 
   useEffect(() => {
     const feed = feedRef.current;
@@ -236,9 +239,23 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     feed.scrollTo({ left: next * feed.clientWidth, behavior: 'smooth' });
   }, [index, items.length]);
 
+  // Load the next story straight into the reader. Advancing `readerIndex`
+  // remounts NewsReaderFrame with a fresh 10s load window; the underlying
+  // slideshow is kept in sync so returning lands on the story just read.
+  const goNextReader = useCallback(() => {
+    setReaderIndex((cur) => {
+      if (cur == null) return cur;
+      const next = cur + 1;
+      if (next >= items.length) return cur;
+      const feed = feedRef.current;
+      if (feed) feed.scrollTo({ left: next * feed.clientWidth, behavior: 'auto' });
+      return next;
+    });
+  }, [items.length]);
+
   useEffect(() => {
     const onKey = (e) => {
-      if (readerItem) return; // reader frame handles its own keys
+      if (readerIndex != null) return; // reader frame handles its own keys
       if (e.key === 'Escape') onClose?.();
       else if (e.key === 'ArrowRight') go(1);
       else if (e.key === 'ArrowLeft') go(-1);
@@ -247,7 +264,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = prevOverflow; };
-  }, [go, onClose, readerItem]);
+  }, [go, onClose, readerIndex]);
 
   if (!items.length) return null;
 
@@ -268,7 +285,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
       </button>
 
       <div className="carousel-feed" ref={feedRef}>
-        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} onRead={setReaderItem} />)}
+        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} onRead={() => setReaderIndex(i)} />)}
       </div>
 
       <div className="carousel-dots" aria-hidden="true">
@@ -277,7 +294,14 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
         ))}
       </div>
 
-      {readerItem && <NewsReaderFrame item={readerItem} onBack={() => setReaderItem(null)} />}
+      {readerItem && (
+        <NewsReaderFrame
+          item={readerItem}
+          onBack={() => setReaderIndex(null)}
+          onNext={goNextReader}
+          hasNext={readerIndex != null && readerIndex < items.length - 1}
+        />
+      )}
     </div>
   );
 }

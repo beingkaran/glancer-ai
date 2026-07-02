@@ -7,9 +7,12 @@ import { useSwipeDown } from '../lib/useSwipeDown';
  *
  * It loads the source's own page LIVE in an <iframe> — unmodified, exactly as
  * published, nothing scraped or re-rendered — and lets the reader interact with
- * it in place. If the page hasn't loaded within 15s (blocked by
+ * it in place. If the page hasn't loaded within 10s (blocked by
  * X-Frame-Options/CSP, or too slow), the reader redirects to the original URL
- * instead of sitting on a blank frame.
+ * instead of sitting on a blank frame. If it loads in time, nothing happens.
+ *
+ * The Next button loads the following story straight into the reader, so the
+ * reader can move through the feed without dropping back to the slideshow.
  *
  * Swipe down on the top bar, or the X, returns to the slideshow.
  */
@@ -17,6 +20,11 @@ import { useSwipeDown } from '../lib/useSwipeDown';
 const BackIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+const NextIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
   </svg>
 );
 const CloseIcon = () => (
@@ -31,9 +39,9 @@ const ExtIcon = () => (
 );
 
 
-export default function NewsReaderFrame({ item, onBack }) {
+export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  // Ref mirror of "loaded" so the 15s timer reads the latest value without a
+  // Ref mirror of "loaded" so the 10s timer reads the latest value without a
   // stale closure.
   const loadedRef = useRef(false);
   const swipe = useSwipeDown(onBack);
@@ -45,16 +53,17 @@ export default function NewsReaderFrame({ item, onBack }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
-  // Give the source 15s to load inside the frame. If it loads, do nothing — the
+  // Give the source 10s to load inside the frame. If it loads, do nothing — the
   // user reads and interacts with the live page in the frame. If it hasn't
   // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), redirect
   // the reader to the original article instead of leaving a blank frame.
+  // Re-arms on every `item` change, so Next gets its own fresh 10s window.
   useEffect(() => {
     setIframeLoaded(false);
     loadedRef.current = false;
     const t = setTimeout(() => {
       if (!loadedRef.current) window.location.href = item.url;
-    }, 15000);
+    }, 10000);
     return () => clearTimeout(t);
   }, [item]);
 
@@ -73,6 +82,11 @@ export default function NewsReaderFrame({ item, onBack }) {
           <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open original article">
             Original <ExtIcon />
           </a>
+          {onNext && hasNext && (
+            <button type="button" className="reader-frame-next" onClick={onNext} aria-label="Next story">
+              Next <NextIcon />
+            </button>
+          )}
           <button type="button" className="reader-frame-close" onClick={onBack} aria-label="Close reader">
             <CloseIcon />
           </button>

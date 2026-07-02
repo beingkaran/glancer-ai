@@ -1833,6 +1833,14 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   transition: background 0.14s ease, color 0.14s ease;
 }
 .reader-frame-ext:hover { background: var(--surface-hover); color: var(--text-primary); }
+.reader-frame-next {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 15px; border-radius: 999px; cursor: pointer;
+  font-size: 0.85rem; font-weight: 600; font-family: inherit;
+  background: var(--grad-brand); border: 1px solid transparent; color: #fff;
+  transition: transform 0.14s ease, filter 0.14s ease;
+}
+.reader-frame-next:hover { transform: translateX(2px); filter: brightness(1.08); }
 .reader-frame-close {
   display: inline-flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
