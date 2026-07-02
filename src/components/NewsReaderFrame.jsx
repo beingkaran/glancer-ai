@@ -8,8 +8,9 @@ import { useSwipeDown } from '../lib/useSwipeDown';
  * It loads the source's own page LIVE in an <iframe> — unmodified, exactly as
  * published, nothing scraped or re-rendered — and lets the reader interact with
  * it in place. If the page hasn't loaded within 10s (blocked by
- * X-Frame-Options/CSP, or too slow), the reader redirects to the original URL
- * instead of sitting on a blank frame. If it loads in time, nothing happens.
+ * X-Frame-Options/CSP, or too slow), the reader opens the original article in a
+ * NEW TAB and returns to the slideshow — glancerai.com stays open behind it,
+ * rather than the whole tab navigating away. If it loads in time, nothing happens.
  *
  * The Next button loads the following story straight into the reader, so the
  * reader can move through the feed without dropping back to the slideshow.
@@ -44,6 +45,12 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   // Ref mirror of "loaded" so the 10s timer reads the latest value without a
   // stale closure.
   const loadedRef = useRef(false);
+  // Ref mirror of onBack so the 10s timer can return to the slideshow WITHOUT
+  // taking onBack as an effect dependency: the parent passes a fresh onBack each
+  // render, and depending on it would re-arm (and thus reset) the timer on every
+  // background feed update — the exact churn that used to leave this frame stuck.
+  const onBackRef = useRef(onBack);
+  useEffect(() => { onBackRef.current = onBack; }, [onBack]);
   const swipe = useSwipeDown(onBack);
 
   // Esc returns to the slideshow rather than closing the whole reader.
@@ -55,8 +62,9 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
 
   // Give the source 10s to load inside the frame. If it loads, do nothing — the
   // user reads and interacts with the live page in the frame. If it hasn't
-  // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), redirect
-  // the reader to the original article instead of leaving a blank frame.
+  // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), open the
+  // original article in a NEW TAB and return to the slideshow, leaving
+  // glancerai.com open behind it instead of navigating the whole tab away.
   //
   // Keyed on `item.url` (a stable string), NOT the `item` object: the live news
   // feed revalidates in the background and hands down fresh item objects every
@@ -69,7 +77,13 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
     setIframeLoaded(false);
     loadedRef.current = false;
     const t = setTimeout(() => {
-      if (!loadedRef.current) window.location.href = item.url;
+      if (!loadedRef.current) {
+        // A popup-blocker may suppress a window.open that isn't from a user
+        // gesture; if so the user simply lands back on the slideshow, where the
+        // story's "Read Story" / source link is still one tap away.
+        window.open(item.url, '_blank', 'noopener,noreferrer');
+        onBackRef.current?.();
+      }
     }, 10000);
     return () => clearTimeout(t);
   }, [item.url]);
