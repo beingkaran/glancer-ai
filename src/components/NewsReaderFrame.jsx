@@ -57,7 +57,14 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   // user reads and interacts with the live page in the frame. If it hasn't
   // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), redirect
   // the reader to the original article instead of leaving a blank frame.
-  // Re-arms on every `item` change, so Next gets its own fresh 10s window.
+  //
+  // Keyed on `item.url` (a stable string), NOT the `item` object: the live news
+  // feed revalidates in the background and hands down fresh item objects every
+  // few seconds, so depending on `item` here would clear and re-arm the timer on
+  // every feed update — it would never reach 10s, leaving the reader stuck on a
+  // blank "Loading…" frame forever. The URL is what actually identifies the page,
+  // so it re-arms only when the reader genuinely moves to a different story
+  // (e.g. Next), giving each one its own fresh 10s window.
   useEffect(() => {
     setIframeLoaded(false);
     loadedRef.current = false;
@@ -65,7 +72,7 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
       if (!loadedRef.current) window.location.href = item.url;
     }, 10000);
     return () => clearTimeout(t);
-  }, [item]);
+  }, [item.url]);
 
   return (
     <div className="reader-frame reader-frame-live" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>

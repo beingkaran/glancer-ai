@@ -214,8 +214,19 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
   const [index, setIndex] = useState(startIndex);
   // Which slide the in-frame reader is showing (null = reader closed). Tracking
   // the index (not the item) lets the Next button walk forward through the feed.
+  //
+  // The reader reads from a SNAPSHOT of the feed taken when it opens
+  // (readerListRef), never the live `items` prop. The news feed revalidates in
+  // the background and hands NewsTab a freshly-sorted `items` array every few
+  // seconds (image enrichment bumps items to the front). Indexing the live array
+  // would let a reorder swap the article out from under an open reader — showing
+  // the wrong story AND continually re-arming NewsReaderFrame's 10s load timer,
+  // so it never loads NOR redirects and hangs on a blank "Loading…" frame.
   const [readerIndex, setReaderIndex] = useState(null);
-  const readerItem = readerIndex != null ? items[readerIndex] : null;
+  const readerListRef = useRef(items);
+  const openReader = useCallback((i) => { readerListRef.current = items; setReaderIndex(i); }, [items]);
+  const readerList = readerListRef.current;
+  const readerItem = readerIndex != null ? readerList[readerIndex] : null;
 
   useEffect(() => {
     const feed = feedRef.current;
@@ -246,12 +257,12 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
     setReaderIndex((cur) => {
       if (cur == null) return cur;
       const next = cur + 1;
-      if (next >= items.length) return cur;
+      if (next >= readerListRef.current.length) return cur;
       const feed = feedRef.current;
       if (feed) feed.scrollTo({ left: next * feed.clientWidth, behavior: 'auto' });
       return next;
     });
-  }, [items.length]);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -285,7 +296,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
       </button>
 
       <div className="carousel-feed" ref={feedRef}>
-        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} onRead={() => setReaderIndex(i)} />)}
+        {items.map((item, i) => <Slide item={item} key={item.rid ?? i} onRead={() => openReader(i)} />)}
       </div>
 
       <div className="carousel-dots" aria-hidden="true">
@@ -299,7 +310,7 @@ export default function NewsCarousel({ items, startIndex = 0, onClose }) {
           item={readerItem}
           onBack={() => setReaderIndex(null)}
           onNext={goNextReader}
-          hasNext={readerIndex != null && readerIndex < items.length - 1}
+          hasNext={readerIndex != null && readerIndex < readerList.length - 1}
         />
       )}
     </div>
