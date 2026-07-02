@@ -1,7 +1,21 @@
 User-agent: *
 Allow: /
 
-# Keep the admin route out of search results.
+# Keep the admin route out of search results. (Route is /_glancer-admin —
+# the trailing wildcard covers it and any future admin sub-paths.)
+Disallow: /_glancer-admin
 Disallow: /_glancer/
+
+# Auth / account pages carry no search value and can create duplicate,
+# thin URLs — keep them out of the index.
+Disallow: /profile
+Disallow: /reset-password
+Disallow: /blog/write
+Disallow: /blog/edit/
+
+# Crawl-budget hygiene for an aggregator: block on-site search results and
+# any query-string permutations of real pages (filters, tracking params) so
+# crawlers spend their budget on the canonical hub + article URLs instead.
+Disallow: /*?
 
 Sitemap: https://glancerai.com/sitemap.xml

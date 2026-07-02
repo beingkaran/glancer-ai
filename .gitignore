@@ -13,6 +13,9 @@ dist-ssr
 .wrangler
 *.local
 
+# Generated weekly-roundup drafts (review artifacts, not source)
+seo/drafts/
+
 # Capacitor native build output (the ios/ & android/ projects themselves are
 # committed once generated; these are per-machine build artifacts only)
 ios/App/Pods

@@ -67,6 +67,43 @@ export function buildArticleSchema(post, { type = 'Article', path } = {}) {
   };
 }
 
+/**
+ * Build an ItemList JSON-LD object for a curated collection page (e.g. a topic
+ * hub or a news roundup). Google reads ItemList to understand that the page is
+ * a structured, ordered set of links — the correct signal for an aggregator's
+ * category pages, and a prerequisite for carousel/rich-result eligibility.
+ *
+ * @param {Array} items  [{ url, name, image?, description? }]
+ * @param {object} opts  { name, path, description }
+ */
+export function buildItemListSchema(items = [], { name, path = '', description } = {}) {
+  const url = ORIGIN + path;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${url}#itemlist`,
+    name,
+    description: description || undefined,
+    url,
+    numberOfItems: items.length,
+    itemListOrder: 'https://schema.org/ItemListOrderDescending',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: absUrl(it.url),
+      name: (it.name || '').slice(0, 110),
+    })),
+  };
+}
+
+/**
+ * Convenience wrapper: NewsArticle schema for a timely roundup/synthesis post.
+ * Thin shim over buildArticleSchema so callers read intentfully.
+ */
+export function buildNewsArticleSchema(post, { path } = {}) {
+  return buildArticleSchema(post, { type: 'NewsArticle', path });
+}
+
 export function buildBreadcrumb(items) {
   return {
     '@context': 'https://schema.org',

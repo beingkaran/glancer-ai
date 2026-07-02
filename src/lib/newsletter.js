@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
  * insert-only for the public anon key (admins read it); see supabase/schema.sql.
  * Stored as plain text per product requirement.
  */
-export async function subscribeNewsletter({ name, email }) {
+export async function subscribeNewsletter({ name, email, source = 'homepage-popup' }) {
   const clean = (email || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
     throw new Error('Please enter a valid email address.');
@@ -17,7 +17,7 @@ export async function subscribeNewsletter({ name, email }) {
   }
   const { error } = await supabase
     .from('newsletter_subscribers')
-    .insert({ name: (name || '').trim() || null, email: clean, source: 'homepage-popup' });
+    .insert({ name: (name || '').trim() || null, email: clean, source });
   // 23505 = unique violation → already subscribed; treat as success.
   if (error && error.code !== '23505') throw error;
   return { ok: true, persisted: true };

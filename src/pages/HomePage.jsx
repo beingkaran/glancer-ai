@@ -6,6 +6,7 @@ import NewsTab from '../components/NewsTab';
 import BlogsTab from '../components/BlogsTab';
 import SearchSection from '../components/SearchSection';
 import NewsFaq from '../components/NewsFaq';
+import NewsletterInline from '../components/NewsletterInline';
 
 const HOME_TABS = new Set(['news', 'blogs']);
 
@@ -50,6 +51,7 @@ export default function HomePage() {
       <GreetingBanner />
       {activeTab === 'news'  && <NewsTab />}
       {activeTab === 'blogs' && <BlogsTab />}
+      <div className="container"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />
       <SearchSection />
       <NewsFaq />

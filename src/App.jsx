@@ -12,6 +12,8 @@ import AIToolsPage from './pages/AIToolsPage';
 import AboutPage from './pages/AboutPage';
 import FAQPage from './pages/FAQPage';
 import BlogsPage from './pages/BlogsPage';
+import TopicsIndexPage from './pages/TopicsIndexPage';
+import TopicHubPage from './pages/TopicHubPage';
 import BlogPostPage from './pages/BlogPostPage';
 import NewsReaderPage from './pages/NewsReaderPage';
 import BlogWritePage from './pages/BlogWritePage';
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="/blog/write"        element={<BlogWritePage />} />
           <Route path="/blog/edit/:id"     element={<BlogWritePage />} />
           <Route path="/blog/:id"          element={<BlogPostPage />} />
+          <Route path="/topics"            element={<TopicsIndexPage />} />
+          <Route path="/topic/:slug"       element={<TopicHubPage />} />
           <Route path="/news/:id"          element={<NewsReaderPage />} />
           <Route path="/metrics"           element={<MetricsPage />} />
           <Route path="/glossary"          element={<GlossaryPage />} />

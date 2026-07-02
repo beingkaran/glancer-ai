@@ -21,6 +21,7 @@ const ORIGIN = 'https://glancerai.com';
 const OUT = resolve(__dirname, '../public/sitemap.xml');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
+const { TOPICS } = await import('../src/data/topics.js');
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -40,7 +41,17 @@ const staticRoutes = [
   },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5', lastmod: today },
   { loc: '/about', changefreq: 'monthly', priority: '0.4', lastmod: today },
+  { loc: '/topics', changefreq: 'daily', priority: '0.8', lastmod: today },
 ];
+
+// One <url> per programmatic topic hub. These are refreshed on every build, so
+// they carry a daily changefreq — they're prime long-tail entry points.
+const topicRoutes = TOPICS.map((t) => ({
+  loc: `/topic/${t.slug}`,
+  changefreq: 'daily',
+  priority: '0.7',
+  lastmod: today,
+}));
 
 // One <url> per curated blog post, with its publish date as lastmod and the
 // banner exposed via image sitemap extension (helps Discover image selection).
@@ -71,7 +82,7 @@ function escapeXml(s) {
   return String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 }
 
-const all = [...staticRoutes, ...blogRoutes];
+const all = [...staticRoutes, ...topicRoutes, ...blogRoutes];
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -80,4 +91,4 @@ ${all.map(urlNode).join('\n')}
 `;
 
 writeFileSync(OUT, xml, 'utf8');
-console.log(`✓ sitemap.xml written with ${all.length} URLs (${blogRoutes.length} blog posts) → ${OUT}`);
+console.log(`✓ sitemap.xml written with ${all.length} URLs (${topicRoutes.length} topic hubs, ${blogRoutes.length} blog posts) → ${OUT}`);
