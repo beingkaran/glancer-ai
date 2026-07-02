@@ -51,24 +51,33 @@ what's **manual / operational** (the parts I can't do from the repo).
 
 ## 🔧 Config needed for full effect
 
-Set an LLM key in the **build environment** (Cloudflare Pages env / secret) so
-the Signal summaries and roundups are original text, not excerpts. The build
-already uses this for the AI tools:
+Deploy model: **Cloudflare git-connected Workers Builds** — Cloudflare runs
+`npm run build` on every deploy, which is where the Signal summaries are baked.
 
-- `GEMINI_API_KEY` (default, cheap/fast — `gemini-2.0-flash`), or
-- `GROQ_API_KEY`, or `OPENROUTER_API_KEY`.
+The LLM key must be set in **TWO** places (they're different scopes):
+- **Cloudflare _build_ environment** → so `npm run build` can generate the hub
+  Signal summaries. ← the one that matters for SEO.
+- **Cloudflare _runtime_ secret** (Worker binding) → so `/api/llm` powers the
+  live AI tools.
 
-Optional tuning: `HUB_ARTICLES` (default 15), `MAX_NEW_SUMMARIES` per build
-(default 120 — the cost cap; leftover articles get summaries on later builds).
+Keys (checked in this order): `GEMINI_API_KEY` (default, `gemini-2.0-flash`),
+`GROQ_API_KEY`, `OPENROUTER_API_KEY`. Without a build-time key, hubs fall back to
+article excerpts (still non-thin, just not original analysis).
 
-To keep hubs fresh, rebuild on a schedule (the feed is pulled at build time).
-**Automated:** `.github/workflows/rebuild-hubs.yml` rebuilds + deploys daily
-(06:17 UTC) and can be run manually from the Actions tab. It needs these repo
-secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `GEMINI_API_KEY`
-(or GROQ/OPENROUTER). It also commits the grown `seo/summary-cache.json` back so
-LLM cost stays near zero over time. If you deploy via Cloudflare's git-connected
-Workers Builds instead, just add `GEMINI_API_KEY` to that build env and trigger a
-scheduled deploy there.
+Optional tuning (build env vars): `HUB_ARTICLES` (default 15),
+`MAX_NEW_SUMMARIES` per build (default 120 — cost cap).
+
+**Daily freshness:** `.github/workflows/rebuild-hubs.yml` fires a Cloudflare
+**Deploy Hook** daily (06:17 UTC) + on-demand from the Actions tab. One-time
+setup: create a Deploy Hook in the Cloudflare project (Settings → Builds →
+Deploy hooks) and store its URL as the GitHub secret
+`CLOUDFLARE_DEPLOY_HOOK_URL`.
+
+> Caching note: `seo/summary-cache.json` makes each article "summarised once
+> ever" for **local** builds. Cloudflare's build sandbox is ephemeral and can't
+> commit the grown cache back to git, so scheduled Cloudflare builds re-generate
+> summaries each run (capped at `MAX_NEW_SUMMARIES`, Gemini-flash-cheap). If that
+> cost ever matters, move the cache to Cloudflare KV — a small follow-up.
 
 ---
 

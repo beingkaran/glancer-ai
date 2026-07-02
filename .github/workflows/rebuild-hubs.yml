@@ -1,22 +1,20 @@
-# Daily rebuild + deploy — keeps the programmatic topic hubs and sitemap fresh.
+# Daily rebuild trigger — keeps the programmatic topic hubs + sitemap fresh.
 #
-# The topic hubs (dist/topic/*.html) and their "Signal" summaries are baked at
-# BUILD time from the live feed, so they only refresh when the site is rebuilt
-# and redeployed. A Cloudflare Worker cron trigger can't run an npm build, so we
-# use a scheduled GitHub Action instead: it runs `npm run build` (which fetches
-# the feed, generates/uses cached Signal summaries, and prerenders the hubs) and
-# then `wrangler deploy`.
+# glancerai.com deploys via Cloudflare's git-connected Workers Builds: every
+# build runs `npm run build`, which re-fetches the live feed, (re)generates the
+# "Signal" summaries using the GEMINI_API_KEY / GROQ_API_KEY set in the
+# Cloudflare BUILD environment, and prerenders dist/topic/*.html. So a scheduled
+# "rebuild" just needs to kick off a new Cloudflare build — we do that by curling
+# a Cloudflare Deploy Hook. No checkout, no npm, no wrangler here.
 #
-# Required repo secrets (Settings → Secrets and variables → Actions):
-#   CLOUDFLARE_API_TOKEN   — token with "Edit Cloudflare Workers" permission
-#   CLOUDFLARE_ACCOUNT_ID  — your Cloudflare account id
-#   GEMINI_API_KEY         — so Signal summaries are original text, not excerpts
-#                            (or GROQ_API_KEY / OPENROUTER_API_KEY instead)
+# One-time setup:
+#   1. Cloudflare dashboard → your Worker/Pages project → Settings → Builds →
+#      Deploy hooks → create a hook, copy its URL.
+#   2. GitHub repo → Settings → Secrets and variables → Actions → new secret
+#      CLOUDFLARE_DEPLOY_HOOK_URL = <that URL>.
 #
-# NOTE: if you already deploy via Cloudflare's git integration (Workers Builds),
-# you don't need the deploy step here — instead add GEMINI_API_KEY to the
-# Cloudflare build environment and trigger a scheduled deploy from its dashboard.
-# This workflow is the self-contained alternative that works either way.
+# Make sure GEMINI_API_KEY (and/or GROQ_API_KEY) is set in the Cloudflare *build*
+# environment (not only as a runtime secret) so summaries are original text.
 
 name: Rebuild topic hubs
 
@@ -30,44 +28,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  trigger-cloudflare-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build (prerender hubs + Signal summaries + sitemap)
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: npm run build
-
-      - name: Deploy to Cloudflare
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-
-      # Persist the summary cache the build just grew, so tomorrow's run reuses
-      # it and re-summarises only genuinely new articles (keeps LLM cost near zero).
-      - name: Commit updated summary cache
+      - name: Trigger Cloudflare deploy hook
         run: |
-          git config user.name "glancer-bot"
-          git config user.email "bot@glancerai.com"
-          if ! git diff --quiet -- seo/summary-cache.json; then
-            git add seo/summary-cache.json
-            git commit -m "chore: refresh topic-hub Signal summary cache [skip ci]"
-            git push
-          else
-            echo "No summary-cache changes to commit."
+          if [ -z "${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}" ]; then
+            echo "::error::CLOUDFLARE_DEPLOY_HOOK_URL secret is not set — see this workflow's header for setup."
+            exit 1
           fi
+          curl -fsS -X POST "${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}"
+          echo "✓ Cloudflare build triggered."
