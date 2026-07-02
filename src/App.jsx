@@ -15,6 +15,7 @@ import BlogsPage from './pages/BlogsPage';
 import TopicsIndexPage from './pages/TopicsIndexPage';
 import TopicHubPage from './pages/TopicHubPage';
 import BlogPostPage from './pages/BlogPostPage';
+import EventsPage from './pages/EventsPage';
 import NewsReaderPage from './pages/NewsReaderPage';
 import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="/blog/write"        element={<BlogWritePage />} />
           <Route path="/blog/edit/:id"     element={<BlogWritePage />} />
           <Route path="/blog/:id"          element={<BlogPostPage />} />
+          <Route path="/events"            element={<EventsPage />} />
           <Route path="/topics"            element={<TopicsIndexPage />} />
           <Route path="/topic/:slug"       element={<TopicHubPage />} />
           <Route path="/news/:id"          element={<NewsReaderPage />} />

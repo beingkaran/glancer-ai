@@ -1,0 +1,110 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Glancer AI//Tech Events//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Glancer AI — Major Tech Events
+X-WR-TIMEZONE:UTC
+REFRESH-INTERVAL;VALUE=DURATION:PT12H
+X-PUBLISHED-TTL:PT12H
+BEGIN:VEVENT
+UID:grafana-observabilitycon-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20260915
+DTEND;VALUE=DATE:20260918
+SUMMARY:Grafana ObservabilityCON 2026
+DESCRIPTION:Grafana Labs’ flagship on metrics\, logs\, traces\, profiles and OpenTelemetry.\n\nHosted by Grafana Labs.\n\nhttps://grafana.com/about/events/observabilitycon/
+LOCATION:Javits Center\, New York\, USA
+URL:https://grafana.com/about/events/observabilitycon/
+END:VEVENT
+BEGIN:VEVENT
+UID:the-ai-conference-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20260916
+DTEND;VALUE=DATE:20260918
+SUMMARY:The AI Conference 2026
+DESCRIPTION:Frontier models\, agents and applied ML from labs and practitioners.\n\nHosted by The AI Conference.\n\nhttps://aiconference.com/
+LOCATION:Pier 48\, San Francisco\, USA
+URL:https://aiconference.com/
+END:VEVENT
+BEGIN:VEVENT
+UID:srecon-emea-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261013
+DTEND;VALUE=DATE:20261016
+SUMMARY:SREcon26 EMEA
+DESCRIPTION:The reliability community’s deep-dive on running systems at scale.\n\nHosted by USENIX.\n\nhttps://www.usenix.org/srecon
+LOCATION:The Convention Centre Dublin\, Dublin\, Ireland
+URL:https://www.usenix.org/srecon
+END:VEVENT
+BEGIN:VEVENT
+UID:microsoft-ignite-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261117
+DTEND;VALUE=DATE:20261121
+SUMMARY:Microsoft Ignite 2026
+DESCRIPTION:Azure\, Copilot and the Microsoft cloud + AI platform roadmap.\n\nHosted by Microsoft.\n\nhttps://ignite.microsoft.com/
+LOCATION:Moscone Center\, San Francisco\, USA
+URL:https://ignite.microsoft.com/
+END:VEVENT
+BEGIN:VEVENT
+UID:observability-day-na-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261109
+DTEND;VALUE=DATE:20261110
+SUMMARY:Observability Day North America 2026
+DESCRIPTION:CNCF co-located day on OpenTelemetry\, Prometheus and Fluent.\n\nHosted by CNCF.\n\nhttps://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
+LOCATION:LA Convention Center\, Los Angeles\, USA
+URL:https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
+END:VEVENT
+BEGIN:VEVENT
+UID:kubecon-na-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261110
+DTEND;VALUE=DATE:20261114
+SUMMARY:KubeCon + CloudNativeCon North America 2026
+DESCRIPTION:The largest cloud-native gathering — Kubernetes\, platforms and observability.\n\nHosted by CNCF.\n\nhttps://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
+LOCATION:LA Convention Center\, Los Angeles\, USA
+URL:https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
+END:VEVENT
+BEGIN:VEVENT
+UID:aws-reinvent-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261130
+DTEND;VALUE=DATE:20261205
+SUMMARY:AWS re:Invent 2026
+DESCRIPTION:AWS’ keynote-driven launch week for cloud\, data and AI services.\n\nHosted by Amazon Web Services.\n\nhttps://reinvent.awsevents.com/
+LOCATION:The Venetian\, Las Vegas\, USA
+URL:https://reinvent.awsevents.com/
+END:VEVENT
+BEGIN:VEVENT
+UID:neurips-2026@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20261207
+DTEND;VALUE=DATE:20261214
+SUMMARY:NeurIPS 2026
+DESCRIPTION:The premier machine-learning research conference of the year.\n\nHosted by NeurIPS Foundation.\n\nhttps://neurips.cc/
+LOCATION:San Diego Convention Center\, San Diego\, USA
+URL:https://neurips.cc/
+END:VEVENT
+BEGIN:VEVENT
+UID:nvidia-gtc-2027@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20270315
+DTEND;VALUE=DATE:20270320
+SUMMARY:NVIDIA GTC 2027
+DESCRIPTION:GPU computing\, accelerated AI and the year’s biggest infra keynote.\n\nHosted by NVIDIA.\n\nhttps://www.nvidia.com/gtc/
+LOCATION:San Jose Convention Center\, San Jose\, USA
+URL:https://www.nvidia.com/gtc/
+END:VEVENT
+BEGIN:VEVENT
+UID:google-cloud-next-2027@glancerai.com
+DTSTAMP:20260702T204318Z
+DTSTART;VALUE=DATE:20270421
+DTEND;VALUE=DATE:20270424
+SUMMARY:Google Cloud Next 2027
+DESCRIPTION:Google Cloud\, Gemini and AI-driven operations across the stack.\n\nHosted by Google.\n\nhttps://cloud.withgoogle.com/next
+LOCATION:Mandalay Bay\, Las Vegas\, USA
+URL:https://cloud.withgoogle.com/next
+END:VEVENT
+END:VCALENDAR

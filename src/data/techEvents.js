@@ -1,0 +1,193 @@
+/*
+ * techEvents — curated list of major upcoming AI, observability, cloud-native
+ * and SRE conferences. Used by the /events agenda page, the home-feed teaser,
+ * and the build-time ICS feed (scripts/generate-events-ics.mjs).
+ *
+ * Dates reflect the best publicly-announced schedule at time of writing and can
+ * shift — every event links to its official page (`url`) as the source of truth,
+ * and the page carries a "verify on the official site" disclaimer.
+ *
+ * Shape:
+ *   id        stable slug — also the ICS UID and calendar-link key
+ *   name      full event title
+ *   organizer host / body
+ *   category  one of the CATEGORY keys below (drives the color accent)
+ *   start     'YYYY-MM-DD' (first day, inclusive)
+ *   end       'YYYY-MM-DD' (last day, inclusive; omit for single-day)
+ *   city, country, venue
+ *   format    'In-person' | 'Virtual' | 'Hybrid'
+ *   url       official event page
+ *   blurb     one-line description
+ *   tags      short topical tags
+ *   emoji     fallback glyph for the date badge
+ */
+
+export const EVENT_CATEGORIES = {
+  Observability: { label: 'Observability', class: 'ev-obs' },
+  AIOps: { label: 'AIOps', class: 'ev-aiops' },
+  'Cloud Native': { label: 'Cloud Native', class: 'ev-cloud' },
+  'AI / ML': { label: 'AI / ML', class: 'ev-ai' },
+  'DevOps / SRE': { label: 'DevOps / SRE', class: 'ev-sre' },
+};
+
+export const TECH_EVENTS = [
+  {
+    id: 'grafana-observabilitycon-2026',
+    name: 'Grafana ObservabilityCON 2026',
+    organizer: 'Grafana Labs',
+    category: 'Observability',
+    start: '2026-09-15',
+    end: '2026-09-17',
+    city: 'New York',
+    country: 'USA',
+    venue: 'Javits Center',
+    format: 'Hybrid',
+    url: 'https://grafana.com/about/events/observabilitycon/',
+    blurb: 'Grafana Labs’ flagship on metrics, logs, traces, profiles and OpenTelemetry.',
+    tags: ['Grafana', 'OpenTelemetry', 'Dashboards'],
+    emoji: '📈',
+  },
+  {
+    id: 'the-ai-conference-2026',
+    name: 'The AI Conference 2026',
+    organizer: 'The AI Conference',
+    category: 'AI / ML',
+    start: '2026-09-16',
+    end: '2026-09-17',
+    city: 'San Francisco',
+    country: 'USA',
+    venue: 'Pier 48',
+    format: 'In-person',
+    url: 'https://aiconference.com/',
+    blurb: 'Frontier models, agents and applied ML from labs and practitioners.',
+    tags: ['LLMs', 'Agents', 'Frontier'],
+    emoji: '🧠',
+  },
+  {
+    id: 'srecon-emea-2026',
+    name: 'SREcon26 EMEA',
+    organizer: 'USENIX',
+    category: 'DevOps / SRE',
+    start: '2026-10-13',
+    end: '2026-10-15',
+    city: 'Dublin',
+    country: 'Ireland',
+    venue: 'The Convention Centre Dublin',
+    format: 'In-person',
+    url: 'https://www.usenix.org/srecon',
+    blurb: 'The reliability community’s deep-dive on running systems at scale.',
+    tags: ['SRE', 'Reliability', 'On-call'],
+    emoji: '⚙️',
+  },
+  {
+    id: 'microsoft-ignite-2026',
+    name: 'Microsoft Ignite 2026',
+    organizer: 'Microsoft',
+    category: 'Cloud Native',
+    start: '2026-11-17',
+    end: '2026-11-20',
+    city: 'San Francisco',
+    country: 'USA',
+    venue: 'Moscone Center',
+    format: 'Hybrid',
+    url: 'https://ignite.microsoft.com/',
+    blurb: 'Azure, Copilot and the Microsoft cloud + AI platform roadmap.',
+    tags: ['Azure', 'Copilot', 'Cloud'],
+    emoji: '☁️',
+  },
+  {
+    id: 'observability-day-na-2026',
+    name: 'Observability Day North America 2026',
+    organizer: 'CNCF',
+    category: 'Observability',
+    start: '2026-11-09',
+    city: 'Los Angeles',
+    country: 'USA',
+    venue: 'LA Convention Center',
+    format: 'In-person',
+    url: 'https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/',
+    blurb: 'CNCF co-located day on OpenTelemetry, Prometheus and Fluent.',
+    tags: ['OpenTelemetry', 'Prometheus', 'CNCF'],
+    emoji: '🔭',
+  },
+  {
+    id: 'kubecon-na-2026',
+    name: 'KubeCon + CloudNativeCon North America 2026',
+    organizer: 'CNCF',
+    category: 'Cloud Native',
+    start: '2026-11-10',
+    end: '2026-11-13',
+    city: 'Los Angeles',
+    country: 'USA',
+    venue: 'LA Convention Center',
+    format: 'Hybrid',
+    url: 'https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/',
+    blurb: 'The largest cloud-native gathering — Kubernetes, platforms and observability.',
+    tags: ['Kubernetes', 'CNCF', 'Platform'],
+    emoji: '☸️',
+  },
+  {
+    id: 'aws-reinvent-2026',
+    name: 'AWS re:Invent 2026',
+    organizer: 'Amazon Web Services',
+    category: 'Cloud Native',
+    start: '2026-11-30',
+    end: '2026-12-04',
+    city: 'Las Vegas',
+    country: 'USA',
+    venue: 'The Venetian',
+    format: 'In-person',
+    url: 'https://reinvent.awsevents.com/',
+    blurb: 'AWS’ keynote-driven launch week for cloud, data and AI services.',
+    tags: ['AWS', 'Cloud', 'Bedrock'],
+    emoji: '🟧',
+  },
+  {
+    id: 'neurips-2026',
+    name: 'NeurIPS 2026',
+    organizer: 'NeurIPS Foundation',
+    category: 'AI / ML',
+    start: '2026-12-07',
+    end: '2026-12-13',
+    city: 'San Diego',
+    country: 'USA',
+    venue: 'San Diego Convention Center',
+    format: 'Hybrid',
+    url: 'https://neurips.cc/',
+    blurb: 'The premier machine-learning research conference of the year.',
+    tags: ['Research', 'ML', 'Papers'],
+    emoji: '📚',
+  },
+  {
+    id: 'nvidia-gtc-2027',
+    name: 'NVIDIA GTC 2027',
+    organizer: 'NVIDIA',
+    category: 'AI / ML',
+    start: '2027-03-15',
+    end: '2027-03-19',
+    city: 'San Jose',
+    country: 'USA',
+    venue: 'San Jose Convention Center',
+    format: 'Hybrid',
+    url: 'https://www.nvidia.com/gtc/',
+    blurb: 'GPU computing, accelerated AI and the year’s biggest infra keynote.',
+    tags: ['GPUs', 'Inference', 'CUDA'],
+    emoji: '🟩',
+  },
+  {
+    id: 'google-cloud-next-2027',
+    name: 'Google Cloud Next 2027',
+    organizer: 'Google',
+    category: 'AIOps',
+    start: '2027-04-21',
+    end: '2027-04-23',
+    city: 'Las Vegas',
+    country: 'USA',
+    venue: 'Mandalay Bay',
+    format: 'In-person',
+    url: 'https://cloud.withgoogle.com/next',
+    blurb: 'Google Cloud, Gemini and AI-driven operations across the stack.',
+    tags: ['Gemini', 'GCP', 'AIOps'],
+    emoji: '🔷',
+  },
+];

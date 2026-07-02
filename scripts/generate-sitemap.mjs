@@ -31,6 +31,7 @@ const staticRoutes = [
   { loc: '/blogs', changefreq: 'daily', priority: '0.9', lastmod: today },
   { loc: '/ai-tools', changefreq: 'weekly', priority: '0.9', lastmod: today },
   { loc: '/metrics', changefreq: 'daily', priority: '0.7', lastmod: today },
+  { loc: '/events', changefreq: 'weekly', priority: '0.7', lastmod: today },
   {
     loc: '/glossary',
     changefreq: 'weekly',

@@ -38,6 +38,7 @@ const PenIcon = () => (
 // for long-tail SEO without diluting the observability positioning.
 const NAV_LINKS = [
   { label: 'News', to: '/#news' },
+  { label: 'Events', to: '/events' },
   { label: 'Topics', to: '/topics' },
   { label: 'Analysis', to: '/blogs' },
   { label: 'Glossary', to: '/glossary' },
