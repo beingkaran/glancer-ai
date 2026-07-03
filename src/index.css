@@ -1269,6 +1269,67 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 .blog-read-content .key-takeaways { background: rgba(255,176,32,0.08); border: 1px solid rgba(255,176,32,0.2); border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
 .blog-read-content .key-takeaways h3 { margin-top: 0; }
 
+/* Blog byline + author bio (E-E-A-T) */
+.blog-byline {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-top: 1px solid var(--glass-border);
+}
+.blog-byline-photo {
+  width: 48px; height: 48px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+  border: 2px solid rgba(255,176,32,0.25);
+}
+.blog-byline-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--glass-bg); font-size: 1.4rem; flex-shrink: 0;
+}
+.blog-byline-name {
+  font-weight: 700; font-size: 0.95rem; color: var(--text-primary);
+}
+.blog-byline-meta {
+  font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;
+}
+.author-bio {
+  display: flex; gap: 18px; align-items: flex-start;
+  padding: 20px 22px; margin-bottom: 24px;
+  background: rgba(255,176,32,0.06);
+  border: 1px solid rgba(255,176,32,0.18);
+  border-radius: 14px;
+}
+.author-bio-photo {
+  width: 72px; height: 72px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+  border: 2px solid rgba(255,176,32,0.3);
+}
+.author-bio-name {
+  font-family: var(--font-heading); font-weight: 700;
+  font-size: 1rem; margin: 0 0 2px;
+}
+.author-bio-name a { color: var(--text-primary); text-decoration: none; }
+.author-bio-name a:hover { color: var(--purple); }
+.author-bio-role {
+  font-size: 0.82rem; color: var(--purple); font-weight: 600;
+  margin: 0 0 8px;
+}
+.author-bio-text {
+  font-size: 0.9rem; line-height: 1.65; color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+.author-bio-links {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  font-size: 0.82rem; font-weight: 600;
+}
+.author-bio-links a {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--cyan); text-decoration: none;
+}
+.author-bio-links a:hover { text-decoration: underline; }
+@media (max-width: 480px) {
+  .author-bio { flex-direction: column; align-items: center; text-align: center; }
+  .author-bio-links { justify-content: center; }
+}
+
 /* Profile blog rows */
 .profile-blog-row { transition: var(--transition); }
 .profile-blog-row:hover { border-color: var(--glass-border-strong); }

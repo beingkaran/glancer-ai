@@ -15,8 +15,27 @@ import { useEffect } from 'react';
  * it correct during client-side navigation and for Supabase-backed posts.
  */
 
+import { PRIMARY_AUTHOR } from '../data/authorMeta.js';
+
 const ORIGIN = 'https://glancerai.com';
 const ORG_ID = `${ORIGIN}/#organization`;
+
+function buildAuthorSchema(post) {
+  const name = post?.author || PRIMARY_AUTHOR.name;
+  if (/team|glancer/i.test(name) && !/karan/i.test(name)) {
+    return { '@type': 'Organization', name: name || 'Glancer AI' };
+  }
+  return {
+    '@type': 'Person',
+    name: PRIMARY_AUTHOR.name,
+    url: `${ORIGIN}/about`,
+    image: post?.authorImage || PRIMARY_AUTHOR.image,
+    jobTitle: post?.authorRole || PRIMARY_AUTHOR.role,
+    description: post?.authorBio || PRIMARY_AUTHOR.bioShort,
+    sameAs: [PRIMARY_AUTHOR.linkedin],
+    email: PRIMARY_AUTHOR.email,
+  };
+}
 
 function absUrl(u) {
   if (!u) return `${ORIGIN}/icon-1024.png`;
@@ -52,10 +71,7 @@ export function buildArticleSchema(post, { type = 'Article', path } = {}) {
     image: [image],
     datePublished: post.date || post.publishedAt || undefined,
     dateModified: post.updatedAt || post.date || undefined,
-    author: {
-      '@type': post.author && /team|glancer/i.test(post.author) ? 'Organization' : 'Person',
-      name: post.author || 'Glancer AI Team',
-    },
+    author: buildAuthorSchema(post),
     publisher: {
       '@type': 'Organization',
       '@id': ORG_ID,

@@ -14,6 +14,8 @@ import AdSlot from '../components/AdSlot';
 import StickyAnchorAd from '../components/StickyAnchorAd';
 import { AD_SLOTS } from '../lib/adsense';
 import { getRelatedPosts } from '../lib/blogRelated';
+import AuthorBio from '../components/AuthorBio';
+import { PRIMARY_AUTHOR } from '../data/authorMeta';
 
 // Split article HTML roughly in half on a paragraph boundary, so a single
 // in-content ad can sit in the natural flow of reading (mid-article).
@@ -162,18 +164,32 @@ export default function BlogPostPage() {
           {post.subtitle && (
             <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>{post.subtitle}</p>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 24, borderBottom: '1px solid var(--glass-border)' }}>
-            <div style={{ width: 42, height: 42, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
-              {post.avatar || '👤'}
-            </div>
+          <div className="blog-byline">
+            {/karan|admin|glancer/i.test(post.author || '') ? (
+              <picture>
+                <source srcSet="/karan.webp" type="image/webp" />
+                <img
+                  className="blog-byline-photo"
+                  src="/karan.jpg"
+                  alt={PRIMARY_AUTHOR.name}
+                  width={48}
+                  height={48}
+                  loading="eager"
+                />
+              </picture>
+            ) : (
+              <div className="blog-byline-avatar">{post.avatar || '👤'}</div>
+            )}
             <div>
-              <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>{post.author || 'Glancer AI'}</div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {formatDate(post.date)} · {post.readTime} min read
+              <div className="blog-byline-name">{post.author || PRIMARY_AUTHOR.name}</div>
+              <div className="blog-byline-meta">
+                {post.authorRole || PRIMARY_AUTHOR.role} · {formatDate(post.date)} · {post.readTime} min read
               </div>
             </div>
           </div>
         </div>
+
+        <AuthorBio post={post} />
 
         {/* ① Ad — after the intro/byline, top viewability */}
         <AdSlot slot={AD_SLOTS.articleTop} className="ad-in-article" />

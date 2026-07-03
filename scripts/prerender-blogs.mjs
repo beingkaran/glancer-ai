@@ -27,6 +27,7 @@ const ORIGIN = 'https://glancerai.com';
 const DIST = resolve(__dirname, '../dist');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
+const { PRIMARY_AUTHOR } = await import('../src/data/authorMeta.js');
 const { buildArticleSchema, buildBreadcrumb, schemaToJson } = await import('../src/lib/structuredData.js');
 const { relatedLinksHtml } = await import('../src/lib/blogRelated.js');
 
@@ -87,11 +88,30 @@ for (const post of BLOG_POSTS) {
 
   // Prerendered article markup inside #root. React replaces this on mount.
   const tags = (post.tags || []).map((t) => `#${esc(t)}`).join(' ');
+  const authorName = post.author || PRIMARY_AUTHOR.name;
+  const authorRole = post.authorRole || PRIMARY_AUTHOR.role;
+  const authorBio = post.authorBio || PRIMARY_AUTHOR.bio;
+  const isKaran = /karan|admin|glancer/i.test(authorName);
+  const bylinePhoto = isKaran
+    ? `<img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="48" height="48" style="width:48px;height:48px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px" />`
+    : '';
+  const authorAside = isKaran
+    ? `<aside aria-label="About the author" style="display:flex;gap:18px;align-items:flex-start;padding:20px 22px;margin:24px 0;background:rgba(255,176,32,0.06);border:1px solid rgba(255,176,32,0.18);border-radius:14px">
+        <img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="72" height="72" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0" />
+        <div>
+          <p style="font-weight:700;margin:0 0 2px"><a href="${ORIGIN}/about">${esc(PRIMARY_AUTHOR.name)}</a></p>
+          <p style="font-size:.82rem;color:#7C3AED;font-weight:600;margin:0 0 8px">${esc(authorRole)}</p>
+          <p style="font-size:.9rem;line-height:1.65;color:#475569;margin:0 0 10px">${esc(authorBio)}</p>
+          <p style="font-size:.82rem;margin:0"><a href="${esc(PRIMARY_AUTHOR.linkedin)}">LinkedIn</a> · <a href="mailto:${esc(PRIMARY_AUTHOR.email)}">${esc(PRIMARY_AUTHOR.email)}</a></p>
+        </div>
+      </aside>`
+    : `<aside aria-label="About the author"><p>Written by <strong>${esc(authorName)}</strong>.</p></aside>`;
   const prerendered = `<article style="max-width:760px;margin:0 auto;padding:96px 20px 80px">
         <p style="font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:#7C3AED">${esc(post.category || 'Article')}</p>
         <h1 style="font-size:2.4rem;line-height:1.18;font-weight:700">${esc(post.title)}</h1>
         ${post.subtitle ? `<p style="font-size:1.1rem;color:#475569">${esc(post.subtitle)}</p>` : ''}
-        <p style="font-size:.85rem;color:#64748b">By ${esc(post.author || 'Glancer AI Team')} · ${esc((post.date || '').slice(0, 10))} · ${esc(post.readTime || 6)} min read ${tags ? '· ' + tags : ''}</p>
+        <p style="font-size:.85rem;color:#64748b;display:flex;align-items:center">${bylinePhoto}<span><strong>${esc(authorName)}</strong> · ${esc(authorRole)} · ${esc((post.date || '').slice(0, 10))} · ${esc(post.readTime || 6)} min read ${tags ? '· ' + tags : ''}</span></p>
+        ${authorAside}
         <img src="${esc(post.bannerImage || '/icon-1024.png')}" alt="${esc(post.title)}" width="1200" height="675" style="width:100%;height:auto;border-radius:12px" />
         <div>${post.body || ''}</div>
         ${relatedLinksHtml(post, BLOG_POSTS)}
