@@ -1,3 +1,1 @@
-# Google AdSense — authorized digital sellers.
-# Replace pub-0000000000000000 with your AdSense publisher id (the digits after "ca-").
 google.com, pub-9454848033838064, DIRECT, f08c47fec0942fa0
