@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const MailIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -67,6 +68,13 @@ const VALUES = [
 ];
 
 export default function AboutPage() {
+  useDocumentMeta({
+    title: 'About Glancer AI — Who Curates This Site',
+    description:
+      'Glancer AI is an independent AI and observability intelligence hub — live news from 100+ sources, practitioner deep dives, a 2,200-term glossary and free tools. Meet the author.',
+    path: '/about',
+  });
+
   return (
     <div className="page-section">
       <div className="container" style={{ maxWidth: 860 }}>

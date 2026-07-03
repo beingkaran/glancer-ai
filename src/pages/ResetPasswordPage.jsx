@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 /*
  * ResetPasswordPage — where the "forgot password" email link lands.
@@ -11,6 +12,13 @@ import { useAuth } from '../context/AuthContext';
  * the user can set a new password via updateUser().
  */
 export default function ResetPasswordPage() {
+  // Account page — no search value; keep out of the index.
+  useDocumentMeta({
+    title: 'Reset Password',
+    description: 'Reset your Glancer AI account password.',
+    robots: 'noindex, nofollow',
+  });
+
   const { updatePassword } = useAuth();
   const navigate = useNavigate();
   const [ready, setReady] = useState(false); // recovery session present?

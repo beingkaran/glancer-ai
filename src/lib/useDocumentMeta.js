@@ -32,7 +32,7 @@ function upsertLink(rel, href) {
   el.setAttribute('href', href);
 }
 
-export function useDocumentMeta({ title, description, path = '', type = 'website', image } = {}) {
+export function useDocumentMeta({ title, description, path = '', type = 'website', image, robots } = {}) {
   useEffect(() => {
     const fullTitle = title ? `${title} · ${SITE}` : `${SITE} — AI News, Metrics & Intelligence Hub`;
     const url = ORIGIN + path;
@@ -40,6 +40,12 @@ export function useDocumentMeta({ title, description, path = '', type = 'website
 
     upsertMeta('name', 'description', description);
     upsertLink('canonical', url);
+
+    // Per-page robots override (e.g. 'noindex, follow' for thin/ephemeral
+    // pages). Restored to the site default on unmount so SPA navigation
+    // doesn't leak noindex onto a route that never sets its own meta.
+    const DEFAULT_ROBOTS = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    upsertMeta('name', 'robots', robots || DEFAULT_ROBOTS);
 
     upsertMeta('property', 'og:title', fullTitle);
     upsertMeta('property', 'og:description', description);
@@ -52,5 +58,10 @@ export function useDocumentMeta({ title, description, path = '', type = 'website
     upsertMeta('name', 'twitter:title', fullTitle);
     upsertMeta('name', 'twitter:description', description);
     if (image) upsertMeta('name', 'twitter:image', image);
-  }, [title, description, path, type, image]);
+
+    if (robots) {
+      return () => upsertMeta('name', 'robots', DEFAULT_ROBOTS);
+    }
+    return undefined;
+  }, [title, description, path, type, image, robots]);
 }

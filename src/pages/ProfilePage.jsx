@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthForm from '../components/AuthForm';
 import { getMyBlogs, deleteBlog } from '../lib/blogStore';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const PenIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -33,6 +34,13 @@ function Avatar({ user, size = 88 }) {
 }
 
 export default function ProfilePage() {
+  // Account page — no search value; keep out of the index.
+  useDocumentMeta({
+    title: 'Your Profile',
+    description: 'Manage your Glancer AI account, submitted articles and settings.',
+    robots: 'noindex, nofollow',
+  });
+
   const { user, isAuthed, logout } = useAuth();
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);

@@ -10,6 +10,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
 import { addBlog, updateBlog, getBlogById, canCurrentUserWrite } from '../lib/blogStore';
 import AuthForm from '../components/AuthForm';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 const CATEGORIES = ['Observability','AIOps','APM','SRE','Distributed Tracing','Kubernetes','Cloud Native','Security','DevOps','AI / ML','Open Source','Industry'];
 const GRADIENTS = [
@@ -77,6 +78,13 @@ function ToolbarBtn({ onClick, active, title, children }) {
 }
 
 export default function BlogWritePage() {
+  // Account page — no search value; keep out of the index.
+  useDocumentMeta({
+    title: 'Write an Article',
+    description: 'Draft and submit a practitioner article to Glancer AI.',
+    robots: 'noindex, nofollow',
+  });
+
   const navigate = useNavigate();
   const { id: editId } = useParams();
   const isEditing = Boolean(editId);

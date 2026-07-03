@@ -4,6 +4,7 @@ import {
   PointElement, ArcElement, Title, Tooltip, Legend, Filler,
 } from 'chart.js';
 import { Bar, Line, Doughnut } from 'react-chartjs-2';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler);
 
@@ -113,6 +114,13 @@ function StatCard({ s, value, open, onToggle }) {
 }
 
 export default function MetricsPage() {
+  useDocumentMeta({
+    title: 'AI Industry Metrics — Funding, Adoption & Model Leaderboard',
+    description:
+      'Key AI industry metrics at a glance — VC funding, enterprise adoption, model benchmark leaderboard and compute trends, with cited public sources for every figure.',
+    path: '/metrics',
+  });
+
   // `openStat` is the expanded KPI. Values are rendered as sourced — no
   // synthetic movement — so nothing on screen is fabricated.
   const [openStat, setOpenStat] = useState(null);

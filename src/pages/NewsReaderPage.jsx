@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
+import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 /*
  * NewsReaderPage — a preview page for one story (/news/:id).
@@ -60,6 +61,15 @@ export default function NewsReaderPage() {
   const navigate = useNavigate();
   const item = useMemo(() => getCachedNewsItem(id), [id]);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  // Reader URLs are ephemeral (cache-backed RSS ids) and mirror the
+  // publisher's content — noindex them so crawl budget goes to real pages.
+  useDocumentMeta({
+    title: item ? item.title : 'News Reader',
+    description: item ? summaryText(item).slice(0, 160) : undefined,
+    path: `/news/${id}`,
+    robots: 'noindex, follow',
+  });
 
   useEffect(() => { setIframeLoaded(false); }, [item]);
 

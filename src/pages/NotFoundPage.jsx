@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 
@@ -11,16 +10,8 @@ export default function NotFoundPage() {
     title: 'Page not found (404)',
     description: 'The page you were looking for could not be found on Glancer AI.',
     path: '/404',
+    robots: 'noindex, follow',
   });
-
-  useEffect(() => {
-    const el = document.createElement('meta');
-    el.name = 'robots';
-    el.content = 'noindex, follow';
-    el.setAttribute('data-404', '1');
-    document.head.appendChild(el);
-    return () => el.remove();
-  }, []);
 
   return (
     <div className="page-section">
