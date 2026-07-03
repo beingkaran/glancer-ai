@@ -173,6 +173,9 @@ export default function Navbar({ theme, onToggleTheme }) {
         <Link to="/profile" className="nav-link" onClick={() => setMobileOpen(false)}>
           {isAuthed ? 'My Profile' : 'Sign In'}
         </Link>
+        <Link to="/privacy" className="nav-link" onClick={() => setMobileOpen(false)}>
+          Privacy Policy
+        </Link>
       </nav>
 
       {showTicker && <SignalTicker />}

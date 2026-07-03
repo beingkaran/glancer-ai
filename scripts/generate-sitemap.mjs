@@ -41,6 +41,8 @@ const staticRoutes = [
   },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5', lastmod: today },
   { loc: '/about', changefreq: 'monthly', priority: '0.4', lastmod: today },
+  { loc: '/privacy', changefreq: 'monthly', priority: '0.6', lastmod: today },
+  { loc: '/terms', changefreq: 'monthly', priority: '0.5', lastmod: today },
   { loc: '/topics', changefreq: 'daily', priority: '0.8', lastmod: today },
 ];
 

@@ -45,6 +45,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://glancerai.com/privacy</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/terms</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://glancerai.com/topics</loc>
     <lastmod>2026-07-03</lastmod>
     <changefreq>daily</changefreq>

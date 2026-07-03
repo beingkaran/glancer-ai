@@ -1842,9 +1842,13 @@ export const BLOG_POSTS = [
   <li><strong>AppDynamics Cognition Engine</strong> — learns baselines per Business Transaction and generates root cause narratives</li>
 </ul>
 
+<h2>How This Fits the Bigger Observability Picture</h2>
+<p>AI observability does not replace the fundamentals. You still need solid <a href="/blog/observability-vs-monitoring">monitoring and observability foundations</a>, meaningful <a href="/blog/four-golden-signals">golden signals</a>, and eventually <a href="/blog/distributed-tracing-explained">distributed tracing</a> as your architecture grows. AI layers on top to reduce noise and speed up investigation — especially when you are comparing platforms in our <a href="/blog/datadog-vs-newrelic-vs-splunk-2026">Datadog vs New Relic vs Splunk shootout</a> or building an <a href="/blog/slo-sla-sli-practical-guide">SLO practice</a>.</p>
+<p>Teams that succeed treat AI as an amplifier for good telemetry hygiene: structured logs, consistent instrumentation, and clear ownership per service. Without that baseline, even the best ML models produce confident-sounding guesses. With it, anomaly detection and correlation become force multipliers that cut mean time to resolution dramatically.</p>
+
 <div class="callout">
   <div class="callout-title">Your Learning Path</div>
-  You're at Level 1. Next up — <strong>Level 2: How Anomaly Detection Actually Works</strong>, where we go under the hood on the algorithms that power "intelligent alerting." No maths degree required.
+  You're at Level 1. Next up — <strong><a href="/blog/ai-observability-anomaly-detection-explained">Level 2: How Anomaly Detection Actually Works</a></strong>, where we go under the hood on the algorithms that power "intelligent alerting." No maths degree required.
 </div>
     `
   },
@@ -2051,9 +2055,13 @@ export const BLOG_POSTS = [
   </tbody>
 </table>
 
+<h2>Putting Correlation in Your Runbook</h2>
+<p>Alert correlation pays off fastest when it sits on top of a coherent observability stack. Start by ensuring each service exports the <a href="/blog/four-golden-signals">four golden signals</a>, adopt <a href="/blog/distributed-tracing-explained">trace context propagation</a> across HTTP boundaries, and define <a href="/blog/slo-sla-sli-practical-guide">SLOs with error budgets</a> so incidents are prioritised by user impact rather than alert volume. If you are still choosing a platform, compare how each vendor handles noise reduction in our <a href="/blog/datadog-vs-newrelic-vs-splunk-2026">APM comparison guide</a> and the broader <a href="/blog/ultimate-apm-comparison-datadog-newrelic-splunk-appdynamics-broadcom-2026">ultimate APM shootout</a>.</p>
+<p>Operationally, train on-call engineers to work from incidents, not individual alerts. The goal is a single timeline with a probable root cause, affected services, and remediation hints — the output modern AIOps tools are designed to produce once topology and history models are fed with clean telemetry.</p>
+
 <div class="callout">
   <div class="callout-title">Next: Level 4</div>
-  Correlation reacts to what's already happening. <strong>Level 4 goes further: predicting failures before they occur</strong> using ML forecasting models for capacity and reliability.
+  Correlation reacts to what's already happening. <strong><a href="/blog/predictive-monitoring-ml-capacity-forecasting-advanced">Level 4 goes further: predicting failures before they occur</a></strong> using ML forecasting models for capacity and reliability.
 </div>
     `
   },

@@ -13,6 +13,7 @@ import Comments from '../components/Comments';
 import AdSlot from '../components/AdSlot';
 import StickyAnchorAd from '../components/StickyAnchorAd';
 import { AD_SLOTS } from '../lib/adsense';
+import { getRelatedPosts } from '../lib/blogRelated';
 
 // Split article HTML roughly in half on a paragraph boundary, so a single
 // in-content ad can sit in the natural flow of reading (mid-article).
@@ -71,7 +72,7 @@ export default function BlogPostPage() {
       if (found) {
         const approved = await getApprovedUserBlogs();
         if (!active) return;
-        setMore([...approved, ...BLOG_POSTS].filter((b) => String(b.id) !== String(id)).slice(0, 3));
+        setMore(getRelatedPosts(found, [...approved, ...BLOG_POSTS], 4));
       }
     })();
     return () => { active = false; };
@@ -203,8 +204,9 @@ export default function BlogPostPage() {
 
         {/* More */}
         {more.length > 0 && (
-          <div style={{ marginTop: 56, paddingTop: 32, borderTop: '1px solid var(--glass-border)', marginBottom: 80 }}>
-            <h2 className="section-title-lg" style={{ marginBottom: 20 }}>More Articles</h2>
+          <nav aria-label="Related articles" style={{ marginTop: 56, paddingTop: 32, borderTop: '1px solid var(--glass-border)', marginBottom: 80 }}>
+            <h2 className="section-title-lg" style={{ marginBottom: 8 }}>Related reading</h2>
+            <p className="hero-sub" style={{ marginBottom: 20, maxWidth: 'none' }}>Continue with these connected guides and comparisons.</p>
             <div className="blogs-grid">
               {more.map((b) => (
                 <Link key={b.id} to={`/blog/${b.id}`} state={{ from: location.state?.from || 'home-blogs' }} className="blog-card" style={{ textDecoration: 'none' }}>
@@ -220,7 +222,7 @@ export default function BlogPostPage() {
                 </Link>
               ))}
             </div>
-          </div>
+          </nav>
         )}
       </article>
 

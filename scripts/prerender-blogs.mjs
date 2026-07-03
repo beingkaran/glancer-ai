@@ -28,6 +28,7 @@ const DIST = resolve(__dirname, '../dist');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
 const { buildArticleSchema, buildBreadcrumb, schemaToJson } = await import('../src/lib/structuredData.js');
+const { relatedLinksHtml } = await import('../src/lib/blogRelated.js');
 
 let shell;
 try {
@@ -93,6 +94,7 @@ for (const post of BLOG_POSTS) {
         <p style="font-size:.85rem;color:#64748b">By ${esc(post.author || 'Glancer AI Team')} · ${esc((post.date || '').slice(0, 10))} · ${esc(post.readTime || 6)} min read ${tags ? '· ' + tags : ''}</p>
         <img src="${esc(post.bannerImage || '/icon-1024.png')}" alt="${esc(post.title)}" width="1200" height="675" style="width:100%;height:auto;border-radius:12px" />
         <div>${post.body || ''}</div>
+        ${relatedLinksHtml(post, BLOG_POSTS)}
       </article>`;
   html = html.replace(/<div id="root">\s*<\/div>/, `<div id="root">${prerendered}</div>`);
 

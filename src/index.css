@@ -2617,6 +2617,29 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .legal-section li { color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
 .legal-section a { color: var(--purple); text-decoration: none; }
 .legal-section a:hover { text-decoration: underline; }
+.legal-cookie-table {
+  width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 0.88rem;
+}
+.legal-cookie-table th,
+.legal-cookie-table td {
+  border: 1px solid var(--glass-border); padding: 10px 12px; text-align: left;
+  color: var(--text-secondary); vertical-align: top;
+}
+.legal-cookie-table th {
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted); background: var(--surface);
+}
+.legal-section code {
+  font-family: var(--font-mono); font-size: 0.82rem; color: var(--cyan);
+  background: var(--cyan-ink); padding: 2px 6px; border-radius: 4px;
+}
+
+.blog-related-prerender {
+  margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;
+}
+.blog-related-prerender h2 { font-size: 1.25rem; margin-bottom: 12px; }
+.blog-related-prerender ul { padding-left: 20px; line-height: 1.7; }
+.blog-related-prerender a { color: #1e3a8a; font-weight: 600; }
 
 /* Cookie-consent banner */
 .cookie-banner {
