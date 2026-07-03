@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { TOPIC_BY_SLUG, articlesForTopic } from '../data/topics';
+import { guideForTopic } from '../data/seoGuides';
 import { getNews, getCachedNews, STATIC_NEWS, displayImage, sourceFavicon } from '../lib/newsFeed';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 import { buildItemListSchema, buildBreadcrumb, useArticleSchema } from '../lib/structuredData';
@@ -76,6 +77,8 @@ export default function TopicHubPage() {
 
   if (!topic) return <NotFoundPage />;
 
+  const guide = guideForTopic(topic.slug);
+
   return (
     <div className="page-section">
       <div className="container">
@@ -90,6 +93,13 @@ export default function TopicHubPage() {
             {articles.length} recent {articles.length === 1 ? 'story' : 'stories'} · refreshed continuously
           </p>
         </div>
+
+        {guide && (
+          <div className="topic-guide chart-card" style={{ maxWidth: 820, margin: '0 auto 32px', padding: '22px 24px' }}>
+            <p className="section-label" style={{ marginBottom: 10 }}>Topic guide</p>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.75, margin: 0, fontSize: '0.95rem' }}>{guide}</p>
+          </div>
+        )}
 
         {articles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>

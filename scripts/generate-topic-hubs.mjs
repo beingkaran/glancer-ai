@@ -37,6 +37,7 @@ const MAX_NEW_SUMMARIES = Number(process.env.MAX_NEW_SUMMARIES || 120); // per b
 const CACHE_MAX = 3000; // keep the cache file from growing unbounded
 
 const { TOPICS, articlesForTopic } = await import('../src/data/topics.js');
+const { guideForTopic } = await import('../src/data/seoGuides.js');
 const { buildRawNews } = await import('../worker/newsCore.js');
 const { buildItemListSchema, buildBreadcrumb, schemaToJson } = await import('../src/lib/structuredData.js');
 
@@ -240,10 +241,16 @@ function renderHub({ topic, articles }) {
       </article>`;
   }).join('\n');
 
+  const guide = guideForTopic(topic.slug);
+  const guideBlock = guide
+    ? `<section style="margin:20px 0 28px;padding:18px 20px;border:1px solid rgba(120,130,150,.2);border-radius:8px;background:rgba(255,255,255,.02)"><p style="font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#0EA5E9;margin:0 0 10px">Topic guide</p><p style="font-size:.95rem;line-height:1.75;color:#334155;margin:0">${esc(guide)}</p></section>`
+    : '';
+
   const prerendered = `<main style="max-width:820px;margin:0 auto;padding:96px 20px 80px">
         <p style="font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:#0EA5E9">Topic Hub</p>
         <h1 style="font-size:2.3rem;line-height:1.18;font-weight:800;margin:.2em 0">${esc(topic.title)}</h1>
         <p style="font-size:1.05rem;line-height:1.6;color:#475569;max-width:720px">${esc(topic.intro)}</p>
+        ${guideBlock}
         <p style="font-size:.82rem;color:#64748b">${articles.length} recent ${articles.length === 1 ? 'story' : 'stories'}, each cut to the signal · updated continuously</p>
         <div style="margin-top:24px">${cards}</div>
       </main>`;
@@ -278,13 +285,15 @@ function renderIndex() {
 
   html = html.replace('</head>', `  <script type="application/ld+json">${listSchema}</script>\n  </head>`);
 
-  const links = TOPICS.map((t) =>
-    `<li style="margin:0 0 14px"><a href="/topic/${t.slug}" style="color:#0EA5E9;text-decoration:none;font-weight:700;font-size:1.1rem">${esc(t.title)}</a><br><span style="color:#64748b;font-size:.9rem">${esc(t.tagline)}</span></li>`,
-  ).join('\n');
+  const enriched = TOPICS.map((t) => {
+    const guide = guideForTopic(t.slug);
+    const excerpt = guide ? `<p style="margin:6px 0 0;font-size:.88rem;line-height:1.6;color:#64748b">${esc(guide.slice(0, 220))}…</p>` : '';
+    return `<li style="margin:0 0 18px"><a href="/topic/${t.slug}" style="color:#0EA5E9;text-decoration:none;font-weight:700;font-size:1.1rem">${esc(t.title)}</a><br><span style="color:#64748b;font-size:.9rem">${esc(t.tagline)}</span>${excerpt}</li>`;
+  }).join('\n');
   const prerendered = `<main style="max-width:760px;margin:0 auto;padding:96px 20px 80px">
         <h1 style="font-size:2.3rem;font-weight:800">AI News by Topic</h1>
-        <p style="font-size:1.05rem;color:#475569">Continuously-refreshed news hubs for the companies and technologies that matter — each filtered down to the signal.</p>
-        <ul style="list-style:none;padding:0;margin:28px 0 0">${links}</ul>
+        <p style="font-size:1.05rem;color:#475569">Continuously-refreshed news hubs for the companies and technologies that matter — each includes an editorial guide, filtered headlines, and original Signal takeaways.</p>
+        <ul style="list-style:none;padding:0;margin:28px 0 0">${enriched}</ul>
       </main>`;
   html = html.replace(/<div id="root">\s*<\/div>/, `<div id="root">${prerendered}</div>`);
 

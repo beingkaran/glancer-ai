@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-sitemap.mjs && node scripts/generate-events-ics.mjs && vite build && node scripts/prerender-blogs.mjs && node scripts/prerender-static-pages.mjs && node scripts/generate-topic-hubs.mjs",
+    "build": "node scripts/generate-sitemap.mjs && node scripts/generate-events-ics.mjs && vite build && node scripts/prerender-blogs.mjs && node scripts/generate-topic-hubs.mjs && node scripts/prerender-static-pages.mjs",
     "build:topics": "node scripts/generate-topic-hubs.mjs",
     "roundup": "node scripts/generate-weekly-roundup.mjs",
     "build:vite": "vite build",

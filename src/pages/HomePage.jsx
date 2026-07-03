@@ -5,6 +5,7 @@ import IntelligenceFeed from '../components/IntelligenceFeed';
 import SearchSection from '../components/SearchSection';
 import NewsFaq from '../components/NewsFaq';
 import NewsletterInline from '../components/NewsletterInline';
+import HomeEditorial from '../components/HomeEditorial';
 
 /*
  * HomePage — unified IntelligenceFeed for news and Deep Dives (blogs). The Hero
@@ -36,6 +37,7 @@ export default function HomePage() {
   return (
     <>
       <Hero activeTab="news" onTabChange={handleTabChange} />
+      <HomeEditorial />
       <IntelligenceFeed segment={segment} onSegment={handleSegment} />
       <div className="container"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />
