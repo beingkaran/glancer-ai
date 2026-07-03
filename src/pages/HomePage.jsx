@@ -37,12 +37,13 @@ export default function HomePage() {
   return (
     <>
       <Hero activeTab="news" onTabChange={handleTabChange} />
-      <HomeEditorial />
       <IntelligenceFeed segment={segment} onSegment={handleSegment} />
       <div className="container"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />
       <SearchSection />
       <NewsFaq />
+      <div className="section-divider" aria-hidden="true" />
+      <HomeEditorial />
     </>
   );
 }
