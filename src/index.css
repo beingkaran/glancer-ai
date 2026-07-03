@@ -302,31 +302,46 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 
 /* Two-column desk layout */
 .hero-grid {
-  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.55fr);
-  gap: 40px; align-items: start; margin-bottom: 36px;
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.7fr);
+  gap: 48px; align-items: start; margin-bottom: 0;
 }
 .hero-copy { min-width: 0; text-align: left; }
 .hero-title {
-  display: flex; flex-direction: column; gap: 6px;
-  margin-bottom: 22px; line-height: 1.05;
+  display: flex; flex-direction: column; gap: 4px;
+  margin-bottom: 18px; line-height: 1.05;
 }
 .hero-title-line {
-  font-family: var(--font-heading); font-size: clamp(2.5rem, 5.8vw, 4.4rem);
+  font-family: var(--font-heading); font-size: clamp(2.3rem, 4.6vw, 3.4rem);
   font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary);
 }
 .hero-title-accent {
-  font-family: var(--font-heading); font-size: clamp(1.65rem, 3.8vw, 2.75rem);
+  font-family: var(--font-heading); font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-weight: 600; font-style: italic; letter-spacing: -0.02em;
   color: var(--accent); padding-left: 2px;
 }
 .hero-lead {
-  font-size: clamp(1.02rem, 1.8vw, 1.18rem); color: var(--text-secondary);
-  line-height: 1.68; max-width: 58ch; margin-bottom: 14px;
+  font-size: clamp(1rem, 1.6vw, 1.12rem); color: var(--text-secondary);
+  line-height: 1.65; max-width: 54ch; margin-bottom: 12px;
 }
 .hero-byline {
-  font-family: var(--font-heading); font-size: 0.98rem; font-style: italic;
+  font-family: var(--font-heading); font-size: 0.95rem; font-style: italic;
   color: var(--text-muted); padding-left: 14px;
-  border-left: 2px solid var(--accent); max-width: 42ch; margin-bottom: 26px;
+  border-left: 2px solid var(--accent); max-width: 42ch; margin-bottom: 22px;
+}
+
+/* Compact stat strip under the byline (replaces the old stats panel) */
+.hero-stats {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px;
+  margin: 0 0 24px; padding: 0;
+}
+.hero-stats li { display: inline-flex; align-items: baseline; gap: 8px; }
+.hero-stats strong {
+  font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.01em;
+}
+.hero-stats span {
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted);
 }
 
 /* Crawlable home editorial — substantive copy + internal links (footer of home) */
@@ -393,10 +408,17 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 /* Right-hand desk panel */
 .hero-desk { min-width: 0; }
 .hero-desk-panel {
-  padding: 22px 20px 18px; border: 1px solid var(--glass-border);
+  padding: 20px 18px 16px; border: 1px solid var(--glass-border);
   border-radius: var(--border-radius); background: var(--glass-bg);
   box-shadow: var(--shadow-card);
 }
+/* Quicklinks living inside the desk panel: hint sits above the label */
+.hero-desk-panel .hero-quicklinks { max-width: none; gap: 6px; }
+.hero-desk-panel .hero-quicklink {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 10px 12px;
+}
+.hero-desk-panel .hero-quicklink-label { color: var(--text-primary); font-size: 0.86rem; }
 .hero-desk-kicker {
   font-family: var(--font-mono); font-size: 0.64rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted);
@@ -426,11 +448,10 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   border: 1px solid rgba(255,176,32,0.22);
 }
 
-/* Tab row anchored to hero bottom */
+/* Tab row inside the copy column */
 .hero-tabs {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 14px 20px;
-  padding-top: 22px; margin-bottom: 40px;
-  border-top: 1px solid var(--glass-border);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px 18px;
+  padding-top: 0; margin-bottom: 0; border-top: none;
 }
 .hero-tabs-label {
   font-family: var(--font-mono); font-size: 0.64rem; font-weight: 600;

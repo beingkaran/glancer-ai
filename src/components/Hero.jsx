@@ -121,78 +121,64 @@ export default function Hero({ activeTab, onTabChange }) {
 
               <p className="hero-lead">
                 Practitioner-grade comparisons, benchmarks and analysis of the AIOps &amp;
-                observability stack — plus a 2,200-term glossary and live industry news.
+                observability stack.
               </p>
               <p className="hero-byline">Written by an engineer, not a marketing team.</p>
 
-              <div
-                key={quickLinkSet}
-                className="hero-quicklinks hero-quicklinks--enter"
-                aria-label="Popular starting points"
-                aria-live="polite"
-              >
-                {QUICK_LINK_SETS[quickLinkSet].map((q) => (
-                  <button
-                    key={`${quickLinkSet}-${q.to}`}
-                    type="button"
-                    className={`hero-quicklink hero-quicklink--${q.tone}`}
-                    onClick={() => navigate(q.to)}
-                  >
-                    <span className="hero-quicklink-hint">{q.category}</span>
-                    <span className="hero-quicklink-label">{q.label}</span>
-                  </button>
+              <ul className="hero-stats" aria-label="What's inside">
+                {DESK_STATS.map((s) => (
+                  <li key={s.label}>
+                    <strong>{s.value}</strong>
+                    <span>{s.label}</span>
+                  </li>
                 ))}
+              </ul>
+
+              <div id="home-tabs" className="hero-tabs">
+                <p className="hero-tabs-label">Explore</p>
+                <div className="tab-switcher" role="tablist" aria-label="Content sections">
+                  {TABS.map(({ id, label, icon }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeTab === id}
+                      className={`tab-btn${activeTab === id ? ' active' : ''}`}
+                      onClick={() => handleTabChange(id)}
+                    >
+                      {icon}
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <aside className="hero-desk" aria-label="What you get here">
+            <aside className="hero-desk" aria-label="Start here">
               <div className="hero-desk-panel">
-                <p className="hero-desk-kicker">The intelligence desk</p>
-                <ul className="hero-desk-stats">
-                  {DESK_STATS.map((s) => (
-                    <li key={s.label}>
-                      <span className="hero-desk-value">{s.value}</span>
-                      <span className="hero-desk-stat-label">{s.label}</span>
-                    </li>
+                <p className="hero-desk-kicker">Start here</p>
+                <div
+                  key={quickLinkSet}
+                  className="hero-quicklinks hero-quicklinks--enter"
+                  aria-label="Popular starting points"
+                  aria-live="polite"
+                >
+                  {QUICK_LINK_SETS[quickLinkSet].map((q) => (
+                    <button
+                      key={`${quickLinkSet}-${q.to}`}
+                      type="button"
+                      className={`hero-quicklink hero-quicklink--${q.tone}`}
+                      onClick={() => navigate(q.to)}
+                    >
+                      <span className="hero-quicklink-hint">{q.category}</span>
+                      <span className="hero-quicklink-label">{q.label}</span>
+                    </button>
                   ))}
-                </ul>
-                <div className="hero-pillars" aria-hidden="true">
-                  <span>AIOps</span>
-                  <span>Observability</span>
-                  <span>SRE</span>
                 </div>
               </div>
             </aside>
           </div>
-
-          <div id="home-tabs" className="hero-tabs">
-            <p className="hero-tabs-label">Explore</p>
-            <div className="tab-switcher" role="tablist" aria-label="Content sections">
-              {TABS.map(({ id, label, icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === id}
-                  className={`tab-btn${activeTab === id ? ' active' : ''}`}
-                  onClick={() => handleTabChange(id)}
-                >
-                  {icon}
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
-
-      <div
-        className="hero-scroll-indicator"
-        style={{ opacity: Math.max(0, 1 - scrollY / 140) }}
-        aria-hidden="true"
-      >
-        <span>Scroll</span>
-        <div className="scroll-arrow" />
       </div>
     </section>
   );
