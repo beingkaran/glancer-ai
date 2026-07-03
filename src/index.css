@@ -1275,15 +1275,17 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   padding: 14px 0; border-top: 1px solid var(--glass-border);
 }
 .author-portrait {
-  object-fit: cover;
-  object-position: center 18%;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
   border-radius: 12px;
   border: 2px solid rgba(255,176,32,0.25);
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  background: #fff;
 }
-.author-portrait-sm { width: 48px; height: 58px; flex-shrink: 0; }
-.author-portrait-md { width: 72px; height: 88px; flex-shrink: 0; }
-.author-portrait-lg { width: 110px; height: 132px; border-width: 3px; border-color: rgba(44,201,224,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.author-portrait-sm { width: 52px; height: 52px; flex-shrink: 0; }
+.author-portrait-md { width: 80px; height: 80px; flex-shrink: 0; }
+.author-portrait-lg { width: 120px; height: 120px; border-width: 3px; border-color: rgba(44,201,224,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
 .blog-byline .author-portrait-sm { flex-shrink: 0; }
 .blog-byline-avatar {
   width: 48px; height: 48px; border-radius: 50%;

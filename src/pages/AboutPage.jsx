@@ -35,8 +35,8 @@ function ProfilePhoto() {
       <img
         src="/karan.jpg"
         alt="Karan Shah"
-        width={110}
-        height={110}
+        width={120}
+        height={120}
         decoding="async"
         fetchpriority="high"
         onError={() => setBroken(true)}

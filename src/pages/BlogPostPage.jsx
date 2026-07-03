@@ -172,8 +172,8 @@ export default function BlogPostPage() {
                   className="blog-byline-photo author-portrait author-portrait-sm"
                   src="/karan.jpg"
                   alt={PRIMARY_AUTHOR.name}
-                  width={48}
-                  height={48}
+                  width={52}
+                  height={52}
                   loading="eager"
                 />
               </picture>

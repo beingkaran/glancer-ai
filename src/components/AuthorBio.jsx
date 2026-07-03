@@ -33,8 +33,8 @@ export default function AuthorBio({ post }) {
           className="author-bio-photo author-portrait author-portrait-md"
           src="/karan.jpg"
           alt={PRIMARY_AUTHOR.name}
-          width={72}
-          height={72}
+          width={80}
+          height={80}
           loading="lazy"
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
