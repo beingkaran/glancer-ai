@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Hero from '../components/Hero';
-import GreetingBanner from '../components/GreetingBanner';
 import IntelligenceFeed from '../components/IntelligenceFeed';
 import SearchSection from '../components/SearchSection';
 import NewsFaq from '../components/NewsFaq';
@@ -51,7 +50,6 @@ export default function HomePage() {
   return (
     <>
       <Hero activeTab={activeTab} onTabChange={handleTabChange} />
-      <GreetingBanner />
       <IntelligenceFeed segment={segment} onSegment={handleSegment} />
       <div className="container"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />

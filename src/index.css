@@ -345,6 +345,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 /* Section labels */
 .section-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple); }
 .section-title-lg { font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.feed-sub { margin-top: 4px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; max-width: 64ch; }
 
 /* News header */
 .news-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
@@ -390,7 +391,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 .tag-purple, .tag-pink, .tag-orange { background: var(--amber-ink); color: var(--accent); border: 1px solid rgba(255,176,32,0.28); }
 .tag-cyan, .tag-blue { background: var(--cyan-ink); color: var(--cyan); border: 1px solid rgba(84,178,230,0.28); }
 .news-featured-title { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; line-height: 1.3; color: var(--text-primary); margin-bottom: 12px; }
-.news-featured-excerpt { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.news-featured-excerpt { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .news-meta { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; }
 .news-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
 
@@ -421,8 +422,8 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 }
 .news-card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; overflow: hidden; }
 .news-card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
-.news-card-title { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.news-card-excerpt { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; flex: 1; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px; }
+.news-card-title { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.news-card-excerpt { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 14px; }
 .news-card-footer { display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); }
 .read-more-link { font-size: 0.8rem; font-weight: 600; color: var(--purple); display: flex; align-items: center; gap: 4px; transition: var(--transition); }
 .read-more-link:hover { color: var(--cyan); }
@@ -1994,22 +1995,8 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .card-like-btn.active.like { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); color: #22c55e; }
 .card-like-btn.active.dislike { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.4); color: #ef4444; }
 
-/* ---- Hero: the intro banner collapses after 5s, revealing the feed -------- */
-.hero-intro {
-  overflow: hidden;
-  max-height: 520px;
-  opacity: 1;
-  transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, margin 0.8s ease, transform 0.8s ease;
-}
-.hero-collapsed { padding-top: calc(var(--navbar-h) + 28px); padding-bottom: 24px; transition: padding 0.8s ease; }
-.hero-collapsed .hero-intro {
-  max-height: 0; opacity: 0; transform: translateY(-12px);
-  margin: 0; pointer-events: none;
-}
-.hero-collapsed .hero-scroll-indicator { opacity: 0 !important; }
-@media (prefers-reduced-motion: reduce) {
-  .hero-intro { transition: none; }
-}
+/* ---- Hero intro (static — it fades with the parallax layer on scroll) ----- */
+.hero-intro { overflow: hidden; }
 
 /* ---- "More at glancerai.com" section link -------------------------------- */
 .section-site-link {
@@ -2561,22 +2548,82 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
    Unified Intelligence Feed — sticky segment control, in-feed analysis cards,
    infinite-scroll sentinel. News + Analysis in one seamless stream.
    ========================================================================== */
+/* Compact one-row sticky bar: never wraps, fully opaque so cards never show
+   through it while scrolling. Topic chips live behind the Topics dropdown. */
 .feed-segment-bar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
   position: sticky; top: calc(var(--navbar-h) + 6px); z-index: 20;
-  margin-bottom: 24px; padding: 10px 0;
-  background: color-mix(in srgb, var(--bg-deep) 86%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 24px; padding: 9px 0;
+  background: var(--bg-deep);
   border-bottom: 1px solid var(--glass-border);
 }
-.feed-segment { display: flex; gap: 8px; flex-wrap: wrap; }
+.feed-segment {
+  display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;
+  flex: 0 1 auto; min-width: 0; overflow-x: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.feed-segment::-webkit-scrollbar { display: none; }
 .feed-segment-bar .read-later-toggle { margin-left: auto; flex-shrink: 0; }
 
-.feed-grid { margin-top: 4px; }
+/* Topics dropdown */
+.feed-topics-wrap { position: relative; flex-shrink: 0; }
+.feed-topics-btn { display: inline-flex; align-items: center; gap: 5px; }
+.feed-topics-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 30;
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 176px; max-height: 320px; overflow-y: auto; padding: 6px;
+  border: 1px solid var(--glass-border-strong); border-radius: var(--border-radius-sm);
+  background: var(--bg-deep); box-shadow: var(--shadow-card);
+}
+.feed-topics-item {
+  padding: 8px 12px; border: none; border-radius: 8px; background: none;
+  color: var(--text-secondary); font-size: 0.82rem; font-weight: 500;
+  text-align: left; cursor: pointer; transition: var(--transition); white-space: nowrap;
+}
+.feed-topics-item:hover { background: var(--surface-hover); color: var(--text-primary); }
+.feed-topics-item.active { background: rgba(255,176,32,0.15); color: var(--purple); }
 
-/* Analysis (long-form) card woven into the news grid — amber-accented so it
-   reads as distinct from live news without breaking the grid rhythm. */
+/* Lead row: featured story (2/3) + "Latest" headline list (1/3) */
+.feed-lead { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: stretch; margin-bottom: 24px; }
+.feed-lead .news-featured { margin-bottom: 0; }
+.latest-list {
+  display: flex; flex-direction: column; min-width: 0;
+  padding: 8px 18px 10px; border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius); background: var(--glass-bg);
+}
+.latest-list-head {
+  padding: 10px 0 8px; font-family: var(--font-mono); font-size: 0.68rem;
+  font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--purple);
+}
+.latest-item { display: block; flex: 1 1 auto; padding: 11px 0; border-top: 1px solid var(--glass-border); text-decoration: none; min-width: 0; }
+.latest-item-title {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-family: var(--font-heading); font-size: 0.88rem; font-weight: 600;
+  line-height: 1.4; color: var(--text-primary); transition: var(--transition);
+}
+.latest-item:hover .latest-item-title { color: var(--purple); }
+.latest-item-meta { display: block; margin-top: 4px; font-size: 0.72rem; color: var(--text-muted); }
+@media (max-width: 1024px) {
+  .feed-lead { grid-template-columns: 1fr; }
+}
+
+/* dense: full-width bands (Deep Dive, events) can leave a one-cell hole in the
+   row above them — let the next card backfill it instead. */
+.feed-grid { margin-top: 4px; grid-auto-flow: dense; }
+
+/* Events teaser woven into the grid as a full-width band */
+.feed-inline-teaser { grid-column: 1 / -1; }
+.feed-inline-teaser .events-teaser { margin: 0; }
+
+/* Analysis (long-form) card woven into the news grid — a full-width horizontal
+   band, amber-accented so it reads as an editorial break in the news stream. */
 .blog-in-feed { border-color: color-mix(in srgb, var(--accent) 32%, var(--glass-border)); }
+.feed-grid .blog-in-feed { grid-column: 1 / -1; display: grid; grid-template-columns: 280px 1fr; }
+.feed-grid .blog-in-feed .news-card-thumb { height: 100%; min-height: 172px; }
+@media (max-width: 768px) {
+  .feed-grid .blog-in-feed { grid-template-columns: 1fr; }
+  .feed-grid .blog-in-feed .news-card-thumb { height: 140px; min-height: 0; }
+}
 .blog-in-feed .news-card-thumb { position: relative; overflow: hidden; }
 .blog-in-feed-banner { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 .deep-dive-ribbon {
@@ -2598,8 +2645,22 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .events-teaser-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
 .events-teaser-all { font-size: 0.8rem; font-weight: 600; color: var(--cyan); white-space: nowrap; text-decoration: none; }
 .events-teaser-all:hover { color: var(--accent); }
-.events-teaser-scroll { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
-.events-teaser-card { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--glass-border); border-left: 3px solid var(--ev-c, var(--glass-border-strong)); border-radius: var(--border-radius-sm); background: var(--surface); transition: var(--transition); text-decoration: none; }
+/* Auto-scrolling marquee: the track holds the card list twice and drifts left
+   by exactly half its width, so the loop is seamless. Cards use margin-right
+   (not gap) so the half-width offset stays exact. Hover/focus pauses it. */
+.events-teaser-marquee { overflow: hidden; padding-bottom: 4px; }
+.events-teaser-track {
+  display: flex; width: max-content;
+  animation: eventsMarquee var(--marquee-dur, 48s) linear infinite;
+}
+.events-teaser-marquee:hover .events-teaser-track,
+.events-teaser-marquee:focus-within .events-teaser-track { animation-play-state: paused; }
+@keyframes eventsMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .events-teaser-track { animation: none; }
+  .events-teaser-marquee { overflow-x: auto; scrollbar-width: thin; }
+}
+.events-teaser-card { flex: 0 0 auto; width: 268px; margin-right: 12px; display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--glass-border); border-left: 3px solid var(--ev-c, var(--glass-border-strong)); border-radius: var(--border-radius-sm); background: var(--surface); transition: var(--transition); text-decoration: none; }
 .events-teaser-card:hover { border-color: var(--glass-border-strong); border-left-color: var(--ev-c, var(--accent)); background: var(--surface-hover); transform: translateY(-2px); }
 .events-teaser-date { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 46px; padding: 6px; border-radius: var(--border-radius-sm); background: var(--accent-soft); }
 .events-teaser-mon { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
@@ -2670,6 +2731,4 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   .event-row { grid-template-columns: 58px 1fr; row-gap: 12px; }
   .event-actions { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: flex-start; }
   .subscribe-bar { flex-direction: column; align-items: flex-start; }
-  .feed-segment { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
-  .feed-segment::-webkit-scrollbar { display: none; }
 }

@@ -16,7 +16,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Claude <strong>Fable 5</strong> and <strong>Mythos 5</strong> were pulled offline globally on <strong>June 12</strong> after a jailbreak, and did not return until <strong>July 1</strong>. That is a 19 day gap, and plenty of teams felt every day of it.</li>
     <li>The models came back with a <strong>new cybersecurity classifier</strong> sitting in front of them, which tells you the shutdown was a safety response and not a billing hiccup.</li>
@@ -50,7 +50,7 @@ export const BLOG_POSTS = [
 <p>This is where the incident stops being a news story and becomes a checklist. If you own risk for an org that leans on a frontier model, the blackout handed you a free lesson. Spend it. The old SLA language about uptime percentages does not cover the failure mode you just watched, because this was not an outage in the traditional sense. It was a deliberate, safety motivated withdrawal, and your paper needs to speak to that.</p>
 
 <div class="callout">
-  <div class="callout-title">🛡️ Five things to put in the contract before the next incident</div>
+  <div class="callout-title">Five things to put in the contract before the next incident</div>
   <strong>(1) Withdrawal notice.</strong> A committed heads up window for planned or safety driven model retirements, separate from unplanned downtime. <strong>(2) Capability continuity.</strong> A named fallback model tier the vendor guarantees stays available if the flagship is pulled. <strong>(3) Version pinning.</strong> The right to stay on a known good version for a defined period rather than being force migrated. <strong>(4) Data and eval portability.</strong> Contractual support for exporting your fine tunes, prompts, and eval sets so a switch is not a rebuild. <strong>(5) Incident transparency.</strong> A post incident report obligation with a real timeline, not a status page emoji.
 </div>
 
@@ -82,7 +82,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Three frontier launches, three completely different access regimes: <strong>GPT-5.6 Sol</strong> is government gated to roughly <strong>20 orgs</strong>, <strong>Fable 5</strong> just returned from a government ordered blackout, and <strong>Grok 4.5</strong> is invite only private beta.</li>
     <li>The obvious story is "these models are hard to get." The non obvious one is that access itself is bifurcating into a <strong>public tier</strong> anyone can buy and a <strong>sovereign tier</strong> that governments and a handful of insiders control.</li>
@@ -116,7 +116,7 @@ export const BLOG_POSTS = [
 <p>You probably build in the public tier, and that is fine. The thing to internalize is that the gap between what you can access and what the frontier can do is going to widen, not close, at the very top end. Plan for it.</p>
 
 <div class="callout">
-  <div class="callout-title">🧭 How to build when the frontier is gated</div>
+  <div class="callout-title">How to build when the frontier is gated</div>
   <strong>(1) Design for the public tier on purpose.</strong> Assume you will never get the sovereign model. Build your product so a strong, buyable model is enough. <strong>(2) Track the valve, not the leaderboard.</strong> Watch which capabilities move from sovereign to public tier and when, because that timing is your real roadmap input. <strong>(3) Avoid single frontier dependence.</strong> If your differentiator needs one gated model, one policy change can end your product. Spread the bet. <strong>(4) Read access as signal.</strong> Who gets early access to a model tells you which markets the lab is prioritizing, same as it did with GPT-5.6 Sol.
 </div>
 
@@ -142,7 +142,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Anthropic quietly made <strong>Sonnet 5</strong> the default model on <strong>Free and Pro</strong> plans. Most users were upgraded without any announcement in their face, and never noticed the swap.</li>
     <li>Pricing sits at <strong>$2 per million input tokens</strong> as an introductory rate through <strong>August 31</strong>, per the trackers at pricepertoken.com and llm-stats.com.</li>
@@ -176,7 +176,7 @@ export const BLOG_POSTS = [
 <p>One thing to not sleep on: the $2 per million input rate is introductory, and the trackers flag it as running through August 31. Introductory pricing is a lever, and levers move. If you are budgeting a product or a heavy personal workflow around this cost, build in the assumption that the number could change after that date and check it before you scale spend. Great deal today, worth a calendar reminder for later.</p>
 
 <div class="callout">
-  <div class="callout-title">✅ Three things to do this week</div>
+  <div class="callout-title">Three things to do this week</div>
   <strong>(1) Confirm your default.</strong> Check that you are actually on Sonnet 5, then rerun a task that used to disappoint you and see if it lands now. <strong>(2) Feed it more context.</strong> With cheaper input tokens, stop trimming so aggressively and let the model see the real problem. <strong>(3) Note the date.</strong> Mark August 31 so the introductory price does not surprise your budget.
 </div>
 
@@ -200,7 +200,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>OpenAI is previewing <strong>GPT-5.6 Sol</strong> on Cerebras wafer-scale hardware at up to <strong>750 tokens/second</strong>, about 10 to 15 times the speed most of us see from a normal API call.</li>
     <li>Speed at this level is not a nice-to-have, it changes which products are even possible. Below a certain latency, an AI stops feeling like a form you submit and starts feeling like a conversation.</li>
@@ -239,7 +239,7 @@ export const BLOG_POSTS = [
 <p>So the useful exercise right now is a thought experiment. Assume the model answers effectively instantly. What changes about your product? For a support tool, maybe you stop showing a typing indicator and just stream a real conversation. For a copilot, maybe you move from "suggest on pause" to "suggest continuously." Teams that have done this thinking will ship faster the day the latency shows up in their tier. Teams that haven't will spend a quarter figuring out that their whole UX assumed a two second wait.</p>
 
 <div class="callout">
-  <div class="callout-title">🛠️ Three moves while you wait for access</div>
+  <div class="callout-title">Three moves while you wait for access</div>
   <strong>(1)</strong> Audit where latency, not intelligence, is your real bottleneck. Be honest, it is more places than you think. <strong>(2)</strong> Prototype the "instant response" version of your core flow even on today's slower models, so the UX is ready. <strong>(3)</strong> Watch the Cerebras and OpenAI announcements for when Sol-class speed moves from preview to general availability, because that is your starting gun.
 </div>
 
@@ -263,7 +263,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>GPT-5.6 and the incoming Gemini 3.5 Pro are pushing agentic coding from "autocomplete" into "writes and ships the whole change" — and most teams have no way to tag which commits came from a model.</li>
     <li>The real gap isn't code quality, it's <strong>attribution</strong>: when an incident hits, you need to know in seconds whether an AI-generated change was involved.</li>
@@ -298,7 +298,7 @@ export const BLOG_POSTS = [
 <p>Wait eighteen months, until Gemini 3.5 Pro and whatever OpenAI ships next have pushed that number past half your commits, and you're trying to bolt attribution onto a codebase where the majority of recent changes are already anonymous. Alot of teams are going to learn this the hard way. The cheapest moment to start tagging is always the moment before you desperately need the tags.</p>
 
 <div class="callout">
-  <div class="callout-title">🛠️ Three things to ship this sprint</div>
+  <div class="callout-title">Three things to ship this sprint</div>
   <strong>(1)</strong> Add a <code>Change-Author</code> commit trailer to every agent in your pipeline — coding assistants, CI bots, the lot. <strong>(2)</strong> Pipe that field into your deploy markers so it lands in your APM tool. <strong>(3)</strong> Build one dashboard: error rate and p99 latency, split by human vs model author. If AI changes ever start regressing, you'll see it the same day instead of arguing about it for a week.
 </div>
 
@@ -322,7 +322,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>New survey data lands hard: only <strong>4%</strong> of organizations have actually operationalized AIOps, versus <strong>49%</strong> stuck in pilots. The "self-healing" marketing is running way ahead of reality.</li>
     <li>The gap isn't a technology problem, it's a <em>trust-and-workflow</em> problem — pilots die when nobody redesigns the on-call process around the AI.</li>
@@ -364,7 +364,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">✅ The honest self-assessment</div>
+  <div class="callout-title">The honest self-assessment</div>
   If you checked all five, you're ready to push a pilot toward production — and you're already ahead of the 49%. If you checked two or fewer, buying a better tool won't help; the missing pieces are process and data, not algorithms. Spend the next month on the boring stuff. It's the actual moat between the demo and the deploy.
 </div>
 
@@ -388,7 +388,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>AWS DevOps Agent and Azure SRE Agent both went GA in March 2026 — the first cloud-native remediation agents you can actually turn on in production.</li>
     <li>They touch <em>different surfaces</em>: AWS leans into deploy + code context, Azure leans into telemetry + infra state. That difference decides which fits your team.</li>
@@ -426,7 +426,7 @@ export const BLOG_POSTS = [
 <p>Then there's Google, who didn't ship a hosted SRE agent at all — they shipped Managed Agents in the Gemini API, announced around I/O 2026. That's a different bet. Instead of "here's our opinionated remediation robot," it's "here's the runtime, build the remediation logic you want." For a single-cloud shop that's more work than value. But for a multi-cloud team that refuses to run two different vendor agents with two different guardrail models, a build-your-own layer that sits above both clouds suddenly looks pretty attractive. Augment Code and a few others are already exploring exactly this pattern.</p>
 
 <div class="callout">
-  <div class="callout-title">🧭 How to choose</div>
+  <div class="callout-title">How to choose</div>
   <strong>Mostly on AWS, outages usually trace to deploys?</strong> AWS DevOps Agent, guardrails set to rollback-only auto-execute at first. <strong>Mostly on Azure, incidents are infra/health drift?</strong> Azure SRE Agent, with tight blast-radius caps. <strong>Multi-cloud and opinionated about consistency?</strong> Look hard at Google's Managed Agents as the layer that unifies both. And whichever you pick — start in suggest-only mode. Earn the autonomy.
 </div>
 
@@ -450,7 +450,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Gemini 3.5 Flash — now Google's default — clocks in around <strong>4x faster</strong> than 3.1 Pro at a fraction of the per-token cost.</li>
     <li>When the model stops being the slow part, your telemetry pipeline quietly becomes the new bottleneck.</li>
@@ -486,7 +486,7 @@ export const BLOG_POSTS = [
 <p>Treat tokens-per-request the way you treat p99 latency: a first-class signal with an alert attached. A sudden jump in average tokens per session is frequently the earliest sign that an agent is misbehaving, long before it shows up as a user complaint. I've now seen "tokens per request" catch a runaway loop a full fifteen minutes before the error rate budged.</p>
 
 <div class="callout">
-  <div class="callout-title">🛠️ What to instrument this quarter</div>
+  <div class="callout-title">What to instrument this quarter</div>
   Add three things if you don't have them: (1) <strong>per-request token counts</strong> as a metric, not just a log field, so you can alert on them; (2) <strong>tail-based sampling</strong> keyed on errors, latency, and "the agent changed its plan"; and (3) a <strong>latency budget</strong> for your own observability overhead — if exporting a span costs 40ms on a 350ms request, that's worth fixing.
 </div>
 
@@ -510,7 +510,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>The 2026 pitch has shifted from "we cut your alert noise" to "we close the incident for you" — detect, act, and verify, autonomously.</li>
     <li>Real autonomy needs a <strong>causal model</strong> of your system, not just correlation. Acting on correlation is how you make outages worse.</li>
@@ -550,7 +550,7 @@ export const BLOG_POSTS = [
 <p>That's not a criticism. A system that auto-heals the safe 70% of incidents and hands you a clean, root-caused, one-click suggestion for the scary 30% is a fantastic outcome. The mistake is buying the slide and discovering the limits during your first 3 a.m. page.</p>
 
 <div class="callout">
-  <div class="callout-title">✅ The five-minute vendor screen</div>
+  <div class="callout-title">The five-minute vendor screen</div>
   Before you believe "autonomous," get straight answers to five things: <strong>(1)</strong> Where is the causal/dependency model? <strong>(2)</strong> Which action tiers will it auto-execute? <strong>(3)</strong> Can every auto-action roll back cleanly? <strong>(4)</strong> How does it verify recovery against the original signal? <strong>(5)</strong> How many tries before it escalates to a human? Vague answers to any of these mean you're buying a suggestion engine — which is fine, if that's what you wanted.
 </div>
     `
@@ -571,7 +571,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Every agent you add is a little non-deterministic black box — same input, different path, and your existing monitoring can't see why.</li>
     <li>Traditional instrumentation captures the <em>API call</em>. With agents you also have to capture the <em>decision</em>: what it chose, why, and what it considered.</li>
@@ -608,7 +608,7 @@ export const BLOG_POSTS = [
 <p>Why that matters practically: if you instrument your agents with OTel GenAI conventions, you stay portable. You can send the same telemetry to whichever backend you like, switch vendors without re-instrumenting, and benefit from a shared vocabulary as the ecosystem standardises. Rolling your own agent telemetry format in 2026 is choosing to maintain a dialect nobody else speaks.</p>
 
 <div class="callout">
-  <div class="callout-title">🚀 Where to start this week</div>
+  <div class="callout-title">Where to start this week</div>
   Pick your highest-traffic agent. Add OTel GenAI spans around (1) each model call with token counts, (2) each tool invocation, and (3) the planning step — log the plan as a span attribute. Then deliberately break it in staging: feed it an input you know is ambiguous and confirm you can reconstruct, from telemetry alone, exactly why it chose what it chose. If you can't, you've found your blind spot before production did.
 </div>
 
@@ -632,7 +632,7 @@ export const BLOG_POSTS = [
     featured: true,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Monitoring detects known failures; observability helps you understand <em>unknown</em> ones.</li>
     <li>Observability rests on three telemetry pillars: metrics, logs, and distributed traces.</li>
@@ -667,7 +667,7 @@ export const BLOG_POSTS = [
 <p>The honest answer: you need both. Monitoring provides the initial signal — the page that wakes you at 2 a.m. Observability provides the investigative depth to understand root causes quickly. Think of monitoring as your smoke detector and observability as the fire investigation that follows.</p>
 
 <div class="callout">
-  <div class="callout-title">💡 Practical Starting Point</div>
+  <div class="callout-title">Practical Starting Point</div>
   Start with good metrics and alerting (monitoring). Add structured logging next. Implement distributed tracing as your system grows past three or four services. Don't try to boil the ocean — incremental observability still beats zero observability.
 </div>
 
@@ -692,7 +692,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Google's SRE book defines four signals that cover the health of almost any service.</li>
     <li>Latency must be measured at percentiles (p50, p95, p99) — averages hide tail latency.</li>
@@ -740,7 +740,7 @@ export const BLOG_POSTS = [
 </ol>
 
 <div class="callout">
-  <div class="callout-title">🛠️ Implementation Tip</div>
+  <div class="callout-title">Implementation Tip</div>
   Use the four golden signals as your SLI candidates. Pick latency and error rate thresholds that represent "good enough for users" as your SLOs. Traffic drives your capacity model. Saturation drives your scaling triggers.
 </div>
     `
@@ -761,7 +761,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>A trace is a complete record of one request's journey across all services.</li>
     <li>Traces are built from spans — individual units of work with start time, duration, and attributes.</li>
@@ -810,7 +810,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">🚀 Getting Started</div>
+  <div class="callout-title">Getting Started</div>
   Start with auto-instrumentation for your HTTP and database layers. You'll immediately get traces without changing application code. Add manual spans for your critical business operations. Route everything through an OTel Collector so you can switch backends without re-instrumenting.
 </div>
 
@@ -840,7 +840,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>AIOps applies ML/AI techniques to IT operations data to automate correlation, anomaly detection, and root cause analysis.</li>
     <li>Alert noise reduction is the most immediate and measurable benefit — teams typically see 70–95% fewer actionable alerts.</li>
@@ -882,7 +882,7 @@ export const BLOG_POSTS = [
 <p>AIOps noise reduction typically achieves 70–95% reduction in actionable alert volume. The remaining alerts are higher quality and better contextualized, making on-call rotations more sustainable and mean time to resolution shorter.</p>
 
 <div class="callout">
-  <div class="callout-title">🎯 Evaluating AIOps Tools</div>
+  <div class="callout-title">Evaluating AIOps Tools</div>
   Ask vendors for their "noise reduction rate" on your actual data (not a demo environment). Request a proof-of-concept using 30 days of historical data. Measure precision (how often are the correlated incidents real?) and recall (how many real incidents are detected?) separately — a tool that never alerts has perfect recall but zero precision.
 </div>
     `
@@ -903,7 +903,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>SLI (what you measure) → SLO (what you target) → SLA (what you promise externally).</li>
     <li>Error budgets convert a reliability target into a budget for risk — enabling faster iteration when the system is healthy.</li>
@@ -968,7 +968,7 @@ export const BLOG_POSTS = [
 <p>An SLA is an explicit or implicit contract with users that typically includes consequences for failure — service credits, refunds, or contractual remedies. SLAs are typically set more conservatively than SLOs. If your internal SLO is 99.9%, you might offer an SLA of 99.5% — giving you a buffer to detect and remediate SLO breaches before they become SLA violations.</p>
 
 <div class="callout">
-  <div class="callout-title">⚠️ Common Mistakes to Avoid</div>
+  <div class="callout-title">Common Mistakes to Avoid</div>
   <strong>Too many SLOs:</strong> Pick 2–3 SLIs per service that best represent the user experience. More than five and they become noise. <br/><br/>
   <strong>SLO set at current reliability:</strong> If you're already hitting 99.99% by accident, setting the SLO there locks you in and kills your error budget permanently. Set aspirational but realistic targets. <br/><br/>
   <strong>No error budget policy:</strong> Document in advance what happens when the budget is 50%, 25%, and 0% burned. Otherwise every conversation about burning budget is a negotiation from scratch.
@@ -994,7 +994,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Datadog has expanded from metrics-only into a 20+ product platform covering the full observability stack.</li>
     <li>Watchdog, Datadog's AI engine, automatically surfaces anomalies without manual threshold configuration.</li>
@@ -1038,7 +1038,7 @@ export const BLOG_POSTS = [
 <p>At small scale this is very manageable. At scale — hundreds of hosts, high-cardinality tracing, verbose logging — costs can escalate rapidly. The key levers are: Metrics Without Limits™ (store all, index only queried metrics), log archive + rehydration patterns, and APM span ingestion control via head-based sampling rules.</p>
 
 <div class="callout">
-  <div class="callout-title">🛠️ Getting Started Recommendation</div>
+  <div class="callout-title">Getting Started Recommendation</div>
   Start with Infrastructure + APM for your three most critical services. Get correlation working before expanding surface area. Enable Watchdog from day one — it's free overhead that immediately pays dividends during incidents.
 </div>
     `
@@ -1061,7 +1061,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>New Relic has publicly committed to OpenTelemetry as its primary instrumentation strategy — proprietary agents are still supported but OTel is the recommended path.</li>
     <li>NRDB (New Relic Database) underpins everything — a petabyte-scale telemetry database built for high-cardinality queries.</li>
@@ -1112,7 +1112,7 @@ export const BLOG_POSTS = [
 </table>
 
 <div class="callout">
-  <div class="callout-title">🚀 Migration Tip</div>
+  <div class="callout-title">Migration Tip</div>
   If you're currently on a proprietary APM and evaluating New Relic, instrument one service with OTel and point it at both your current backend and New Relic's OTLP endpoint simultaneously. Run them in parallel for two weeks — zero migration risk, genuine data to compare.
 </div>
     `
@@ -1135,7 +1135,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>AppDynamics models your application around Business Transactions — end-to-end flows mapped to real user actions, not just technical service calls.</li>
     <li>Business iQ (formerly Business Performance Monitoring) correlates application performance data with business KPIs like revenue, conversions, and customer satisfaction.</li>
@@ -1181,7 +1181,7 @@ export const BLOG_POSTS = [
 <p>For large enterprises already invested in Cisco's infrastructure, FSO offers a genuinely unified view from the network layer up through the application layer. For organizations without Cisco infrastructure, the APM product stands alone effectively.</p>
 
 <div class="callout">
-  <div class="callout-title">💡 Best Fit Assessment</div>
+  <div class="callout-title">Best Fit Assessment</div>
   AppDynamics shines in enterprises with complex Java or .NET monoliths/SOA where Business Transaction modeling provides immediate clarity. If your architecture is primarily microservices on Kubernetes and your team is OTel-native, tools like Datadog or New Relic may offer a smoother path. The two are not mutually exclusive — many enterprises run AppDynamics for legacy apps and a complementary tool for cloud-native services.
 </div>
     `
@@ -1203,7 +1203,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Datadog leads on breadth and UI polish — best for teams wanting a single pane of glass without integration work.</li>
     <li>New Relic leads on OTel-native workflows and pricing transparency — best for teams already investing in open standards.</li>
@@ -1253,7 +1253,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">⚡ Proof-of-Concept Checklist</div>
+  <div class="callout-title">Proof-of-Concept Checklist</div>
   Before signing any contract: (1) instrument your three most critical services; (2) run a tabletop incident simulation using only the candidate tool; (3) test your most frequent ad-hoc query patterns; (4) calculate projected cost at 2× your current data volume. Do this with each finalist — the winner on paper often loses in practice.
 </div>
     `
@@ -1276,7 +1276,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>CA APM, rebranded as Broadcom DX APM after the 2018 acquisition, has a 25+ year history in enterprise Java and .NET monitoring.</li>
     <li>The Introscope agent remains one of the deepest bytecode instrumentation engines in the market — unmatched for complex JEE application profiling.</li>
@@ -1322,7 +1322,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">🎯 Strategic Recommendation</div>
+  <div class="callout-title">Strategic Recommendation</div>
   If DX APM is working for your legacy Java/mainframe applications in an on-prem environment with no near-term cloud migration, staying put may be entirely reasonable. If you have new cloud-native workloads being built in parallel, instrument those with a modern OTel-native platform from day one and run hybrid until the legacy migration is complete. Avoid extending DX APM coverage to new cloud-native services.
 </div>
     `
@@ -1345,7 +1345,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Datadog wins on UI polish, breadth of integrations, and AI-driven alerting — but costs more at scale.</li>
     <li>New Relic wins on OTel-native workflows, pricing predictability, and the 100 GB free tier.</li>
@@ -1418,7 +1418,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">⚡ Decision Framework</div>
+  <div class="callout-title">Decision Framework</div>
   Run a 2-week parallel proof-of-concept. Instrument your three most critical services with OTel and point the OTLP exporter at both platforms simultaneously. Simulate your last three major incidents using only each tool. Calculate projected cost at 2× current scale. The winner in your environment may differ from industry analysts' rankings.
 </div>
     `
@@ -1440,7 +1440,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Datadog excels in cloud-native, containerised, polyglot environments — faster setup, broader coverage.</li>
     <li>AppDynamics excels in large enterprise Java/.NET applications where Business Transaction modelling provides unique business context.</li>
@@ -1494,7 +1494,7 @@ export const BLOG_POSTS = [
 </table>
 
 <div class="callout">
-  <div class="callout-title">🎯 Decision Matrix</div>
+  <div class="callout-title">Decision Matrix</div>
   <strong>Choose Datadog if:</strong> You're primarily cloud-native, need fast setup, value breadth over depth, or have polyglot microservices.<br/><br/>
   <strong>Choose AppDynamics if:</strong> You run complex Java/.NET enterprise applications, need business transaction context, are already in the Cisco ecosystem, or require network-to-application correlation.
 </div>
@@ -1517,7 +1517,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>New Relic is purpose-built for MELT (Metrics, Events, Logs, Traces) with a unified query model via NRQL — ideal for developer-centric observability.</li>
     <li>Splunk leads on log analytics power, SIEM integration, and compliance-grade data retention — ideal for security-observability convergence.</li>
@@ -1572,7 +1572,7 @@ export const BLOG_POSTS = [
 </table>
 
 <div class="callout">
-  <div class="callout-title">🎯 Choose New Relic if…</div>
+  <div class="callout-title">Choose New Relic if…</div>
   Your primary use case is application observability, your team is developer-centric, you want OTel portability, or cost efficiency matters more than log analytics depth.<br/><br/>
   <strong>Choose Splunk if…</strong> Log analytics is central to your workflow, you need SIEM + observability from one platform, compliance mandates multi-year log retention, or you're a security-operations team that also wants APM.
 </div>
@@ -1595,7 +1595,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Both platforms have deep Java/.NET APM DNA — AppDynamics from its 2008 founding, Broadcom DX APM from the 1998 Wily Introscope lineage.</li>
     <li>AppDynamics is actively investing in cloud-native, Kubernetes, and Cisco FSO integration. Broadcom DX APM is in maintenance mode.</li>
@@ -1644,7 +1644,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">🏁 Bottom Line</div>
+  <div class="callout-title">Bottom Line</div>
   If you're evaluating today and have no legacy DX APM investment: choose AppDynamics. If you're already on DX APM: assess your architecture. On-prem mainframe/legacy Java with no cloud migration in sight? DX APM may serve you for years. Hybrid or cloud migration in progress? Start AppDynamics on new workloads now and migrate legacy when it makes operational sense.
 </div>
     `
@@ -1666,7 +1666,7 @@ export const BLOG_POSTS = [
     featured: false,
     body: `
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>No single platform wins every dimension — the right choice depends on your architecture, team, and budget.</li>
     <li>Datadog scores highest overall for cloud-native organisations who want breadth and speed.</li>
@@ -1716,19 +1716,19 @@ export const BLOG_POSTS = [
 
 <h2>Platform Summaries</h2>
 
-<h3>🐶 Datadog — Best Overall for Cloud-Native Teams</h3>
+<h3>Datadog — Best Overall for Cloud-Native Teams</h3>
 <p>Datadog is the safest default for organisations building on AWS, GCP, or Azure with containerised workloads. The breadth of integrations (750+), the quality of Watchdog AI alerting, the Kubernetes Explorer, and the polished unified UX make it the fastest path from "nothing" to "meaningfully observable." The price premium is real — budget carefully and enable Metrics Without Limits from day one.</p>
 
-<h3>🌐 New Relic — Best Value + OTel-Native</h3>
+<h3>New Relic — Best Value + OTel-Native</h3>
 <p>New Relic is the right choice for developer-first teams that care about portability, pricing predictability, and OTel standardisation. NRDB's query flexibility, Pixie for Kubernetes live debugging, Errors Inbox for developer workflows, and the 100 GB free tier make it the most accessible serious observability platform. The UI is slightly less polished than Datadog's, but the underlying data model is more powerful.</p>
 
-<h3>🔍 Splunk — Best for Security + Observability Convergence</h3>
+<h3>Splunk — Best for Security + Observability Convergence</h3>
 <p>Splunk wins when log analytics depth, SIEM integration, and compliance-grade data retention are requirements. If your security operations team and your observability team are the same people — or need to be — Splunk is the only platform that serves both credibly. The APM capabilities (Observability Cloud, ex-SignalFx) are strong, especially NoSample™ tracing. The price is higher than pure-observability alternatives.</p>
 
-<h3>💼 AppDynamics — Best Business Context for Enterprise Java</h3>
+<h3>AppDynamics — Best Business Context for Enterprise Java</h3>
 <p>AppDynamics is the right choice when "which code path is hurting revenue right now" is the question that matters most. Business Transaction monitoring, Business iQ, and the Cognition Engine provide a combination of technical depth and business context that no other platform matches for complex enterprise Java or .NET applications. Cisco's FSO integration adds network context. For cloud-native greenfield, start with Datadog or New Relic instead.</p>
 
-<h3>🏛️ Broadcom DX APM — Best for Stable On-Premises Legacy</h3>
+<h3>Broadcom DX APM — Best for Stable On-Premises Legacy</h3>
 <p>Broadcom DX APM (CA APM) is the right choice only in a narrow but real scenario: large on-premises Java installations with no imminent cloud migration, no Kubernetes in sight, and an existing investment in the CA/Broadcom toolchain. SmartStor's long-term retention, Introscope's deep JEE visibility, and mainframe monitoring capabilities are genuinely unmatched for that context. For anything else, choose a more actively invested alternative.</p>
 
 <h2>Decision Flowchart</h2>
@@ -1745,7 +1745,7 @@ export const BLOG_POSTS = [
 </div>
 
 <div class="callout">
-  <div class="callout-title">📋 Final Recommendation</div>
+  <div class="callout-title">Final Recommendation</div>
   Run a 30-day proof-of-concept before signing any contract. Instrument the same three critical services on each finalist platform, simulate your last three major incidents, test your most-used query patterns, and calculate projected cost at 2× current scale. The platform that performs best <em>in your environment</em> is the right answer — ignore the analyst rankings.
 </div>
     `
@@ -1770,7 +1770,7 @@ export const BLOG_POSTS = [
 <div style="display:inline-flex;align-items:center;gap:8px;background:#dcfce7;color:#166534;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🟢 LEVEL 1 OF 5 — BEGINNER</div>
 
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Traditional monitoring uses fixed rules; AI learns what "normal" looks like and flags deviations.</li>
     <li>Modern systems generate too much data for humans to read — AI filters the signal from the noise.</li>
@@ -1843,7 +1843,7 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">📚 Your Learning Path</div>
+  <div class="callout-title">Your Learning Path</div>
   You're at Level 1. Next up — <strong>Level 2: How Anomaly Detection Actually Works</strong>, where we go under the hood on the algorithms that power "intelligent alerting." No maths degree required.
 </div>
     `
@@ -1867,7 +1867,7 @@ export const BLOG_POSTS = [
 <div style="display:inline-flex;align-items:center;gap:8px;background:#ccfbf1;color:#0f766e;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🔵 LEVEL 2 OF 5 — BEGINNER+</div>
 
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Anomaly detection compares current values to a learned "normal" range — not a fixed threshold.</li>
     <li>The normal range shifts with time-of-day and day-of-week patterns automatically.</li>
@@ -1941,7 +1941,7 @@ export const BLOG_POSTS = [
 <p>The most sophisticated anomaly detection systems understand context — not just "is this metric high?" but "is this metric high given everything else that's happening?" A 5× increase in error rate is alarming. A 5× increase in error rate during a major product launch, while traffic is also 5× higher than normal? Probably expected. Good AI observability platforms factor in correlated signals before firing an alert.</p>
 
 <div class="callout">
-  <div class="callout-title">📚 Next: Level 3</div>
+  <div class="callout-title">Next: Level 3</div>
   Anomaly detection identifies <em>individual</em> issues. But in a distributed system, one root cause generates hundreds of alerts. <strong>Level 3 covers AIOps alert correlation</strong> — how AI groups those hundreds of alerts into a single, actionable incident.
 </div>
     `
@@ -1965,7 +1965,7 @@ export const BLOG_POSTS = [
 <div style="display:inline-flex;align-items:center;gap:8px;background:#ede9fe;color:#5b21b6;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🟡 LEVEL 3 OF 5 — INTERMEDIATE</div>
 
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>A single infrastructure failure in a distributed system typically generates 100–1,000+ cascading alerts.</li>
     <li>Alert correlation groups related alerts using temporal proximity, topology awareness, and historical patterns.</li>
@@ -2052,7 +2052,7 @@ export const BLOG_POSTS = [
 </table>
 
 <div class="callout">
-  <div class="callout-title">📚 Next: Level 4</div>
+  <div class="callout-title">Next: Level 4</div>
   Correlation reacts to what's already happening. <strong>Level 4 goes further: predicting failures before they occur</strong> using ML forecasting models for capacity and reliability.
 </div>
     `
@@ -2076,7 +2076,7 @@ export const BLOG_POSTS = [
 <div style="display:inline-flex;align-items:center;gap:8px;background:#fff7ed;color:#c2410c;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🟠 LEVEL 4 OF 5 — ADVANCED</div>
 
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>Predictive monitoring uses time-series ML models to forecast where a metric is heading, not just where it is.</li>
     <li>Capacity forecasting can predict disk-full, connection pool exhaustion, and memory leak failures hours or days in advance.</li>
@@ -2143,7 +2143,7 @@ export const BLOG_POSTS = [
 <p>Google's original SRE practices defined burn rate alerts (e.g., "alert if burning 14× the sustainable rate"), but these are still reactive — they fire when you're already burning fast. Predictive burn rate models go further: they extrapolate the current burn rate trend and alert you at the inflection point, before the rate becomes critical.</p>
 
 <div class="callout">
-  <div class="callout-title">🛠️ Implementing Predictive Monitoring</div>
+  <div class="callout-title">Implementing Predictive Monitoring</div>
   Start with disk and memory — both have well-behaved, mostly monotonic growth curves that even simple linear regression predicts accurately. Then add connection pool and thread pool forecasting. These four metrics alone prevent the majority of "we didn't see it coming" incidents.
 </div>
 
@@ -2156,8 +2156,8 @@ export const BLOG_POSTS = [
 </ul>
 
 <div class="callout">
-  <div class="callout-title">📚 Next: Level 5 — Expert</div>
-  The final level covers the cutting edge: <strong>eBPF-powered telemetry combined with Large Language Models</strong> for fully automated root cause narration and remediation suggestion. This is where observability is heading in 2026.
+  <div class="callout-title">Next: Level 5 — Expert</div>
+  The final level is where the newest work is happening: <strong>eBPF-powered telemetry combined with Large Language Models</strong> for fully automated root cause narration and remediation suggestion. This is where observability is heading in 2026.
 </div>
     `
   },
@@ -2180,7 +2180,7 @@ export const BLOG_POSTS = [
 <div style="display:inline-flex;align-items:center;gap:8px;background:#f3e8ff;color:#6b21a8;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🟣 LEVEL 5 OF 5 — EXPERT</div>
 
 <div class="key-takeaways">
-  <h3>🔑 Key Takeaways</h3>
+  <h3>Key takeaways</h3>
   <ul>
     <li>eBPF (extended Berkeley Packet Filter) allows safe kernel-level code execution — capturing telemetry with zero instrumentation overhead.</li>
     <li>LLMs applied to observability data can generate plain-English root cause narratives, runbook suggestions, and code-level hypotheses.</li>
@@ -2268,7 +2268,7 @@ export const BLOG_POSTS = [
 <p>Today, the most advanced teams are implementing human-in-the-loop versions: the AI diagnoses and proposes a fix, a human approves it in one click, and automation executes. The "fully autonomous" version — where the AI both diagnoses and remediates without approval — exists in narrow, well-understood contexts (auto-scaling, circuit breaker triggering) but is not yet appropriate for production application-layer remediations.</p>
 
 <div class="callout">
-  <div class="callout-title">🎓 Congratulations — You've Completed the Path!</div>
+  <div class="callout-title">Congratulations — You've Completed the Path!</div>
   You've gone from the basics of AI in observability (Level 1) to the frontier of eBPF + LLMs (Level 5). The practical next step: pick one tool from the table above and run a proof-of-concept on your most critical service. Start with Coroot — it's free, eBPF-native, and deploys in one Helm command. See what the AI shows you that your existing monitoring missed.
 </div>
     `

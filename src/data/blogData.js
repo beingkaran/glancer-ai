@@ -38,7 +38,7 @@ export const BLOG_POSTS = [
   {
     id: 'aiops-anomaly-detection',
     title: 'How AIOps Transforms Anomaly Detection in Large-Scale Systems',
-    subtitle: 'From static thresholds to ML-driven baselines — a deep dive into how modern AIOps platforms detect what traditional monitoring misses.',
+    subtitle: 'How modern AIOps platforms move from static thresholds to ML-driven baselines, and what that catches that traditional monitoring misses.',
     category: 'AIOps',
     emoji: '🤖',
     gradient: 'linear-gradient(135deg, #2d0a2e 0%, #831843 60%, #ec4899 100%)',

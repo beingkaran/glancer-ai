@@ -3,13 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { subscribeNewsletter } from '../lib/newsletter';
 
 /*
- * NewsletterPopup — appears once, ~60s after an UNSIGNED visitor lands, inviting
- * them to subscribe. Name + email are stored (plain text) in Supabase. Once a
- * visitor subscribes or dismisses, we never show it again (localStorage flag).
+ * NewsletterPopup — appears once, 20s after an UNSIGNED visitor lands, asking
+ * for their name + email. Stored (plain text) in Supabase. Once a visitor
+ * subscribes or dismisses, we never show it again (localStorage flag).
  */
 
 const STORAGE_KEY = 'glancer_newsletter_seen';
-const DELAY_MS = 60 * 1000; // 1 minute
+const DELAY_MS = 20 * 1000;
 
 const MailIcon = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -74,16 +74,15 @@ export default function NewsletterPopup() {
         {state === 'done' ? (
           <div className="nl-success">
             <div className="nl-icon" aria-hidden="true">✓</div>
-            <h3 className="nl-title">You&apos;re in! 🎉</h3>
-            <p className="nl-sub">Your first AI digest lands tomorrow. Thanks for joining Glancer AI.</p>
+            <h3 className="nl-title">You&apos;re in</h3>
+            <p className="nl-sub">Your first digest lands tomorrow. Thanks for reading Glancer AI.</p>
           </div>
         ) : (
           <>
             <div className="nl-icon" aria-hidden="true"><MailIcon /></div>
-            <h3 className="nl-title">Be updated with AI News</h3>
+            <h3 className="nl-title">Get the daily AI brief</h3>
             <p className="nl-sub">
-              Enter your email — <strong>we will never spam you</strong>, only 1 email daily to catch up
-              with all things AI.
+              One short email a day with the stories that matter. No spam, unsubscribe whenever you like.
             </p>
 
             <form className="nl-form" onSubmit={submit}>
@@ -95,6 +94,7 @@ export default function NewsletterPopup() {
                 onChange={(e) => setName(e.target.value)}
                 aria-label="Your name"
                 autoComplete="name"
+                required
               />
               <input
                 className="nl-input"

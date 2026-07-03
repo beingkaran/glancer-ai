@@ -19,18 +19,7 @@ export default function Hero({ activeTab, onTabChange }) {
   const heroRef = useRef(null);
   const contentRef = useRef(null);
   const [scrollY, setScrollY] = useState(0);
-  // After 5s the big intro banner (badge + headline + sub) collapses away so the
-  // news feed comes into view; the tab switcher stays put. Skipped if the reader
-  // has already scrolled down into the content themselves.
-  const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      if (window.scrollY < 80) setCollapsed(true);
-    }, 5000);
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -57,14 +46,14 @@ export default function Hero({ activeTab, onTabChange }) {
   }
 
   return (
-    <section className={`hero${collapsed ? ' hero-collapsed' : ''}`} ref={heroRef} id="hero">
+    <section className="hero" ref={heroRef} id="hero">
       <div
         className="hero-parallax-layer"
         style={{ transform: `translateY(${parallaxY}px)`, opacity, scale }}
         ref={contentRef}
       >
         <div className="container">
-          <div className="hero-intro" aria-hidden={collapsed}>
+          <div className="hero-intro">
             <div className="hero-badge">
               <span className="hero-badge-dot" aria-hidden="true" />
               AIOps · Observability · SRE

@@ -88,7 +88,7 @@ export default function AboutPage() {
             Founder &amp; Creator of Glancer AI
           </p>
           <p style={{ color: 'var(--text-secondary)', lineHeight: 1.75, maxWidth: 560, margin: '0 auto 28px', fontSize: '0.95rem' }}>
-            Karan is a technology enthusiast and builder passionate about making the complex world of AI, AIOps, and observability accessible to everyone. He created Glancer AI as a free, independent resource for engineers, SREs, and learners who need clear, up-to-date information without the noise.
+            Karan is an engineer who got tired of vendor blogs explaining observability badly, so he built this site. Glancer AI is a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
