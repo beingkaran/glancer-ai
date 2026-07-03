@@ -1,6 +1,190 @@
 /* Glancer AI — Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'claude-fable-5-19-day-blackout-enterprise-risk-playbook',
+    bannerImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=80',
+    title: 'The 19-Day AI Blackout That Rewrote the Enterprise Risk Playbook',
+    subtitle: 'Claude Fable 5 and Mythos 5 went dark worldwide on June 12 after a jailbreak, and came back on July 1 with a new cybersecurity classifier. The story worth reading is not that the model returned. It is what those 19 days exposed about how fragile enterprise AI really is.',
+    category: 'Enterprise AI',
+    icon: '🔒',
+    bgGradient: 'linear-gradient(135deg, #1a0505 0%, #7f1d1d 55%, #f87171 100%)',
+    author: 'Karan Shah',
+    avatar: '✍️',
+    date: '2026-07-03',
+    readTime: 9,
+    tags: ['Claude Fable 5', 'Mythos 5', 'enterprise AI', 'CISO', 'SLA', 'vendor lock-in', 'AI risk'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>Claude <strong>Fable 5</strong> and <strong>Mythos 5</strong> were pulled offline globally on <strong>June 12</strong> after a jailbreak, and did not return until <strong>July 1</strong>. That is a 19 day gap, and plenty of teams felt every day of it.</li>
+    <li>The models came back with a <strong>new cybersecurity classifier</strong> sitting in front of them, which tells you the shutdown was a safety response and not a billing hiccup.</li>
+    <li>The real lesson is not "the model is back." Its what the blackout revealed about how fragile enterprise AI dependencies actually are.</li>
+    <li>CISOs should treat this like a live fire drill and rewrite the vendor SLA before the next outage, not after.</li>
+  </ul>
+</div>
+
+<h2>Nineteen days is a very long time to be down</h2>
+<p>Most cloud incidents you read about are measured in minutes. A region blips, a load balancer misbehaves, the status page turns yellow for an hour and then everyone moves on. This was not that. A frontier model family going dark for nearly three weeks is the kind of event that reprices how a whole industry thinks about dependency.</p>
+<p>The reporting from VentureBeat and the follow-ups on MarkTechPost line up on the basic timeline. On June 12 a jailbreak against Fable 5 and Mythos 5 pushed the vendor to pull both models globally. Not throttle them, not degrade them. Pull them. They stayed unavailable until July 1, when they returned with a cybersecurity classifier layered in front to catch the class of prompt that caused the trouble in the first place.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1280&q=80" alt="Lines of code glowing on a dark screen" loading="lazy" /><figcaption>A single jailbreak class was enough to take two frontier models offline worldwide. The blast radius of one prompt is bigger than most risk registers assume.</figcaption></figure>
+
+<h2>What actually happened, minus the drama</h2>
+<p>Strip out the hot takes and the shape of the incident is simple. Someone found a reliable way to make the model do something it was not supposed to do. The vendor decided the safest move was full withdrawal while they built a mitigation. MarketScale framed the return as a maturity signal, and I think that read is fair. A company that ships a classifier and a public timeline is behaving more like a regulated utility than a startup crossing its fingers.</p>
+<p>Here is the uncomfortable part for anyone who built on top of those models. The decision to pull them was not yours to make. You did not get a vote, a heads up window, or a migration path. One morning the capability was there, and the next it was gone, and it stayed gone for 19 days.</p>
+<blockquote><strong>The reframe:</strong> availability of a frontier model is not a property of your architecture. It is a property of someone else's safety posture, and that posture can change overnight for reasons that have nothing to do with your uptime.</blockquote>
+
+<h2>The dependency nobody drew on the architecture diagram</h2>
+<p>Walk into most engineering orgs and ask for the system diagram. You will see load balancers, databases, queues, a cache, maybe a nice little icon for the model API off to the side. That little icon is doing a lot of quiet work. For a growing number of products it is not a feature, it is the product, and it is single sourced from one vendor.</p>
+<p>Databases get replicas. Payment providers get a fallback. Even DNS gets a secondary. The model, in most stacks, gets nothing. There is no warm standby, no second provider wired up behind a feature flag, no graceful degradation path that keeps the lights on when the primary disappears. The blackout made that gap visible in a way a slide deck never could.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="Close-up of circuitry on a server board" loading="lazy" /><figcaption>The new classifier that shipped with the return is a good fix. It also proves the point: the safety layer between you and the model is fully in the vendor's hands.</figcaption></figure>
+
+<h2>Vendor lock-in wears a friendly face</h2>
+<p>Lock-in rarely shows up as a contract clause. It shows up as a thousand small decisions that were reasonable at the time. You tuned your prompts to one model's quirks. Your eval suite is calibrated to its output. Your latency budgets assume its response curve. Each choice was fine on its own. Stacked together they mean that swapping providers under pressure is a multi week project, not a config change, and 19 days is not enough runway to do it cleanly.</p>
+<p>Teams that had a second model already wired up rode this out. They flipped a flag, ate a small quality hit, and kept serving customers. Teams that were single sourced spent the outage explaining to their own leadership why a core feature was dark and there was nothing to do but wait. Those are two very different Mondays.</p>
+
+<h2>What CISOs should demand in the next SLA</h2>
+<p>This is where the incident stops being a news story and becomes a checklist. If you own risk for an org that leans on a frontier model, the blackout handed you a free lesson. Spend it. The old SLA language about uptime percentages does not cover the failure mode you just watched, because this was not an outage in the traditional sense. It was a deliberate, safety motivated withdrawal, and your paper needs to speak to that.</p>
+
+<div class="callout">
+  <div class="callout-title">🛡️ Five things to put in the contract before the next incident</div>
+  <strong>(1) Withdrawal notice.</strong> A committed heads up window for planned or safety driven model retirements, separate from unplanned downtime. <strong>(2) Capability continuity.</strong> A named fallback model tier the vendor guarantees stays available if the flagship is pulled. <strong>(3) Version pinning.</strong> The right to stay on a known good version for a defined period rather than being force migrated. <strong>(4) Data and eval portability.</strong> Contractual support for exporting your fine tunes, prompts, and eval sets so a switch is not a rebuild. <strong>(5) Incident transparency.</strong> A post incident report obligation with a real timeline, not a status page emoji.
+</div>
+
+<p>None of that removes the risk. What it does is move the risk from "silent and total" to "known and bounded," which is the whole job. A CISO cannot promise a model never disappears. A CISO can absolutely promise that if it does, there is a written plan, a fallback, and a phone number that gets answered.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80" alt="A developer working across several screens" loading="lazy" /><figcaption>The teams that survived the blackout were not smarter. They just had a second model wired behind a flag before they needed it.</figcaption></figure>
+
+<h2>The one exercise to run this week</h2>
+<p>Forget the contract for a second and do something operational. Pick your most model dependent user flow and ask a blunt question. If the primary model vanished right now, for 19 days, what happens? Walk it all the way through. Who notices, what breaks, what is the fallback, how long to stand it up, what do you tell customers on day one and day ten.</p>
+<p>If the honest answer is "we wait and hope," you have found your top risk item, and you found it in a tabletop exercise instead of in production. That is the good outcome. The blackout already ran the experiment for you. All you have to do is read the results and act like they will happen again, because they probably will.</p>
+
+<h2>The takeaway</h2>
+<p>Fable 5 and Mythos 5 coming back is the boring half of this story. The interesting half is that a jailbreak, a vendor decision, and 19 days of silence just gave every enterprise a preview of a failure mode most of them never planned for. The classifier fixes the specific hole. It does nothing for the structural fact that your most important capability might be single sourced from a vendor who can, and will, turn it off to keep everyone safe. Rewrite the SLA. Wire up the fallback. Do it while the memory is fresh, because the next blackout will not send a calendar invite.</p>
+    `
+  },
+  {
+    id: 'frontier-ai-public-tier-sovereign-tier-access-bifurcation',
+    bannerImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80',
+    title: 'Who Actually Gets to Use the Most Powerful AI Models Now?',
+    subtitle: 'GPT-5.6 Sol is gated to around 20 organizations. Fable 5 just came back from a government-ordered blackout. Grok 4.5 is private beta only. Three frontier models, three different velvet ropes, and one quiet trend hiding underneath: frontier AI is splitting into a public tier and a sovereign tier.',
+    category: 'AI Industry',
+    icon: '🚪',
+    bgGradient: 'linear-gradient(135deg, #0a0a2e 0%, #4338ca 55%, #a78bfa 100%)',
+    author: 'Karan Shah',
+    avatar: '✍️',
+    date: '2026-07-03',
+    readTime: 8,
+    tags: ['GPT-5.6 Sol', 'Fable 5', 'Grok 4.5', 'frontier AI', 'AI access', 'AI policy', 'sovereign AI'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>Three frontier launches, three completely different access regimes: <strong>GPT-5.6 Sol</strong> is government gated to roughly <strong>20 orgs</strong>, <strong>Fable 5</strong> just returned from a government ordered blackout, and <strong>Grok 4.5</strong> is invite only private beta.</li>
+    <li>The obvious story is "these models are hard to get." The non obvious one is that access itself is bifurcating into a <strong>public tier</strong> anyone can buy and a <strong>sovereign tier</strong> that governments and a handful of insiders control.</li>
+    <li>Which tier a model lives in now shapes who can build on it, what it is allowed to do, and how fast it reaches the rest of us.</li>
+    <li>If your roadmap assumes frontier capability keeps flowing freely to whoever pays, its worth stress testing that assumption right now.</li>
+  </ul>
+</div>
+
+<h2>Three launches, three velvet ropes</h2>
+<p>Line the three up next to each other and the pattern jumps out. Reporting from TechCrunch and Forbes puts GPT-5.6 Sol in the hands of about 20 organizations, with access shaped by government involvement rather than a public waitlist. Fable 5, as we covered separately, spent 19 days offline under what looks like a government influenced safety hold before returning in July. Grok 4.5 is not publicly available at all, it is a private beta you get pulled into, not one you sign up for.</p>
+<p>Each rope looks different up close. Step back and they are the same rope. In all three cases the question of who gets the model is being answered by someone other than the open market. That is new, and it is a bigger deal than any single benchmark score.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=1280&q=80" alt="Abstract glowing blue AI visualization" loading="lazy" /><figcaption>Three of the most capable models in the world launched inside the same few weeks. None of them shipped as "sign up and start building."</figcaption></figure>
+
+<h2>The public tier you already live in</h2>
+<p>Most of us operate entirely in the public tier and never think about it. You want a strong model, you open a billing page, you get an API key, you ship. That tier is real and it is excellent. Sonnet class models, open weights you can self host, the workhorse APIs that power most production AI today. The floor of the public tier keeps rising, and for the vast majority of products it is more than enough.</p>
+<p>The public tier has a defining trait: nobody vets you. Your use case is your business. You are trusted to not do anything catastrophic, and the guardrails live inside the model, not inside an approval committee. That openness is exactly what made the last few years of AI product building possible.</p>
+
+<h2>The sovereign tier you will never log into</h2>
+<p>Above the public tier a different layer is forming, and it does not have a pricing page. Call it the sovereign tier. Access is granted, not purchased. The gatekeepers are governments, national security bodies, and the labs themselves acting on their guidance. GPT-5.6 Sol sitting with about 20 organizations is the clearest example. You cannot buy your way onto that list. Someone decides you belong there, or you do not exist to it.</p>
+<p>Fable 5 tells the other half of the story. A model can start in the public tier and get yanked toward the sovereign one when a government decides the risk profile calls for it. The 19 day blackout was, in effect, a public model spending three weeks under sovereign style control before being handed back. The line between the tiers is not a wall, its a valve, and the valve is not operated by customers.</p>
+<blockquote><strong>The reframe:</strong> we used to ask "how good is the best model." The sharper question in 2026 is "which tier is the best model in, and who holds the key." Capability and access have become separate axes.</blockquote>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1280&q=80" alt="Rows of servers glowing in a data center" loading="lazy" /><figcaption>Same silicon, same training recipes, radically different rules about who is allowed to run a query. The split is about governance, not hardware.</figcaption></figure>
+
+<h2>Why the split is happening now</h2>
+<p>The bifurcation is not a conspiracy, its a predictable response to capability crossing a line. When a model is genuinely useful for offensive cyber work, bio design, or large scale manipulation, "let anyone with a credit card use it" stops being a defensible default for the frontier edge. The Fable 5 jailbreak was a small preview of why. One clever prompt was enough to take two models offline worldwide.</p>
+<p>Governments noticed. Labs noticed. The result is a two speed system. The bulk of capability keeps flowing to the public tier, a little slower and a little more filtered than before. The bleeding edge, the stuff that is powerful enough to be dangerous, gets routed into the sovereign tier where a small set of trusted orgs run it under supervision. Grok 4.5 staying in private beta fits the same logic, even when the driver is commercial caution rather than a formal mandate.</p>
+
+<h2>What it means if you build on these models</h2>
+<p>You probably build in the public tier, and that is fine. The thing to internalize is that the gap between what you can access and what the frontier can do is going to widen, not close, at the very top end. Plan for it.</p>
+
+<div class="callout">
+  <div class="callout-title">🧭 How to build when the frontier is gated</div>
+  <strong>(1) Design for the public tier on purpose.</strong> Assume you will never get the sovereign model. Build your product so a strong, buyable model is enough. <strong>(2) Track the valve, not the leaderboard.</strong> Watch which capabilities move from sovereign to public tier and when, because that timing is your real roadmap input. <strong>(3) Avoid single frontier dependence.</strong> If your differentiator needs one gated model, one policy change can end your product. Spread the bet. <strong>(4) Read access as signal.</strong> Who gets early access to a model tells you which markets the lab is prioritizing, same as it did with GPT-5.6 Sol.
+</div>
+
+<p>There is a real upside hiding in here too. The public tier is getting genuinely powerful, and most valuable products do not need frontier of frontier capability. They need reliable, affordable, good enough models wired into a great user experience. That has never been more available. The sovereign tier is where the scary demos live. The public tier is where the businesses get built.</p>
+
+<h2>The takeaway</h2>
+<p>GPT-5.6 Sol, Fable 5, and Grok 4.5 look like three separate stories about three hard to reach models. They are one story. Frontier AI is quietly splitting into a public tier you can buy and a sovereign tier you have to be granted, and the border between them is controlled by governments and labs, not customers. Knowing which tier a capability lives in, and which way the valve is turning, is becoming as important as knowing how the model scores. Build for the tier you can actually reach, and watch the valve like it is your roadmap, because increasingly it is.</p>
+    `
+  },
+  {
+    id: 'claude-sonnet-5-default-free-users-what-changed',
+    bannerImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=1600&q=80',
+    title: 'Claude Sonnet 5 Is Now the Default for Free Users: Here Is What Changed',
+    subtitle: 'Anthropic quietly made Sonnet 5 the default on Free and Pro plans at $2 per million input tokens, introductory through August 31, and it posts 63.2% on agentic coding benchmarks against Sonnet 4.6 at 58.1%. Most people got upgraded and never noticed. Here is what it actually means for coding, writing, and agent workflows.',
+    category: 'AI Models',
+    icon: '⭐',
+    bgGradient: 'linear-gradient(135deg, #0a1f1a 0%, #0f766e 55%, #2dd4bf 100%)',
+    author: 'Karan Shah',
+    avatar: '✍️',
+    date: '2026-07-03',
+    readTime: 7,
+    tags: ['Claude Sonnet 5', 'Anthropic', 'AI coding', 'agentic AI', 'LLM pricing', 'Sonnet 4.6'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>🔑 Key Takeaways</h3>
+  <ul>
+    <li>Anthropic quietly made <strong>Sonnet 5</strong> the default model on <strong>Free and Pro</strong> plans. Most users were upgraded without any announcement in their face, and never noticed the swap.</li>
+    <li>Pricing sits at <strong>$2 per million input tokens</strong> as an introductory rate through <strong>August 31</strong>, per the trackers at pricepertoken.com and llm-stats.com.</li>
+    <li>On agentic coding benchmarks Sonnet 5 lands at <strong>63.2%</strong> versus Sonnet 4.6 at <strong>58.1%</strong>. That five point jump is small on paper and pretty noticeable in practice.</li>
+    <li>The practical win is not the score. Its that the default model behind everyday coding, writing, and agent tasks quietly got better for the same or lower cost.</li>
+  </ul>
+</div>
+
+<h2>You got upgraded and nobody told you</h2>
+<p>Model upgrades used to come with a keynote. This one arrived like a silent app update. If you use Claude on a Free or Pro plan, there is a good chance your default model is now Sonnet 5, and there was no banner, no popup, no "you have been upgraded" moment. The write ups on felloai.com and the numbers on llm-stats.com are how a lot of people are finding out after the fact.</p>
+<p>That silence is kind of the point. When an upgrade is good enough to just leave on by default, you do not need to sell it. The model got better, the price did not go up, and the rollout was designed to be invisible. Nice problem to have, if you are the one shipping it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1280&q=80" alt="Source code on a dark terminal screen" loading="lazy" /><figcaption>No changelog popup, no migration step. The default model behind millions of everyday chats and code sessions just got swapped underneath everyone.</figcaption></figure>
+
+<h2>What the numbers actually say</h2>
+<p>Benchmarks get overhyped, so let me be careful here. The headline is 63.2% for Sonnet 5 against 58.1% for Sonnet 4.6 on agentic coding. Agentic coding means the model is not just completing a snippet, it is driving a multi step task: read the repo, plan a change, edit files, run something, react to the result. That is the workload that actually matters for the way people use these models now.</p>
+<p>Five points does not sound like much. In agentic work it compounds. A task that touches ten steps fails if any single step goes wrong, so a few points of per step reliability turns into a meaningfully higher chance the whole task finishes without you stepping in. The difference you feel is fewer "ugh, it went off the rails at step six" moments, and those moments are exactly what makes agent workflows frustrating.</p>
+<blockquote><strong>The reframe:</strong> for agentic tasks, benchmark points are not about raw smarts, they are about how often the model gets all the way to done without a human rescuing it. That is the number that changes your day.</blockquote>
+
+<h2>What changes for everyday coding</h2>
+<p>This is where the upgrade earns its keep. If you lean on Claude for coding, the improvements show up in the boring, high value places. Multi file refactors hold together more often. The model follows a longer chain of instructions before losing the thread. It is better at reading an existing codebase and matching its style instead of inventing its own. You will still review everything, you should, but the ratio of "usable on the first pass" to "start over" tips in your favor.</p>
+<p>The cost side matters just as much. At $2 per million input tokens through August 31, running longer contexts and more iterations is cheaper than it was, so the natural move is to stop rationing tokens and let the model see more of your actual project. More context plus a stronger model is where the real quality lives.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80" alt="A developer working across multiple monitors of code" loading="lazy" /><figcaption>The gains land in the unglamorous places: refactors that stay coherent, longer instruction chains, better repo awareness. Exactly where agent coding usually breaks.</figcaption></figure>
+
+<h2>What changes for writing and everyday chat</h2>
+<p>Coding gets the headline but the writing side moved too. Sonnet 5 holds a voice more consistently across a long piece, keeps track of constraints you set early in a conversation, and is less likely to drift into generic filler when a draft gets long. For anyone using it as a daily writing or thinking partner, the difference is subtle per message and obvious over a full session.</p>
+<p>If you have a system prompt or a set of style rules you reuse, this is a good week to run it again. Prompts that were tuned against 4.6 will still work, but a stronger default sometimes needs less hand holding, and you might be able to trim instructions you no longer need.</p>
+
+<h2>The pricing detail worth circling</h2>
+<p>One thing to not sleep on: the $2 per million input rate is introductory, and the trackers flag it as running through August 31. Introductory pricing is a lever, and levers move. If you are budgeting a product or a heavy personal workflow around this cost, build in the assumption that the number could change after that date and check it before you scale spend. Great deal today, worth a calendar reminder for later.</p>
+
+<div class="callout">
+  <div class="callout-title">✅ Three things to do this week</div>
+  <strong>(1) Confirm your default.</strong> Check that you are actually on Sonnet 5, then rerun a task that used to disappoint you and see if it lands now. <strong>(2) Feed it more context.</strong> With cheaper input tokens, stop trimming so aggressively and let the model see the real problem. <strong>(3) Note the date.</strong> Mark August 31 so the introductory price does not surprise your budget.
+</div>
+
+<h2>The takeaway</h2>
+<p>Sonnet 5 becoming the quiet default on Free and Pro is a small headline with a real payoff. A five point bump on agentic coding, 63.2% against 58.1%, plus a $2 introductory input price, adds up to a better daily model that most people are already using and did not know it. Do not treat it as a press release. Go rerun the tasks that used to frustrate you, give the model more room to work, and keep an eye on that August 31 date. The upgrade already happened. The only thing left is to actually use it.</p>
+    `
+  },
+  {
     id: 'openai-gpt-56-sol-cerebras-750-tokens-second',
     bannerImage: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=1600&q=80',
     title: "OpenAI's 750 Tokens/Second Bet: What GPT-5.6 Sol on Cerebras Actually Unlocks",
