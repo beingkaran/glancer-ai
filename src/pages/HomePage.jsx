@@ -7,49 +7,35 @@ import NewsFaq from '../components/NewsFaq';
 import NewsletterInline from '../components/NewsletterInline';
 
 /*
- * HomePage — the News and Analysis feeds are now a single IntelligenceFeed.
- * The Hero tab switcher and the feed's own sticky segmented control both drive
- * one `segment` state, so there's no route/tab hop between news and long-form.
- *
- * URL sync: ?tab=blogs (used by "back to analysis" links from articles) maps to
- * the Analysis segment; the plain home URL is the blended "All" feed.
+ * HomePage — unified IntelligenceFeed for news and Deep Dives (blogs). The Hero
+ * tab switcher and the feed's sticky segmented control share one `segment` state.
  */
 
 export default function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const wantsBlogs = searchParams.get('tab') === 'blogs';
-  const [segment, setSegment] = useState(wantsBlogs ? 'analysis' : 'all');
+  const [segment, setSegment] = useState('all');
 
-  // Sync when arriving via back/forward or a direct ?tab=blogs link.
+  // Retire legacy ?tab=blogs URLs from the old Analysis page.
   useEffect(() => {
-    if (wantsBlogs) setSegment('analysis');
-  }, [wantsBlogs]);
+    if (searchParams.get('tab') === 'blogs') setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
 
-  // Scroll to the feed controls when landing on analysis from an article.
-  useEffect(() => {
-    if (wantsBlogs) {
-      requestAnimationFrame(() => {
-        document.getElementById('home-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    }
-  }, [wantsBlogs]);
-
-  // Keep the URL honest so browser-back lands on the right segment.
   const handleSegment = useCallback((seg) => {
     setSegment(seg);
-    if (seg === 'analysis') setSearchParams({ tab: 'blogs' }, { replace: true });
-    else if (searchParams.get('tab')) setSearchParams({}, { replace: true });
+    if (searchParams.get('tab')) setSearchParams({}, { replace: true });
   }, [setSearchParams, searchParams]);
 
-  // Hero's News/Analysis tabs feed the same segment state.
-  const activeTab = segment === 'analysis' ? 'blogs' : 'news';
   const handleTabChange = useCallback((tab) => {
-    handleSegment(tab === 'blogs' ? 'analysis' : 'all');
-  }, [handleSegment]);
+    if (tab === 'glossary') return;
+    setSegment('all');
+    requestAnimationFrame(() => {
+      document.getElementById('home-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
 
   return (
     <>
-      <Hero activeTab={activeTab} onTabChange={handleTabChange} />
+      <Hero activeTab="news" onTabChange={handleTabChange} />
       <IntelligenceFeed segment={segment} onSegment={handleSegment} />
       <div className="container"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />

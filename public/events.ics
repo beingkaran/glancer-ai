@@ -8,8 +8,68 @@ X-WR-TIMEZONE:UTC
 REFRESH-INTERVAL;VALUE=DURATION:PT12H
 X-PUBLISHED-TTL:PT12H
 BEGIN:VEVENT
+UID:kubecon-india-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20260812
+DTEND;VALUE=DATE:20260814
+SUMMARY:KubeCon + CloudNativeCon India 2026
+DESCRIPTION:The CNCF flagship comes to India — Kubernetes\, platforms and OSS at scale.\n\nHosted by CNCF.\n\nhttps://events.linuxfoundation.org/kubecon-cloudnativecon-india/
+LOCATION:HICC\, Hyderabad\, India
+URL:https://events.linuxfoundation.org/kubecon-cloudnativecon-india/
+END:VEVENT
+BEGIN:VEVENT
+UID:gartner-symposium-gold-coast-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20260907
+DTEND;VALUE=DATE:20260910
+SUMMARY:Gartner IT Symposium/Xpo Australia 2026
+DESCRIPTION:CIO and IT-leadership agenda for ANZ — AI strategy\, ops and governance.\n\nHosted by Gartner.\n\nhttps://www.gartner.com/en/conferences/apac/symposium-australia
+LOCATION:Gold Coast Convention and Exhibition Centre\, Gold Coast\, Australia
+URL:https://www.gartner.com/en/conferences/apac/symposium-australia
+END:VEVENT
+BEGIN:VEVENT
+UID:openai-devday-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20261005
+DTEND;VALUE=DATE:20261006
+SUMMARY:OpenAI DevDay 2026
+DESCRIPTION:OpenAI’s developer conference — new models\, APIs and platform launches.\n\nHosted by OpenAI.\n\nhttps://openai.com/devday/
+LOCATION:Fort Mason\, San Francisco\, USA
+URL:https://openai.com/devday/
+END:VEVENT
+BEGIN:VEVENT
+UID:nvidia-ai-summit-india-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20261027
+DTEND;VALUE=DATE:20261030
+SUMMARY:NVIDIA AI Summit India 2026
+DESCRIPTION:NVIDIA’s India summit on accelerated computing\, inference and sovereign AI.\n\nHosted by NVIDIA.\n\nhttps://www.nvidia.com/en-in/events/ai-summit/
+LOCATION:Jio World Convention Centre\, Mumbai\, India
+URL:https://www.nvidia.com/en-in/events/ai-summit/
+END:VEVENT
+BEGIN:VEVENT
+UID:gartner-symposium-india-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20261110
+DTEND;VALUE=DATE:20261113
+SUMMARY:Gartner IT Symposium/Xpo India 2026
+DESCRIPTION:India’s largest CIO gathering — AI\, cloud and enterprise IT strategy.\n\nHosted by Gartner.\n\nhttps://www.gartner.com/en/conferences/apac/symposium-india
+LOCATION:Grand Hyatt Bolgatty\, Kochi\, India
+URL:https://www.gartner.com/en/conferences/apac/symposium-india
+END:VEVENT
+BEGIN:VEVENT
+UID:yow-melbourne-2026@glancerai.com
+DTSTAMP:20260703T095125Z
+DTSTART;VALUE=DATE:20261207
+DTEND;VALUE=DATE:20261209
+SUMMARY:YOW! Melbourne 2026
+DESCRIPTION:International software-engineering talks — systems\, AI and architecture.\n\nHosted by YOW! Conferences.\n\nhttps://yowcon.com/
+LOCATION:Melbourne Convention and Exhibition Centre\, Melbourne\, Australia
+URL:https://yowcon.com/
+END:VEVENT
+BEGIN:VEVENT
 UID:grafana-observabilitycon-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20260915
 DTEND;VALUE=DATE:20260918
 SUMMARY:Grafana ObservabilityCON 2026
@@ -19,7 +79,7 @@ URL:https://grafana.com/about/events/observabilitycon/
 END:VEVENT
 BEGIN:VEVENT
 UID:the-ai-conference-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20260916
 DTEND;VALUE=DATE:20260918
 SUMMARY:The AI Conference 2026
@@ -29,7 +89,7 @@ URL:https://aiconference.com/
 END:VEVENT
 BEGIN:VEVENT
 UID:srecon-emea-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261013
 DTEND;VALUE=DATE:20261016
 SUMMARY:SREcon26 EMEA
@@ -39,7 +99,7 @@ URL:https://www.usenix.org/srecon
 END:VEVENT
 BEGIN:VEVENT
 UID:microsoft-ignite-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261117
 DTEND;VALUE=DATE:20261121
 SUMMARY:Microsoft Ignite 2026
@@ -49,7 +109,7 @@ URL:https://ignite.microsoft.com/
 END:VEVENT
 BEGIN:VEVENT
 UID:observability-day-na-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261109
 DTEND;VALUE=DATE:20261110
 SUMMARY:Observability Day North America 2026
@@ -59,7 +119,7 @@ URL:https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
 END:VEVENT
 BEGIN:VEVENT
 UID:kubecon-na-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261110
 DTEND;VALUE=DATE:20261114
 SUMMARY:KubeCon + CloudNativeCon North America 2026
@@ -69,7 +129,7 @@ URL:https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/
 END:VEVENT
 BEGIN:VEVENT
 UID:aws-reinvent-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261130
 DTEND;VALUE=DATE:20261205
 SUMMARY:AWS re:Invent 2026
@@ -79,7 +139,7 @@ URL:https://reinvent.awsevents.com/
 END:VEVENT
 BEGIN:VEVENT
 UID:neurips-2026@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20261207
 DTEND;VALUE=DATE:20261214
 SUMMARY:NeurIPS 2026
@@ -89,7 +149,7 @@ URL:https://neurips.cc/
 END:VEVENT
 BEGIN:VEVENT
 UID:nvidia-gtc-2027@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20270315
 DTEND;VALUE=DATE:20270320
 SUMMARY:NVIDIA GTC 2027
@@ -99,7 +159,7 @@ URL:https://www.nvidia.com/gtc/
 END:VEVENT
 BEGIN:VEVENT
 UID:google-cloud-next-2027@glancerai.com
-DTSTAMP:20260703T070048Z
+DTSTAMP:20260703T095125Z
 DTSTART;VALUE=DATE:20270421
 DTEND;VALUE=DATE:20270424
 SUMMARY:Google Cloud Next 2027

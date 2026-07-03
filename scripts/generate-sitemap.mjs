@@ -28,7 +28,6 @@ const today = new Date().toISOString().slice(0, 10);
 // Top-level routes with sensible crawl priorities.
 const staticRoutes = [
   { loc: '/', changefreq: 'daily', priority: '1.0', lastmod: today },
-  { loc: '/blogs', changefreq: 'daily', priority: '0.9', lastmod: today },
   { loc: '/ai-tools', changefreq: 'weekly', priority: '0.9', lastmod: today },
   { loc: '/metrics', changefreq: 'daily', priority: '0.7', lastmod: today },
   { loc: '/events', changefreq: 'weekly', priority: '0.7', lastmod: today },

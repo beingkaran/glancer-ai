@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import Navbar from './components/Navbar';
@@ -11,7 +11,6 @@ import GlossaryPage from './pages/GlossaryPage';
 import AIToolsPage from './pages/AIToolsPage';
 import AboutPage from './pages/AboutPage';
 import FAQPage from './pages/FAQPage';
-import BlogsPage from './pages/BlogsPage';
 import TopicsIndexPage from './pages/TopicsIndexPage';
 import TopicHubPage from './pages/TopicHubPage';
 import BlogPostPage from './pages/BlogPostPage';
@@ -48,7 +47,6 @@ export default function App() {
     recordHit(pathname);
   }, [pathname]);
 
-  const isBlogs = pathname === '/blogs';
   // Admin dashboard renders its own full-screen chrome (no public navbar/footer).
   const isAdmin = pathname.startsWith('/_glancer-admin');
 
@@ -62,13 +60,13 @@ export default function App() {
         <div className="bg-grid" />
       </div>
 
-      {!isBlogs && !isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
+      {!isAdmin && <Navbar theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} />}
 
       <main>
         <ErrorBoundary>
         <Routes>
           <Route path="/"                  element={<HomePage />} />
-          <Route path="/blogs"             element={<BlogsPage />} />
+          <Route path="/blogs"             element={<Navigate to="/" replace />} />
           <Route path="/blog/write"        element={<BlogWritePage />} />
           <Route path="/blog/edit/:id"     element={<BlogWritePage />} />
           <Route path="/blog/:id"          element={<BlogPostPage />} />

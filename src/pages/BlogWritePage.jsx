@@ -300,7 +300,7 @@ export default function BlogWritePage() {
               : 'has been submitted for review. It will appear publicly once approved by the Glancer AI team.'}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <button className="btn-grad" onClick={() => navigate(isEditing ? '/profile' : '/blogs')} style={{ padding: '12px 28px' }}>
+            <button className="btn-grad" onClick={() => navigate(isEditing ? '/profile' : '/')} style={{ padding: '12px 28px' }}>
               {isEditing ? 'Back to Profile' : 'View All Blogs'}
             </button>
             {!isEditing && (
@@ -547,7 +547,7 @@ export default function BlogWritePage() {
           )}
 
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-            <button type="button" className="filter-chip" onClick={() => navigate(isEditing ? '/profile' : '/blogs')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
+            <button type="button" className="filter-chip" onClick={() => navigate(isEditing ? '/profile' : '/')} style={{ padding: '12px 24px', cursor: 'pointer' }}>
               Cancel
             </button>
             <button type="submit" disabled={submitting} className="btn-grad" style={{ padding: '12px 32px' }}>

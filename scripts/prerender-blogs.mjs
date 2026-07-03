@@ -62,7 +62,6 @@ for (const post of BLOG_POSTS) {
   const crumbSchema = schemaToJson(
     buildBreadcrumb([
       { name: 'Home', path: '/' },
-      { name: 'Blogs', path: '/blogs' },
       { name: post.title, path },
     ])
   );

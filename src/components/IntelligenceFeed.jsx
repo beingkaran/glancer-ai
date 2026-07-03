@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, Fragment } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, Children } from 'react';
 import { Link } from 'react-router-dom';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
@@ -18,25 +18,16 @@ import { entryForNews, entryForBlog, getSavedCount } from '../lib/readLater';
  * IntelligenceFeed — one continuous stream that merges live AI News with
  * long-form Analysis (blogs), so a reader never has to switch tabs to see both.
  *
- * Layout: a lead row (featured story 2/3 + "Latest" headline list 1/3) sits
- * above the card grid, so the top of the feed has editorial hierarchy instead
- * of a wall of identical cards.
+ * Layout: two responsive card grids — Deep Dives first, then News Right Now.
+ * Each section shows the top 9 items with an expand control for the full list.
  *
  * Seamlessness / fewer clicks:
- *  - A compact one-row sticky bar filters in place: All · News · Analysis plus
- *    a Topics dropdown; topic chips never wrap into a second row.
- *  - In "All", a full-width Deep Dive card is woven in every few cards so
- *    long-form is discovered without leaving the flow.
- *  - Infinite scroll: an IntersectionObserver reveals more items as you reach
- *    the bottom — no pagination clicks.
- *  - News cards open the in-app swipe reader (carousel) on click; analysis
- *    cards route straight to the article. The reader never opens on its own.
+ *  - A compact sticky bar filters in place: All · News · Analysis plus Topics.
+ *  - Blogs lead the page in "All" so long-form is surfaced before headlines.
+ *  - News and analysis cards open the in-app swipe reader on tap.
  */
 
-const PAGE = 9;           // grid items revealed per "page"
-const ANALYSIS_EVERY = 8; // in "All", insert one analysis card after every N news
-const LATEST_COUNT = 5;   // headlines in the lead "Latest" list
-const TEASER_AFTER = 7;   // grid index after which the events teaser is woven in
+const TOP = 9;
 
 function formatBlogDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -58,31 +49,15 @@ const CaretIcon = () => (
   </svg>
 );
 
-// Build the ordered feed for the active segment. Returns entries shaped
-// { kind: 'news' | 'analysis', item }.
-function buildEntries(segment, news, analysis) {
-  const N = news.map((item) => ({ kind: 'news', item }));
-  const A = analysis.map((item) => ({ kind: 'analysis', item }));
+function filterBySegment(segment, news, analysis) {
+  if (segment === 'news') return { news, analysis: [] };
+  if (segment === 'all') return { news, analysis };
 
-  if (segment === 'news') return N;
-  if (segment === 'analysis') return A;
-
-  if (segment !== 'all') {
-    // Topic segment: news + analysis in that category, news first.
-    const n = N.filter((e) => e.item.category === segment);
-    const a = A.filter((e) => e.item.category === segment);
-    return [...n, ...a];
-  }
-
-  // "All": weave analysis into the news stream.
-  const out = [];
-  let ai = 0;
-  N.forEach((entry, i) => {
-    out.push(entry);
-    if ((i + 1) % ANALYSIS_EVERY === 0 && ai < A.length) out.push(A[ai++]);
-  });
-  while (ai < A.length) out.push(A[ai++]); // append any remaining analysis
-  return out;
+  // Topic segment: both streams filtered to the category.
+  return {
+    news: news.filter((item) => item.category === segment),
+    analysis: analysis.filter((item) => item.category === segment),
+  };
 }
 
 export default function IntelligenceFeed({ segment = 'all', onSegment }) {
@@ -92,12 +67,10 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
   const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState(() => byNewest(BLOG_POSTS));
   const [blogSlides, setBlogSlides] = useState([]);
-  const [visible, setVisible] = useState(PAGE);
   const [carouselAt, setCarouselAt] = useState(null);
   const [readLaterOpen, setReadLaterOpen] = useState(false);
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [savedCount, setSavedCount] = useState(() => getSavedCount());
-  const sentinelRef = useRef(null);
   const topicsRef = useRef(null);
 
   useEffect(() => {
@@ -173,24 +146,17 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
 
   const carouselItems = useMemo(() => [...sortedNews, ...blogSlides], [sortedNews, blogSlides]);
 
-  const entries = useMemo(
-    () => buildEntries(segment, sortedNews, analysis),
+  const { news: feedNews, analysis: feedAnalysis } = useMemo(
+    () => filterBySegment(segment, sortedNews, analysis),
     [segment, sortedNews, analysis],
   );
 
-  // Reset the reveal window whenever the segment changes.
-  useEffect(() => { setVisible(PAGE); }, [segment]);
-
-  // Infinite scroll: reveal another page when the sentinel scrolls into view.
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return undefined;
-    const io = new IntersectionObserver((es) => {
-      if (es[0].isIntersecting) setVisible((v) => Math.min(v + PAGE, entries.length));
-    }, { rootMargin: '600px 0px' });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [entries.length]);
+  // Index of each blog within carouselItems (news slides come first).
+  const blogCarouselIndex = useMemo(() => {
+    const m = new Map();
+    analysis.forEach((post, i) => m.set(post.id, sortedNews.length + i));
+    return m;
+  }, [analysis, sortedNews.length]);
 
   // Topic categories present in the live news set (shown in the dropdown).
   const present = new Set(sortedNews.map((i) => i.category));
@@ -198,23 +164,23 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
   const baseSegments = [
     { id: 'all', label: 'All' },
     { id: 'news', label: 'News' },
-    { id: 'analysis', label: 'Analysis' },
   ];
   const isTopic = !baseSegments.some((s) => s.id === segment);
 
-  // Lead row (featured + Latest list) consumes the first entries; the grid
-  // starts after them so nothing appears twice.
-  const lead = 1 + LATEST_COUNT;
-  const featured = entries[0];
-  const latest = entries.slice(1, lead);
-  const rest = entries.slice(lead, lead + visible);
-  const hasMore = lead + visible < entries.length;
-  const teaserAt = Math.min(TEASER_AFTER, rest.length - 1);
+  const showAnalysis = segment === 'all' || isTopic;
+  const showNews = segment === 'all' || segment === 'news' || isTopic;
 
   const openNews = (rid) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
     const idx = newsIndex.get(rid);
+    if (idx != null) setCarouselAt(idx);
+  };
+
+  const openBlog = (postId) => (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    const idx = blogCarouselIndex.get(postId);
     if (idx != null) setCarouselAt(idx);
   };
 
@@ -225,7 +191,7 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
   const greeting = `${greetingFor(hour)}${firstName ? `, ${firstName}` : ''}`;
 
   return (
-    <div className="content-section">
+    <div className="content-section" id="intelligence-feed">
       <div className="container">
         <div className="news-header">
           <div>
@@ -296,63 +262,37 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
           </button>
         </div>
 
-        {/* Lead row: featured story + Latest headline list */}
-        {featured && (
-          <div className="feed-lead">
-            {featured.kind === 'news'
-              ? <FeaturedNews item={featured.item} onOpen={openNews} />
-              : <FeaturedAnalysis post={featured.item} />}
-            {latest.length > 0 && (
-              <aside className="latest-list" aria-label="Latest headlines">
-                <p className="latest-list-head">Latest</p>
-                {latest.map((entry) => (
-                  entry.kind === 'news' ? (
-                    <a
-                      key={entry.item.rid}
-                      className="latest-item"
-                      href={entry.item.url}
-                      onClick={openNews(entry.item.rid)}
-                      rel="noopener noreferrer"
-                    >
-                      <span className="latest-item-title">{entry.item.title}</span>
-                      <span className="latest-item-meta">{entry.item.source}{entry.item.date ? ` · ${entry.item.date}` : ''}</span>
-                    </a>
-                  ) : (
-                    <Link
-                      key={`b-${entry.item.id}`}
-                      className="latest-item"
-                      to={`/blog/${entry.item.id}`}
-                      state={{ from: 'home-feed' }}
-                    >
-                      <span className="latest-item-title">{entry.item.title}</span>
-                      <span className="latest-item-meta">Deep Dive · {entry.item.readTime} min read</span>
-                    </Link>
-                  )
-                ))}
-              </aside>
-            )}
-          </div>
+        {showAnalysis && feedAnalysis.length > 0 && (
+          <FeedSection
+            key={`analysis-${segment}`}
+            label="Practitioner Analysis"
+            title="Deep Dives"
+            count={feedAnalysis.length}
+            subtitle="Articles created by tech authors in AI and observability — practitioner guides, comparisons and deep dives."
+            initialCount={TOP}
+          >
+            {feedAnalysis.map((post) => (
+              <BlogCard key={post.id} post={post} onOpen={openBlog} />
+            ))}
+          </FeedSection>
         )}
 
-        {/* Grid — the events teaser is woven in as a full-width band */}
-        <div className="news-grid feed-grid">
-          {rest.map((entry, i) => (
-            <Fragment key={entry.kind === 'news' ? entry.item.rid : `b-${entry.item.id}`}>
-              {entry.kind === 'news'
-                ? <NewsCard item={entry.item} onOpen={openNews} />
-                : <AnalysisCard post={entry.item} />}
-              {segment === 'all' && i === teaserAt && (
-                <div className="feed-inline-teaser"><UpcomingEventsTeaser /></div>
-              )}
-            </Fragment>
-          ))}
-        </div>
+        {segment === 'all' && <UpcomingEventsTeaser />}
 
-        {/* Infinite-scroll sentinel */}
-        {hasMore && (
-          <div ref={sentinelRef} className="feed-sentinel" aria-hidden="true">
-            <span className="feed-spinner" /> Loading more…
-          </div>
+        {showNews && feedNews.length > 0 && (
+          <FeedSection
+            key={`news-${segment}`}
+            label={loading ? 'Updating…' : live ? 'Live · 100+ sources' : 'Curated'}
+            title="News Right Now"
+            count={feedNews.length}
+            subtitle="Today's AI headlines — tap any card to read in the swipe reader."
+            className={showAnalysis ? 'feed-section-spaced' : ''}
+            initialCount={TOP}
+          >
+            {feedNews.map((item) => (
+              <NewsCard key={item.rid} item={item} onOpen={openNews} />
+            ))}
+          </FeedSection>
         )}
 
         {carouselAt !== null && (
@@ -364,56 +304,44 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
   );
 }
 
-/* ------------------------------------------------------------------ cards */
+/* ------------------------------------------------------------------ sections + cards */
 
-function FeaturedNews({ item, onOpen }) {
-  return (
-    <a className="news-featured news-link" href={item.url} onClick={onOpen(item.rid)} rel="noopener noreferrer" aria-label={`Read: ${item.title}`}>
-      <Thumb item={item} className="news-featured-img" emojiSize="5rem" eager />
-      <div className="news-featured-body">
-        <div>
-          <span className={`news-category-tag ${item.categoryClass}`}>{item.category}</span>
-          <h3 className="news-featured-title">{item.title}</h3>
-          <p className="news-featured-excerpt">{item.excerpt}</p>
-        </div>
-        <div className="news-meta">
-          <span>{item.source}</span>
-          {item.date && <><span className="news-meta-dot" aria-hidden="true" /><span>{item.date}</span></>}
-          <span className="news-meta-dot" aria-hidden="true" />
-          <span>{item.readMin} min read</span>
-          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-            <SaveButton entry={entryForNews(item)} className="news-share" />
-            <span className="read-more-link">Read story <ArrowIcon /></span>
-          </span>
-        </div>
-      </div>
-    </a>
-  );
-}
+function FeedSection({
+  label, title, subtitle, count, children, className = '', initialCount = TOP,
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const items = Children.toArray(children);
+  const total = count ?? items.length;
+  const capped = items.length > initialCount;
+  const visible = expanded || !capped ? items : items.slice(0, initialCount);
+  const hidden = total - visible.length;
 
-function FeaturedAnalysis({ post }) {
   return (
-    <Link to={`/blog/${post.id}`} state={{ from: 'home-feed' }} className="news-featured news-link" aria-label={`Read: ${post.title}`}>
-      <BlogBanner post={post} className="news-featured-img" emojiSize="5rem" logoStyle={{ width: 120, height: 120 }} />
-      <div className="news-featured-body">
-        <div>
-          <span className="news-category-tag tag-purple">Deep Dive · {post.category}</span>
-          <h3 className="news-featured-title">{post.title}</h3>
-          <p className="news-featured-excerpt">{post.subtitle}</p>
+    <section className={`feed-section${className ? ` ${className}` : ''}`} aria-label={title}>
+      <header className="feed-section-head">
+        <p className="section-label">{label}</p>
+        <h3 className="feed-section-title">
+          {title}
+          <span className="feed-section-count">{total}</span>
+        </h3>
+        {subtitle && <p className="feed-section-sub">{subtitle}</p>}
+      </header>
+      <div className="news-grid feed-card-grid">{visible}</div>
+      {capped && (
+        <div className="feed-expand-wrap">
+          <button
+            type="button"
+            className="feed-expand-btn"
+            aria-expanded={expanded}
+            onClick={() => setExpanded((e) => !e)}
+          >
+            {expanded
+              ? `Show top ${initialCount} only`
+              : `Show all ${total}${hidden > 0 ? ` (+${hidden} more)` : ''}`}
+          </button>
         </div>
-        <div className="news-meta">
-          <span>{post.author || 'Glancer AI'}</span>
-          <span className="news-meta-dot" aria-hidden="true" />
-          <span>{formatBlogDate(post.date)}</span>
-          <span className="news-meta-dot" aria-hidden="true" />
-          <span>{post.readTime} min read</span>
-          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-            <SaveButton entry={entryForBlog(post)} className="news-share" />
-            <span className="read-more-link">Read analysis <ArrowIcon /></span>
-          </span>
-        </div>
-      </div>
-    </Link>
+      )}
+    </section>
   );
 }
 
@@ -437,21 +365,27 @@ function NewsCard({ item, onOpen }) {
   );
 }
 
-// Analysis card — woven into the news grid as a full-width horizontal band,
-// amber-accented with a "Deep Dive" ribbon so long-form reads stand apart.
-function AnalysisCard({ post }) {
+// Blog card — mirrors the news card layout so analysis reads like "News Right Now".
+function BlogCard({ post, onOpen }) {
   return (
-    <Link to={`/blog/${post.id}`} state={{ from: 'home-feed' }} className="news-card blog-in-feed news-link" style={{ textDecoration: 'none' }}>
-      <div className="news-card-thumb" style={{ position: 'relative' }}>
-        <BlogBanner post={post} className="blog-in-feed-banner" />
-        <span className="deep-dive-ribbon">Deep Dive</span>
+    <Link
+      to={`/blog/${post.id}`}
+      state={{ from: 'home-feed' }}
+      className="news-card news-link"
+      onClick={onOpen(post.id)}
+      aria-label={`Read: ${post.title}`}
+    >
+      <div className="news-card-thumb">
+        <BlogBanner post={post} className="feed-blog-banner" />
       </div>
       <div className="news-card-body">
-        <span className="news-category-tag tag-purple" style={{ marginBottom: 10, fontSize: '0.68rem' }}>{post.category}</span>
+        <span className="news-category-tag tag-purple" style={{ marginBottom: 10, fontSize: '0.68rem' }}>
+          Deep Dive · {post.category}
+        </span>
         <h3 className="news-card-title">{post.title}</h3>
         <p className="news-card-excerpt">{post.subtitle}</p>
         <div className="news-card-footer">
-          <span>{post.author || 'Glancer AI'} · {formatBlogDate(post.date)}</span>
+          <span>{post.author || 'Glancer AI'}{post.date ? ` · ${formatBlogDate(post.date)}` : ''}</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <SaveButton entry={entryForBlog(post)} className="news-share" label={false} />
             <span className="read-time-badge">{post.readTime} min</span>

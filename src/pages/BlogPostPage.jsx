@@ -39,9 +39,8 @@ const BackIcon = () => (
 );
 
 function blogsReturnPath(from) {
-  if (from === '/blogs') return '/blogs';
   if (from === '/profile') return '/profile';
-  return '/?tab=blogs';
+  return '/';
 }
 
 export default function BlogPostPage() {
@@ -80,10 +79,10 @@ export default function BlogPostPage() {
 
   const goBack = () => {
     const from = location.state?.from;
-    navigate(from ? blogsReturnPath(from) : '/?tab=blogs');
+    navigate(from ? blogsReturnPath(from) : '/');
   };
 
-  const backLabel = location.state?.from === '/blogs' ? 'Back to all articles' : 'Back to Blogs';
+  const backLabel = location.state?.from === 'home-feed' ? 'Back to feed' : 'Back to home';
 
   // Per-article SEO: title/description/canonical/OG + Article & Breadcrumb
   // JSON-LD. Hooks run every render (no-op while loading) to respect hook order.
@@ -105,7 +104,6 @@ export default function BlogPostPage() {
           buildArticleSchema(post, { type: 'Article', path }),
           buildBreadcrumb([
             { name: 'Home', path: '/' },
-            { name: 'Blogs', path: '/blogs' },
             { name: post.title, path },
           ]),
         ]
