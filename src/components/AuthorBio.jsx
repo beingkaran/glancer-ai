@@ -30,7 +30,7 @@ export default function AuthorBio({ post }) {
       <picture>
         <source srcSet="/karan.webp" type="image/webp" />
         <img
-          className="author-bio-photo"
+          className="author-bio-photo author-portrait author-portrait-md"
           src="/karan.jpg"
           alt={PRIMARY_AUTHOR.name}
           width={72}

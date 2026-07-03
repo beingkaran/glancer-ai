@@ -4,7 +4,7 @@
  */
 export const PRIMARY_AUTHOR = {
   name: 'Karan Shah',
-  role: 'Founder & Creator of Glancer AI',
+  role: 'Service Delivery Director AIOPS/DATA/AI',
   email: 'karan.igniite@gmail.com',
   linkedin: 'https://www.linkedin.com/in/beingkaran/',
   site: 'https://glancerai.com',

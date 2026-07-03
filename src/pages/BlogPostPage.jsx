@@ -169,7 +169,7 @@ export default function BlogPostPage() {
               <picture>
                 <source srcSet="/karan.webp" type="image/webp" />
                 <img
-                  className="blog-byline-photo"
+                  className="blog-byline-photo author-portrait author-portrait-sm"
                   src="/karan.jpg"
                   alt={PRIMARY_AUTHOR.name}
                   width={48}

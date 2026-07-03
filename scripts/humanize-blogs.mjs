@@ -10,7 +10,7 @@ import { dirname, resolve } from 'node:path';
 const FILE = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/allBlogs.js');
 
 const AUTHOR_BLOCK = `author: 'Karan Shah',
-    authorRole: 'Founder & Creator of Glancer AI',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
     authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
     authorImage: 'https://glancerai.com/karan.webp',
     authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',

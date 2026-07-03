@@ -40,7 +40,8 @@ function ProfilePhoto() {
         decoding="async"
         fetchpriority="high"
         onError={() => setBroken(true)}
-        style={{ width: 110, height: 110, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 20px', display: 'block', border: '3px solid rgba(44,201,224,0.4)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
+        className="author-portrait author-portrait-lg"
+        style={{ margin: '0 auto 20px', display: 'block' }}
       />
     </picture>
   );
@@ -85,7 +86,7 @@ export default function AboutPage() {
             Karan Shah
           </h2>
           <p style={{ color: 'var(--purple)', fontWeight: 600, fontSize: '0.9rem', marginBottom: 16 }}>
-            Founder &amp; Creator of Glancer AI
+            Service Delivery Director AIOPS/DATA/AI
           </p>
           <p style={{ color: 'var(--text-secondary)', lineHeight: 1.75, maxWidth: 560, margin: '0 auto 28px', fontSize: '0.95rem' }}>
             Karan is an engineer who got tired of vendor blogs explaining observability badly, so he built this site. Glancer AI is a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.

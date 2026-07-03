@@ -93,11 +93,11 @@ for (const post of BLOG_POSTS) {
   const authorBio = post.authorBio || PRIMARY_AUTHOR.bio;
   const isKaran = /karan|admin|glancer/i.test(authorName);
   const bylinePhoto = isKaran
-    ? `<img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="48" height="48" style="width:48px;height:48px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px" />`
+    ? `<img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="48" height="58" style="width:48px;height:58px;border-radius:12px;object-fit:cover;object-position:center 18%;vertical-align:middle;margin-right:10px" />`
     : '';
   const authorAside = isKaran
     ? `<aside aria-label="About the author" style="display:flex;gap:18px;align-items:flex-start;padding:20px 22px;margin:24px 0;background:rgba(255,176,32,0.06);border:1px solid rgba(255,176,32,0.18);border-radius:14px">
-        <img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="72" height="72" style="width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0" />
+        <img src="/karan.jpg" alt="${esc(PRIMARY_AUTHOR.name)}" width="72" height="88" style="width:72px;height:88px;border-radius:12px;object-fit:cover;object-position:center 18%;flex-shrink:0" />
         <div>
           <p style="font-weight:700;margin:0 0 2px"><a href="${ORIGIN}/about">${esc(PRIMARY_AUTHOR.name)}</a></p>
           <p style="font-size:.82rem;color:#7C3AED;font-weight:600;margin:0 0 8px">${esc(authorRole)}</p>
