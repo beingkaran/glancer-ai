@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useMemo, useCallback, Children } from 'react';
+import { useState, useEffect, useRef, useMemo, Children } from 'react';
 import { Link } from 'react-router-dom';
+import { segmentPath } from '../lib/feedRoutes';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
 import { BLOG_POSTS } from '../data/allBlogs';
@@ -21,10 +22,9 @@ import { entryForNews, entryForBlog, getSavedCount } from '../lib/readLater';
  * Layout: two responsive card grids — Deep Dives first, then News Right Now.
  * Each section shows the top 9 items with an expand control for the full list.
  *
- * Seamlessness / fewer clicks:
- *  - A compact sticky bar filters in place: All · News · Analysis plus Topics.
- *  - Blogs lead the page in "All" so long-form is surfaced before headlines.
- *  - News and analysis cards open the in-app swipe reader on tap.
+ * Multi-page: the filter bar's chips are real links (/, /news,
+ * /news/topic/<slug>) so every view is its own page; the bar scrolls away
+ * with the content rather than sticking. Cards open the in-app swipe reader.
  */
 
 const TOP = 9;
@@ -60,7 +60,7 @@ function filterBySegment(segment, news, analysis) {
   };
 }
 
-export default function IntelligenceFeed({ segment = 'all', onSegment }) {
+export default function IntelligenceFeed({ segment = 'all' }) {
   const { user, isAuthed } = useAuth();
   const [items, setItems] = useState(STATIC_NEWS);
   const [live, setLive] = useState(false);
@@ -184,8 +184,6 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
     if (idx != null) setCarouselAt(idx);
   };
 
-  const setSeg = useCallback((id) => { onSegment?.(id); }, [onSegment]);
-
   const hour = new Date().getHours();
   const firstName = isAuthed ? (user?.name || '').split(' ')[0] : '';
   const greeting = `${greetingFor(hour)}${firstName ? `, ${firstName}` : ''}`;
@@ -205,19 +203,20 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
           </div>
         </div>
 
-        {/* Compact one-row sticky bar: All/News/Analysis + Topics ▾ + Read Later */}
+        {/* Compact one-row filter bar: All/News + Topics ▾ + Read Later.
+            Chips are real links — each feed view is its own page/URL. */}
         <div className="feed-segment-bar">
-          <div className="feed-segment" role="tablist" aria-label="Filter the feed">
+          <div className="feed-segment" role="navigation" aria-label="Feed pages">
             {baseSegments.map((s) => (
-              <button
+              <Link
                 key={s.id}
-                role="tab"
-                aria-selected={segment === s.id}
+                to={segmentPath(s.id)}
+                state={{ keepScroll: true }}
+                aria-current={segment === s.id ? 'page' : undefined}
                 className={`filter-chip${segment === s.id ? ' active' : ''}`}
-                onClick={() => setSeg(s.id)}
               >
                 {s.label}
-              </button>
+              </Link>
             ))}
           </div>
           {topicCats.length > 0 && (
@@ -232,17 +231,19 @@ export default function IntelligenceFeed({ segment = 'all', onSegment }) {
                 {isTopic ? segment : 'Topics'} <CaretIcon />
               </button>
               {topicsOpen && (
-                <div className="feed-topics-menu" role="listbox" aria-label="Topics">
+                <div className="feed-topics-menu" role="menu" aria-label="Topics">
                   {topicCats.map((c) => (
-                    <button
+                    <Link
                       key={c}
-                      role="option"
-                      aria-selected={segment === c}
+                      role="menuitem"
+                      to={segmentPath(c)}
+                      state={{ keepScroll: true }}
+                      aria-current={segment === c ? 'page' : undefined}
                       className={`feed-topics-item${segment === c ? ' active' : ''}`}
-                      onClick={() => { setSeg(c); setTopicsOpen(false); }}
+                      onClick={() => setTopicsOpen(false)}
                     >
                       {c}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               )}

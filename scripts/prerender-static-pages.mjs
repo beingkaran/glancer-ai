@@ -21,6 +21,7 @@ const { EXTRA_GLOSSARY_TERMS } = await import('../src/data/extraGlossary.js');
 const { EXTRA_GLOSSARY_BATCH4 } = await import('../src/data/extraGlossaryBatch4.js');
 const { FEATURED_TERMS } = await import('../src/data/glossaryMeta.js');
 const { AI_TOOLS } = await import('../src/data/aiTools.js');
+const { NEWS_ITEMS, NEWS_CATEGORIES } = await import('../src/data/newsData.js');
 
 /** Lightweight catalog for prerender — customTools.js pulls browser-only engines. */
 const BROWSER_TOOLS = [
@@ -158,6 +159,22 @@ function topicsIndexBody() {
   `;
 }
 
+function newsBody() {
+  const catSlug = (c) => c.toLowerCase().replace(/\s+/g, '-');
+  const cats = NEWS_CATEGORIES.filter((c) => c !== 'All')
+    .map((c) => `<a href="/news/topic/${catSlug(c)}">${esc(c)}</a>`)
+    .join(' · ');
+  const items = NEWS_ITEMS.slice(0, 12)
+    .map((n) => `<li><a href="${esc(n.url)}" rel="noopener">${esc(n.title)}</a> — <span>${esc((n.excerpt || '').slice(0, 140))}</span></li>`)
+    .join('\n');
+  return `
+    <p>Live AI and observability headlines aggregated from 100+ curated sources — research labs, model vendors, AIOps and APM platforms, open source projects and industry press. The feed refreshes continuously in the app; below is a curated snapshot.</p>
+    <p><strong>Browse by topic:</strong> ${cats}</p>
+    <ul style="list-style:none;padding:0">${items}</ul>
+    <p>Prefer long-form? Read our <a href="/">Deep Dives on the home feed</a>, explore <a href="/topics">company and technology hubs</a>, or check <a href="/events">upcoming AI &amp; observability events</a>.</p>
+  `;
+}
+
 const PAGES = [
   {
     path: '/',
@@ -167,6 +184,15 @@ const PAGES = [
       'Practitioner-grade AIOps and observability intelligence — in-depth APM comparisons, OpenTelemetry guides, 2,200-term glossary, and live AI news.',
     h1: 'Observability intelligence, without the vendor spin',
     body: homeBody(),
+  },
+  {
+    path: '/news',
+    out: 'news.html',
+    title: "Today's AI News — Live Headlines from 100+ Sources | Glancer AI",
+    description:
+      "Today's AI and observability headlines, refreshed continuously from 100+ curated sources — research, models, industry, AIOps and more.",
+    h1: "Today's AI News",
+    body: newsBody(),
   },
   {
     path: '/privacy',

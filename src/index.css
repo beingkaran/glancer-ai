@@ -595,6 +595,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   padding: 6px 14px; border-radius: var(--border-radius-pill); border: 1px solid var(--glass-border);
   background: var(--surface); color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;
   cursor: pointer; transition: var(--transition); white-space: nowrap;
+  text-decoration: none; /* chips can be <Link>s (feed pages), not just buttons */
 }
 .filter-chip:hover, .filter-chip.active { background: rgba(255,176,32,0.15); border-color: rgba(255,176,32,0.35); color: var(--purple); }
 
@@ -2887,11 +2888,11 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
    Unified Intelligence Feed — sticky segment control, in-feed analysis cards,
    infinite-scroll sentinel. News + Analysis in one seamless stream.
    ========================================================================== */
-/* Compact one-row sticky bar: never wraps, fully opaque so cards never show
-   through it while scrolling. Topic chips live behind the Topics dropdown. */
+/* Compact one-row filter bar: never wraps; scrolls away with the page (not
+   sticky). Topic chips live behind the Topics dropdown. */
 .feed-segment-bar {
   display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
-  position: sticky; top: calc(var(--navbar-h) + 6px); z-index: 20;
+  position: relative; z-index: 20;
   margin-bottom: 24px; padding: 9px 0;
   background: var(--bg-deep);
   border-bottom: 1px solid var(--glass-border);
@@ -2918,6 +2919,7 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   padding: 8px 12px; border: none; border-radius: 8px; background: none;
   color: var(--text-secondary); font-size: 0.82rem; font-weight: 500;
   text-align: left; cursor: pointer; transition: var(--transition); white-space: nowrap;
+  text-decoration: none; /* items are <Link>s to /news/topic/<slug> pages */
 }
 .feed-topics-item:hover { background: var(--surface-hover); color: var(--text-primary); }
 .feed-topics-item.active { background: rgba(255,176,32,0.15); color: var(--purple); }
@@ -3021,18 +3023,14 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   body { overscroll-behavior-y: none; }
 
-  /* Sticky feed controls sit below the masthead (+ Signal ticker on home). */
+  /* Feed controls flow with the page (not sticky) — wrap for touch layouts. */
   .feed-segment-bar {
     flex-wrap: wrap; gap: 10px; row-gap: 10px;
-    top: calc(52px + env(safe-area-inset-top));
     padding: 12px 0 14px;
     margin-left: calc(-1 * env(safe-area-inset-left));
     margin-right: calc(-1 * env(safe-area-inset-right));
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
-  }
-  .navbar:has(.signal-ticker) ~ main .feed-segment-bar {
-    top: calc(84px + env(safe-area-inset-top));
   }
 
   .feed-segment {

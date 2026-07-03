@@ -29,14 +29,17 @@ import { recordHit } from './lib/analytics';
 
 export default function App() {
   const [theme, setTheme] = useState('dark');
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Scroll to top on route change
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  // Scroll to top on route change — except in-feed page switches (/ ↔ /news ↔
+  // /news/topic/*), which pass keepScroll so the reader stays where they are.
+  useEffect(() => {
+    if (!state?.keepScroll) window.scrollTo(0, 0);
+  }, [pathname, state]);
 
   // Count this page view (anonymous, fire-and-forget). Admin pages are excluded
   // so the dashboard's own traffic doesn't inflate the public visit stats.
@@ -66,6 +69,8 @@ export default function App() {
         <ErrorBoundary>
         <Routes>
           <Route path="/"                  element={<HomePage />} />
+          <Route path="/news"              element={<HomePage />} />
+          <Route path="/news/topic/:topicSlug" element={<HomePage />} />
           <Route path="/blogs"             element={<Navigate to="/" replace />} />
           <Route path="/blog/write"        element={<BlogWritePage />} />
           <Route path="/blog/edit/:id"     element={<BlogWritePage />} />
