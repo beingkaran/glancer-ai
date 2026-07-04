@@ -66,8 +66,9 @@ export default function IntelligenceFeed({ segment = 'all' }) {
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState(() => byNewest(BLOG_POSTS));
-  const [blogSlides, setBlogSlides] = useState([]);
-  const [carouselAt, setCarouselAt] = useState(null);
+  // Carousel state: { mode: 'news' | 'blogs', at } — news cards open the
+  // merged news stream, Deep Dive cards open a blogs-only slideshow.
+  const [carousel, setCarousel] = useState(null);
   const [readLaterOpen, setReadLaterOpen] = useState(false);
   const [topicsOpen, setTopicsOpen] = useState(false);
   const [savedCount, setSavedCount] = useState(() => getSavedCount());
@@ -95,9 +96,7 @@ export default function IntelligenceFeed({ segment = 'all' }) {
     const loadBlogs = async () => {
       const approved = (await getApprovedUserBlogs()).map((b) => ({ ...b, isUserBlog: true }));
       if (!alive) return;
-      const merged = byNewest([...approved, ...BLOG_POSTS]);
-      setAnalysis(merged);
-      setBlogSlides(blogsToSlides(merged));
+      setAnalysis(byNewest([...approved, ...BLOG_POSTS]));
     };
     loadBlogs();
     window.addEventListener('glancer:blogs-changed', loadBlogs);
@@ -144,6 +143,10 @@ export default function IntelligenceFeed({ segment = 'all' }) {
     return m;
   }, [sortedNews]);
 
+  // Blog slides derive straight from the analysis list, so the blogs-only
+  // slideshow is always in sync with what the cards show.
+  const blogSlides = useMemo(() => blogsToSlides(analysis), [analysis]);
+
   const carouselItems = useMemo(() => [...sortedNews, ...blogSlides], [sortedNews, blogSlides]);
 
   const { news: feedNews, analysis: feedAnalysis } = useMemo(
@@ -151,12 +154,12 @@ export default function IntelligenceFeed({ segment = 'all' }) {
     [segment, sortedNews, analysis],
   );
 
-  // Index of each blog within carouselItems (news slides come first).
-  const blogCarouselIndex = useMemo(() => {
+  // Index of each blog within the blogs-only slideshow.
+  const blogIndex = useMemo(() => {
     const m = new Map();
-    analysis.forEach((post, i) => m.set(post.id, sortedNews.length + i));
+    analysis.forEach((post, i) => m.set(post.id, i));
     return m;
-  }, [analysis, sortedNews.length]);
+  }, [analysis]);
 
   // Topic categories present in the live news set (shown in the dropdown).
   const present = new Set(sortedNews.map((i) => i.category));
@@ -174,14 +177,14 @@ export default function IntelligenceFeed({ segment = 'all' }) {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
     const idx = newsIndex.get(rid);
-    if (idx != null) setCarouselAt(idx);
+    if (idx != null) setCarousel({ mode: 'news', at: idx });
   };
 
   const openBlog = (postId) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
-    const idx = blogCarouselIndex.get(postId);
-    if (idx != null) setCarouselAt(idx);
+    const idx = blogIndex.get(postId);
+    if (idx != null) setCarousel({ mode: 'blogs', at: idx });
   };
 
   const hour = new Date().getHours();
@@ -296,8 +299,12 @@ export default function IntelligenceFeed({ segment = 'all' }) {
           </FeedSection>
         )}
 
-        {carouselAt !== null && (
-          <NewsCarousel items={carouselItems} startIndex={carouselAt} onClose={() => setCarouselAt(null)} />
+        {carousel !== null && (
+          <NewsCarousel
+            items={carousel.mode === 'blogs' ? blogSlides : carouselItems}
+            startIndex={carousel.at}
+            onClose={() => setCarousel(null)}
+          />
         )}
         {readLaterOpen && <ReadLaterPanel onClose={() => setReadLaterOpen(false)} />}
       </div>

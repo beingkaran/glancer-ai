@@ -95,16 +95,13 @@ export default function Navbar({ theme, onToggleTheme }) {
     <header className={`navbar${hidden ? ' navbar-hidden' : ''}`}>
       <div className="masthead-top">
         <div className="masthead-left">
-          <Link
+          <button
+            type="button"
             className="masthead-pill"
-            to="/"
-            onClick={() => {
-              navigate('/');
-              setTimeout(() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' }), 100);
-            }}
+            onClick={() => window.dispatchEvent(new Event('glancer:newsletter-open'))}
           >
             Get the newsletter
-          </Link>
+          </button>
           <div className="masthead-utils">
             <Link to="/ai-tools">Free AI tools</Link>
             <Link to="/metrics">Live metrics</Link>

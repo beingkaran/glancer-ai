@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { subscribeNewsletter } from '../lib/newsletter';
 
@@ -6,6 +6,10 @@ import { subscribeNewsletter } from '../lib/newsletter';
  * NewsletterPopup — appears once, 20s after an UNSIGNED visitor lands, asking
  * for their name + email. Stored (plain text) in Supabase. Once a visitor
  * subscribes or dismisses, we never show it again (localStorage flag).
+ *
+ * The masthead "Get the newsletter" pill reopens the same box on demand via
+ * the `glancer:newsletter-open` window event — for any visitor, signed in or
+ * not, regardless of the seen flag.
  */
 
 const STORAGE_KEY = 'glancer_newsletter_seen';
@@ -29,6 +33,7 @@ export default function NewsletterPopup() {
   const [email, setEmail] = useState('');
   const [state, setState] = useState('idle'); // idle | busy | done | error
   const [error, setError] = useState('');
+  const manual = useRef(false); // opened via the masthead pill, not the timer
 
   useEffect(() => {
     if (isAuthed) return;
@@ -39,8 +44,21 @@ export default function NewsletterPopup() {
     return () => clearTimeout(t);
   }, [isAuthed]);
 
-  // A signed-in user never needs the prompt — close it if they log in meanwhile.
-  useEffect(() => { if (isAuthed) setOpen(false); }, [isAuthed]);
+  // On-demand open from the masthead pill.
+  useEffect(() => {
+    const openNow = () => {
+      manual.current = true;
+      setState('idle');
+      setError('');
+      setOpen(true);
+    };
+    window.addEventListener('glancer:newsletter-open', openNow);
+    return () => window.removeEventListener('glancer:newsletter-open', openNow);
+  }, []);
+
+  // A signed-in user never needs the auto prompt — close it if they log in
+  // meanwhile. A deliberately opened box stays put.
+  useEffect(() => { if (isAuthed && !manual.current) setOpen(false); }, [isAuthed]);
 
   const dismiss = () => {
     try { localStorage.setItem(STORAGE_KEY, '1'); } catch { /* ignore */ }

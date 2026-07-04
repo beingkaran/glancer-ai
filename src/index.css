@@ -3366,3 +3366,6 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   .feed-lead-slot .news-card-thumb { height: 215px; }
   .feed-lead-slot .news-card-title { font-size: 1.32rem; }
 }
+
+/* The masthead pill is a button now (opens the newsletter box on demand). */
+.masthead-pill { border: none; cursor: pointer; font-family: var(--font-body); }
