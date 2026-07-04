@@ -12,7 +12,7 @@ const ORIGIN = 'https://glancerai.com';
 const DIST = resolve(__dirname, '../dist');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
-const { FAQS, AI_NEWS_FAQS } = await import('../src/data/faqContent.js');
+const { FAQS, AI_NEWS_FAQS, CLAUDE_PUBLISHED_LINKS } = await import('../src/data/faqContent.js');
 const { HOME_EDITORIAL, TOPIC_GUIDES } = await import('../src/data/seoGuides.js');
 const { TOPICS } = await import('../src/data/topics.js');
 const { TECH_EVENTS } = await import('../src/data/techEvents.js');
@@ -244,7 +244,7 @@ const PAGES = [
     title: 'AI News FAQ | Glancer AI',
     description: 'FAQ: AI news, generative AI, agents, LLMs, AIOps, observability, free tools, and how Glancer AI works.',
     h1: 'AI News — Frequently Asked Questions',
-    body: `${faqSectionHtml(AI_NEWS_FAQS, 'AI News & Artificial Intelligence')}${faqSectionHtml(FAQS, 'About Glancer AI')}`,
+    body: `${faqSectionHtml(AI_NEWS_FAQS, 'AI News & Artificial Intelligence')}${faqSectionHtml(FAQS, 'About Glancer AI')}<h2>Published on Claude</h2><ul>${CLAUDE_PUBLISHED_LINKS.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a></li>`).join('')}</ul>`,
   },
   {
     path: '/about',

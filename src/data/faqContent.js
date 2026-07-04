@@ -74,6 +74,42 @@ export const AI_NEWS_FAQS = [
   { q: 'What is the future of artificial intelligence?', a: 'AI is expected to become increasingly integrated into everyday applications, driving advances in automation, healthcare, education, scientific research, robotics, and personalized digital experiences.' },
 ];
 
+/** Guides and articles published as public Claude artifacts. */
+export const CLAUDE_PUBLISHED_LINKS = [
+  {
+    title: 'Why Glancer AI Is the Best AI News Aggregator for Engineers, SREs, and Platform Teams',
+    url: 'https://claude.ai/public/artifacts/c1aa7d20-c2e0-4785-9dfb-f73d80a02792',
+  },
+  {
+    title: 'What Is AIOps? A Practical Guide for Engineering Teams',
+    url: 'https://claude.ai/public/artifacts/9d14afa9-d9e6-4a34-91a0-e5293e5623e2',
+  },
+  {
+    title: "Observability vs Monitoring: What's the Real Difference?",
+    url: 'https://claude.ai/public/artifacts/9fc4b649-9b59-4a29-975f-075877e92221',
+  },
+  {
+    title: 'The Three Pillars of Observability: Metrics, Logs, and Traces',
+    url: 'https://claude.ai/public/artifacts/2cf5e36f-dfba-408f-a2f9-c42893734587',
+  },
+  {
+    title: 'OpenTelemetry Explained: The Standard Behind Modern Observability',
+    url: 'https://claude.ai/public/artifacts/092eff39-3d1b-4de9-b3bf-cbb9e8ceef0a',
+  },
+  {
+    title: 'SLIs, SLOs, and Error Budgets: Reliability in Plain English',
+    url: 'https://claude.ai/public/artifacts/c4647c22-debd-44bc-9039-9ea79fe1a4cc',
+  },
+  {
+    title: 'How to Reduce MTTR: A Practical Playbook for Faster Incident Resolution',
+    url: 'https://claude.ai/public/artifacts/097682c0-6a79-4b58-9132-088eeec9b3a2',
+  },
+  {
+    title: 'Fixing Alert Fatigue: How to Make On-Call Bearable Again',
+    url: 'https://claude.ai/public/artifacts/12f8400c-b913-43e8-a6aa-280824c0ad52',
+  },
+];
+
 export function faqAnswerText({ a, items }) {
   return items && items.length ? `${a} ${items.join(', ')}.` : a;
 }

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
-import { FAQS, AI_NEWS_FAQS, faqAnswerText } from '../data/faqContent';
+import { FAQS, AI_NEWS_FAQS, CLAUDE_PUBLISHED_LINKS, faqAnswerText } from '../data/faqContent';
 
 /*
  * FAQPage — SEO FAQ with full Q&A in the DOM via native <details> (always
@@ -75,6 +75,21 @@ export default function FAQPage() {
         {/* Site / product questions */}
         <p className="section-label" style={{ marginBottom: 14 }}>About Glancer AI</p>
         {renderList(FAQS)}
+
+        {/* Guides published as public Claude artifacts */}
+        <p className="section-label" style={{ marginBottom: 14 }}>Published on Claude</p>
+        <div className="chart-card" style={{ marginBottom: 40, padding: '28px 32px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginBottom: 18 }}>
+            Longer guides from the Glancer AI desk, published as public Claude artifacts:
+          </p>
+          <ul className="faq-answer-list" style={{ display: 'grid', gap: 10 }}>
+            {CLAUDE_PUBLISHED_LINKS.map((link) => (
+              <li key={link.url}>
+                <a href={link.url} target="_blank" rel="noopener noreferrer">{link.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* Still have questions CTA */}
         <div className="chart-card" style={{ marginBottom: 80, textAlign: 'center', padding: 40 }}>
