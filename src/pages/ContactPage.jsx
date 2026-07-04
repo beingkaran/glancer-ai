@@ -67,7 +67,7 @@ export default function ContactPage() {
         <Section title="What to write in about">
           <ul>
             <li><strong>Corrections.</strong> Spotted something wrong in an article or a glossary entry? Send the link and what needs fixing. Corrections are prioritised over everything else.</li>
-            <li><strong>Story tips.</strong> AI, AIOps and observability news the feed should be covering, or a practitioner story worth a deep dive.</li>
+            <li><strong>Story tips.</strong> An AI, AIOps or observability topic worth a deep dive, or a practitioner story we should be covering.</li>
             <li><strong>Guest writing.</strong> You can publish directly through the <a href="/blog/write">Write a Blog</a> flow (posts are reviewed before going live), or pitch an idea by email first.</li>
             <li><strong>Partnerships and press.</strong> Vendor briefings, product news, and collaboration ideas. Plain-spoken pitches do better than press releases.</li>
             <li><strong>Privacy requests.</strong> Data access or deletion requests under GDPR/CCPA, as described in our <a href="/privacy">Privacy Policy</a>.</li>

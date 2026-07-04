@@ -8,12 +8,6 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://glancerai.com/news</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://glancerai.com/ai-tools</loc>
     <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
@@ -67,54 +61,6 @@
     <lastmod>2026-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/research</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/models</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/industry</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/open-source</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/tools</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/hardware</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/aiops</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://glancerai.com/news/topic/policy</loc>
-    <lastmod>2026-07-04</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/openai</loc>
@@ -199,6 +145,27 @@
     <lastmod>2026-07-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/claude-sonnet-5-2-dollar-pricing-enterprise-budget-math</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>The $2-Per-Million Model That&apos;s Eating Enterprise AI Budgets: Claude Sonnet 5 Explained</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/openai-jalapeno-inference-chip-developers</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>OpenAI Is Building Its Own Chips: What the &apos;Jalapeño&apos; Inference ASIC Means for Developers</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/google-1-billion-ai-mode-users-gemini-flash-distribution</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>1 Billion AI Mode Users: What Google&apos;s Gemini 3.5 Flash Tells Us About the Real AI Race</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/claude-fable-5-19-day-blackout-enterprise-risk-playbook</loc>

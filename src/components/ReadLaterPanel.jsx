@@ -77,7 +77,7 @@ export default function ReadLaterPanel({ onClose }) {
             <div style={{ fontSize: '2.4rem', marginBottom: 10 }}>🔖</div>
             <p style={{ fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 6px' }}>Nothing saved yet</p>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
-              Tap <strong>Save</strong> on any news story or blog to keep it here for later.
+              Tap <strong>Save</strong> on any deep dive to keep it here for later.
             </p>
           </div>
         ) : (

@@ -363,7 +363,7 @@ export default function AIToolsPage() {
         </section>
 
         <div className="section-site-link" style={{ marginBottom: 60 }}>
-          More AI news, tools &amp; insights at{' '}
+          More AIOps &amp; observability deep dives, tools &amp; insights at{' '}
           <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
         </div>
       </div>

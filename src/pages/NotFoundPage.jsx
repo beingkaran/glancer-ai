@@ -19,10 +19,10 @@ export default function NotFoundPage() {
         <p className="error-code">404</p>
         <h1 className="error-title">This page wandered off</h1>
         <p className="error-sub">
-          The page you’re looking for doesn’t exist or may have moved. Let’s get you back to the AI news.
+          The page you’re looking for doesn’t exist or may have moved. Let’s get you back to the deep dives.
         </p>
         <div className="error-actions">
-          <Link to="/" className="write-cta-btn">← Back to AI News</Link>
+          <Link to="/" className="write-cta-btn">← Back to Deep Dives</Link>
           <Link to="/glossary" className="filter-chip error-chip">Glossary</Link>
           <Link to="/faq" className="filter-chip error-chip">FAQ</Link>
           <Link to="/ai-tools" className="filter-chip error-chip">Free AI Tools</Link>

@@ -49,7 +49,7 @@ export default function ShareBar({ post }) {
         <ShareIcon /> {label}
       </button>
       <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-        Your AI — News, Blogs &amp; Trends, all in one platform ·{' '}
+        AIOps &amp; observability deep dives, blogs &amp; trends ·{' '}
         <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--cyan)', fontWeight: 600, textDecoration: 'none' }}>
           glancerai.com
         </a>

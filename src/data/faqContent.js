@@ -3,11 +3,11 @@
 export const FAQS = [
   {
     q: 'What is Glancer AI?',
-    a: 'Glancer AI (glancerai.com) is a free AI intelligence hub for engineers, SREs, and researchers. It brings together breaking AI news, industry metrics and benchmarks, a searchable AIOps/observability glossary, expert blogs, and 25+ free in-browser AI tools — all in one place, with no paywalls or mandatory sign-up.',
+    a: 'Glancer AI (glancerai.com) is a free AI intelligence hub for engineers, SREs, and researchers. It brings together in-depth deep dives and vendor comparisons, industry metrics and benchmarks, a searchable AIOps/observability glossary, expert blogs, and 25+ free in-browser AI tools — all in one place, with no paywalls or mandatory sign-up.',
   },
   {
     q: 'Is Glancer AI free to use?',
-    a: 'Yes. Glancer AI is completely free. You can read the news, browse the glossary, view metrics, read blogs, and use every in-browser AI tool without paying or creating an account. Ads help keep the site running. An optional free account lets you write and publish your own blog posts.',
+    a: 'Yes. Glancer AI is completely free. You can read the deep dives, browse the glossary, view metrics, read blogs, and use every in-browser AI tool without paying or creating an account. Ads help keep the site running. An optional free account lets you write and publish your own blog posts.',
   },
   {
     q: 'What free AI tools does Glancer AI offer?',
@@ -26,8 +26,8 @@ export const FAQS = [
     a: 'APM (Application Performance Monitoring) is the practice of tracking the performance, availability, and user experience of software applications. It measures things like response time, error rates, throughput, and resource usage, often using distributed tracing to follow a request across services. Glancer AI\'s glossary covers APM and related terms in depth.',
   },
   {
-    q: 'How often is the AI news on Glancer AI updated?',
-    a: 'The AI News feed on Glancer AI is updated continuously throughout the day, pulling the latest developments from AI labs, research, and the broader industry. You get a fast, scannable overview of what is happening in AI without having to check dozens of sources.',
+    q: 'How often are the Deep Dives on Glancer AI updated?',
+    a: 'New deep dives — practitioner guides, vendor comparisons and benchmarks — are published regularly, and existing ones are revised as the AIOps and observability landscape changes. The glossary and metrics are kept current alongside them.',
   },
   {
     q: 'Can I write and publish my own blog on Glancer AI?',
@@ -51,12 +51,11 @@ export const FAQS = [
   },
 ];
 
-export const AI_NEWS_FAQS = [
-  { q: 'What is AI news?', a: 'AI news covers the latest developments in artificial intelligence, including new models, research breakthroughs, company announcements, regulations, startups, and AI-powered products.' },
-  { q: 'Where can I find the latest AI news?', a: 'You can follow dedicated AI news websites, technology publications, research labs, and official announcements from companies like OpenAI, Google, Microsoft, Meta, Anthropic, and NVIDIA. Glancer AI brings the latest AI news from 100+ of these sources into one live feed.' },
-  { q: 'Why is AI news important?', a: 'AI is transforming industries such as healthcare, finance, education, manufacturing, and software development. Keeping up with AI news helps individuals and businesses stay competitive.' },
+export const AI_FAQS = [
+  { q: 'What is AIOps and observability?', a: 'AIOps applies machine learning to IT operations data — logs, metrics, traces and events — to detect anomalies, correlate alerts and speed up incident resolution. Observability is the ability to understand a system\'s internal state from those outputs. Together they are how modern engineering teams keep complex systems reliable.' },
+  { q: 'How do the major observability vendors compare?', a: 'Datadog, New Relic, Splunk, Dynatrace, Grafana and others differ on pricing model, data ingestion, tracing depth and how much AI-driven analysis they include. Glancer AI publishes vendor-neutral deep dives and side-by-side comparisons written by an engineer rather than a marketing team.' },
+  { q: 'Why does practitioner-grade analysis matter?', a: 'Vendor blogs tend to explain observability in ways that favour their own product. Independent, practitioner-grade analysis focuses on trade-offs, real-world benchmarks and how tools behave in production, so you can make decisions on evidence rather than marketing.' },
   { q: 'Which companies are leading AI development?', a: 'Some of the leading AI companies include OpenAI, Google DeepMind, Microsoft, Anthropic, Meta, NVIDIA, Amazon, IBM, and xAI.' },
-  { q: 'How often is AI news updated?', a: 'Major AI news is published daily. Significant product launches, research papers, and funding announcements happen throughout the week. Glancer AI refreshes its feed on every visit.' },
   { q: 'What are the biggest AI trends in 2025?', a: 'Current trends include:', items: ['Agentic AI', 'Multimodal AI models', 'AI coding assistants', 'Enterprise AI adoption', 'AI-powered search', 'Robotics and autonomous systems', 'AI regulation and governance'] },
   { q: 'Is AI replacing jobs?', a: 'AI is automating certain repetitive tasks while also creating new roles in AI engineering, prompt engineering, data science, AI governance, and machine learning operations.' },
   { q: 'What is generative AI?', a: 'Generative AI is a type of artificial intelligence that creates new content such as text, images, videos, music, and computer code from user prompts.' },
@@ -70,16 +69,12 @@ export const AI_NEWS_FAQS = [
   { q: 'What are Large Language Models (LLMs)?', a: 'LLMs are AI models trained on massive datasets to understand and generate human-like text. They power modern AI assistants, chatbots, and coding tools.' },
   { q: 'What is multimodal AI?', a: 'Multimodal AI can process and generate multiple forms of content, including text, images, audio, and video within a single model.' },
   { q: 'Can AI create images and videos?', a: 'Yes. Modern generative AI models can create realistic images, videos, animations, and digital artwork from natural language prompts.' },
-  { q: 'How can I stay updated with AI news?', a: 'You can subscribe to AI newsletters, follow AI researchers and companies on social media, monitor GitHub projects, read research publications, and bookmark trusted AI news websites like Glancer AI.' },
+  { q: 'How can I stay updated with AI and observability?', a: 'You can subscribe to engineering newsletters, follow AI researchers and companies on social media, monitor GitHub projects, read research publications, and bookmark practitioner resources like Glancer AI\'s deep dives and glossary.' },
   { q: 'What is the future of artificial intelligence?', a: 'AI is expected to become increasingly integrated into everyday applications, driving advances in automation, healthcare, education, scientific research, robotics, and personalized digital experiences.' },
 ];
 
 /** Guides and articles published as public Claude artifacts. */
 export const CLAUDE_PUBLISHED_LINKS = [
-  {
-    title: 'Why Glancer AI Is the Best AI News Aggregator for Engineers, SREs, and Platform Teams',
-    url: 'https://claude.ai/public/artifacts/c1aa7d20-c2e0-4785-9dfb-f73d80a02792',
-  },
   {
     title: 'What Is AIOps? A Practical Guide for Engineering Teams',
     url: 'https://claude.ai/public/artifacts/9d14afa9-d9e6-4a34-91a0-e5293e5623e2',

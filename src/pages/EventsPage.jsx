@@ -224,7 +224,7 @@ export default function EventsPage() {
         </p>
 
         <div className="section-site-link">
-          More AI news, tools &amp; insights at{' '}
+          More AIOps &amp; observability deep dives, tools &amp; insights at{' '}
           <a href="https://glancerai.com" target="_blank" rel="noopener noreferrer">glancerai.com</a>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
-import { FAQS, AI_NEWS_FAQS, CLAUDE_PUBLISHED_LINKS, faqAnswerText } from '../data/faqContent';
+import { FAQS, AI_FAQS, CLAUDE_PUBLISHED_LINKS, faqAnswerText } from '../data/faqContent';
 
 /*
  * FAQPage — SEO FAQ with full Q&A in the DOM via native <details> (always
@@ -10,8 +10,8 @@ import { FAQS, AI_NEWS_FAQS, CLAUDE_PUBLISHED_LINKS, faqAnswerText } from '../da
 
 export default function FAQPage() {
   useDocumentMeta({
-    title: 'AI News FAQ — AI, LLMs, AI Agents, AGI & 2025 Trends',
-    description: 'AI news FAQ: what is AI news, where to find the latest AI news, generative AI, AI agents, LLMs, AGI, AI regulation and the biggest AI trends of 2025 — plus questions about Glancer AI, free AI tools and the AIOps glossary.',
+    title: 'FAQ — AIOps, Observability, AI, LLMs & AI Agents',
+    description: 'Frequently asked questions about AIOps, observability, APM, vendor comparisons, generative AI, AI agents, LLMs and AGI — plus how Glancer AI, its free tools and the AIOps glossary work.',
     path: '/faq',
   });
 
@@ -21,7 +21,7 @@ export default function FAQPage() {
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: [...FAQS, ...AI_NEWS_FAQS].map((f) => ({
+      mainEntity: [...FAQS, ...AI_FAQS].map((f) => ({
         '@type': 'Question',
         name: f.q,
         acceptedAnswer: { '@type': 'Answer', text: faqAnswerText(f) },
@@ -62,15 +62,15 @@ export default function FAQPage() {
         {/* Hero */}
         <div className="page-hero" style={{ paddingTop: 'calc(var(--navbar-h) + 60px)', paddingBottom: 36, textAlign: 'center' }}>
           <p className="section-label" style={{ marginBottom: 12 }}>Help Center</p>
-          <h1 className="page-hero-title">AI News — Frequently Asked Questions</h1>
+          <h1 className="page-hero-title">Frequently Asked Questions</h1>
           <p className="hero-sub" style={{ margin: '0 auto' }}>
-            Clear answers to the most-searched questions about AI news, generative AI, AI agents, LLMs and 2025 AI trends — plus how Glancer AI, its free tools and glossary work.
+            Clear answers to the most-searched questions about AIOps, observability, generative AI, AI agents and LLMs — plus how Glancer AI, its free tools and glossary work.
           </p>
         </div>
 
-        {/* AI news questions (broad search intent) */}
-        <p className="section-label" style={{ marginBottom: 14 }}>AI News &amp; Artificial Intelligence</p>
-        {renderList(AI_NEWS_FAQS)}
+        {/* Broad AIOps / AI questions (search intent) */}
+        <p className="section-label" style={{ marginBottom: 14 }}>AIOps, Observability &amp; Artificial Intelligence</p>
+        {renderList(AI_FAQS)}
 
         {/* Site / product questions */}
         <p className="section-label" style={{ marginBottom: 14 }}>About Glancer AI</p>

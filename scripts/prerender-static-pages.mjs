@@ -12,7 +12,7 @@ const ORIGIN = 'https://glancerai.com';
 const DIST = resolve(__dirname, '../dist');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
-const { FAQS, AI_NEWS_FAQS, CLAUDE_PUBLISHED_LINKS } = await import('../src/data/faqContent.js');
+const { FAQS, AI_FAQS, CLAUDE_PUBLISHED_LINKS } = await import('../src/data/faqContent.js');
 const { HOME_EDITORIAL, TOPIC_GUIDES } = await import('../src/data/seoGuides.js');
 const { TOPICS } = await import('../src/data/topics.js');
 const { TECH_EVENTS } = await import('../src/data/techEvents.js');
@@ -21,7 +21,6 @@ const { EXTRA_GLOSSARY_TERMS } = await import('../src/data/extraGlossary.js');
 const { EXTRA_GLOSSARY_BATCH4 } = await import('../src/data/extraGlossaryBatch4.js');
 const { FEATURED_TERMS } = await import('../src/data/glossaryMeta.js');
 const { AI_TOOLS } = await import('../src/data/aiTools.js');
-const { NEWS_ITEMS, NEWS_CATEGORIES } = await import('../src/data/newsData.js');
 
 /** Lightweight catalog for prerender — customTools.js pulls browser-only engines. */
 const BROWSER_TOOLS = [
@@ -159,40 +158,15 @@ function topicsIndexBody() {
   `;
 }
 
-function newsBody() {
-  const catSlug = (c) => c.toLowerCase().replace(/\s+/g, '-');
-  const cats = NEWS_CATEGORIES.filter((c) => c !== 'All')
-    .map((c) => `<a href="/news/topic/${catSlug(c)}">${esc(c)}</a>`)
-    .join(' · ');
-  const items = NEWS_ITEMS.slice(0, 12)
-    .map((n) => `<li><a href="${esc(n.url)}" rel="noopener">${esc(n.title)}</a> — <span>${esc((n.excerpt || '').slice(0, 140))}</span></li>`)
-    .join('\n');
-  return `
-    <p>Live AI and observability headlines aggregated from 100+ curated sources — research labs, model vendors, AIOps and APM platforms, open source projects and industry press. The feed refreshes continuously in the app; below is a curated snapshot.</p>
-    <p><strong>Browse by topic:</strong> ${cats}</p>
-    <ul style="list-style:none;padding:0">${items}</ul>
-    <p>Prefer long-form? Read our <a href="/">Deep Dives on the home feed</a>, explore <a href="/topics">company and technology hubs</a>, or check <a href="/events">upcoming AI &amp; observability events</a>.</p>
-  `;
-}
-
 const PAGES = [
   {
     path: '/',
     out: 'index.html',
-    title: 'AI News Today — Latest AI News & Breakthroughs | Glancer AI',
+    title: 'AIOps & Observability Deep Dives — Vendor-Neutral Analysis | Glancer AI',
     description:
-      'Practitioner-grade AIOps and observability intelligence — in-depth APM comparisons, OpenTelemetry guides, 2,200-term glossary, and live AI news.',
+      'Practitioner-grade AIOps and observability intelligence — in-depth APM comparisons, OpenTelemetry guides, benchmarks and a 2,200-term glossary. Written by an engineer.',
     h1: 'Observability intelligence, without the vendor spin',
     body: homeBody(),
-  },
-  {
-    path: '/news',
-    out: 'news.html',
-    title: "Today's AI News — Live Headlines from 100+ Sources | Glancer AI",
-    description:
-      "Today's AI and observability headlines, refreshed continuously from 100+ curated sources — research, models, industry, AIOps and more.",
-    h1: "Today's AI News",
-    body: newsBody(),
   },
   {
     path: '/privacy',
@@ -235,16 +209,16 @@ const PAGES = [
     body: `
       <p>Glancer AI tracks the numbers that matter in the artificial intelligence ecosystem — venture funding into AI startups, the count of foundation models on public leaderboards, SWE-bench scores for coding models, Fortune 500 adoption rates, aggregate AI market capitalisation, daily ChatGPT user estimates, median LLM API latency, and uptime across major model providers.</p>
       <p>Each metric links to its primary source (CB Insights, Stanford HAI, SWE-bench, McKinsey, Bloomberg Intelligence, Similarweb, Artificial Analysis, and official status pages) so you can verify figures and drill into methodology. Charts update with modest synthetic movement for demonstration; always cite the upstream source for published work.</p>
-      <p>Pair this dashboard with our <a href="/">live news feed</a>, <a href="/blog/datadog-vs-newrelic-vs-splunk-2026">APM comparisons</a>, and <a href="/glossary">glossary</a> for qualitative context behind the numbers.</p>
+      <p>Pair this dashboard with our <a href="/">Deep Dives</a>, <a href="/blog/datadog-vs-newrelic-vs-splunk-2026">APM comparisons</a>, and <a href="/glossary">glossary</a> for qualitative context behind the numbers.</p>
     `,
   },
   {
     path: '/faq',
     out: 'faq.html',
-    title: 'AI News FAQ | Glancer AI',
-    description: 'FAQ: AI news, generative AI, agents, LLMs, AIOps, observability, free tools, and how Glancer AI works.',
-    h1: 'AI News — Frequently Asked Questions',
-    body: `${faqSectionHtml(AI_NEWS_FAQS, 'AI News & Artificial Intelligence')}${faqSectionHtml(FAQS, 'About Glancer AI')}<h2>Published on Claude</h2><ul>${CLAUDE_PUBLISHED_LINKS.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a></li>`).join('')}</ul>`,
+    title: 'FAQ — AIOps, Observability, AI, LLMs & Agents | Glancer AI',
+    description: 'FAQ: AIOps, observability, APM, vendor comparisons, generative AI, agents, LLMs, free tools, and how Glancer AI works.',
+    h1: 'Frequently Asked Questions',
+    body: `${faqSectionHtml(AI_FAQS, 'AIOps, Observability & Artificial Intelligence')}${faqSectionHtml(FAQS, 'About Glancer AI')}<h2>Published on Claude</h2><ul>${CLAUDE_PUBLISHED_LINKS.map((l) => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title)}</a></li>`).join('')}</ul>`,
   },
   {
     path: '/about',
@@ -253,7 +227,7 @@ const PAGES = [
     description: 'Why Glancer AI exists — practitioner-grade observability intelligence without vendor spin.',
     h1: 'Built to Make Sense of AI',
     body: `
-      <p>Glancer AI began as a searchable glossary for AIOps, observability, and APM terminology and evolved into an intelligence desk for engineers: vendor comparisons, OpenTelemetry guides, live news from 100+ feeds, topic hubs, metrics, events, and free browser-based tools.</p>
+      <p>Glancer AI began as a searchable glossary for AIOps, observability, and APM terminology and evolved into an intelligence desk for engineers: in-depth deep dives, vendor comparisons, OpenTelemetry guides, topic hubs, metrics, events, and free browser-based tools.</p>
       <p>Everything is written and maintained by <strong>Karan Shah</strong>, an engineer — not a marketing team. We prioritise clarity, primary sources, and production relevance over hype cycles.</p>
       <p><a href="/blog/datadog-vs-newrelic-vs-splunk-2026">Read our APM shootouts</a> · <a href="/glossary">Browse the glossary</a> · <a href="/topics">Explore topic hubs</a> · <a href="mailto:karan.igniite@gmail.com">Contact</a></p>
     `,

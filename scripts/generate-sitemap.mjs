@@ -22,14 +22,12 @@ const OUT = resolve(__dirname, '../public/sitemap.xml');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
 const { TOPICS } = await import('../src/data/topics.js');
-const { NEWS_CATEGORIES } = await import('../src/data/newsData.js');
 
 const today = new Date().toISOString().slice(0, 10);
 
 // Top-level routes with sensible crawl priorities.
 const staticRoutes = [
   { loc: '/', changefreq: 'daily', priority: '1.0', lastmod: today },
-  { loc: '/news', changefreq: 'daily', priority: '0.9', lastmod: today },
   { loc: '/ai-tools', changefreq: 'weekly', priority: '0.9', lastmod: today },
   { loc: '/metrics', changefreq: 'daily', priority: '0.7', lastmod: today },
   { loc: '/events', changefreq: 'weekly', priority: '0.7', lastmod: today },
@@ -47,17 +45,6 @@ const staticRoutes = [
   { loc: '/terms', changefreq: 'monthly', priority: '0.5', lastmod: today },
   { loc: '/topics', changefreq: 'daily', priority: '0.8', lastmod: today },
 ];
-
-// Category feed pages (/news/topic/<slug>) — one per news category, mirroring
-// the multi-page home feed. Slug rule must match src/lib/feedRoutes.js.
-for (const cat of NEWS_CATEGORIES.filter((c) => c !== 'All')) {
-  staticRoutes.push({
-    loc: `/news/topic/${cat.toLowerCase().replace(/\s+/g, '-')}`,
-    changefreq: 'daily',
-    priority: '0.6',
-    lastmod: today,
-  });
-}
 
 // One <url> per programmatic topic hub. These are refreshed on every build, so
 // they carry a daily changefreq — they're prime long-tail entry points.

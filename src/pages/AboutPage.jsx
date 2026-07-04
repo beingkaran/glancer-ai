@@ -64,14 +64,14 @@ const VALUES = [
   { icon:'🎯', title:'Clarity First', desc:'Every definition, article, and metric should make something clearer — not more confusing.' },
   { icon:'🛠️', title:'Built for Practitioners', desc:'Not marketing copy. Written by engineers, for engineers who need to solve real problems.' },
   { icon:'🌐', title:'Open & Free', desc:'The core glossary and content will always be free. Knowledge shouldn\'t be paywalled.' },
-  { icon:'⚡', title:'Always Current', desc:'The AI space moves fast. We keep the metrics, news, and glossary up to date with what\'s actually happening.' },
+  { icon:'⚡', title:'Always Current', desc:'The AI space moves fast. We keep the deep dives, metrics, and glossary up to date with what\'s actually happening.' },
 ];
 
 export default function AboutPage() {
   useDocumentMeta({
     title: 'About Glancer AI — Who Curates This Site',
     description:
-      'Glancer AI is an independent AI and observability intelligence hub — live news from 100+ sources, practitioner deep dives, a 2,200-term glossary and free tools. Meet the author.',
+      'Glancer AI is an independent AI and observability intelligence hub — practitioner deep dives, a 2,200-term glossary, live metrics and free tools. Meet the author.',
     path: '/about',
   });
 
@@ -83,7 +83,7 @@ export default function AboutPage() {
           <p className="section-label" style={{ marginBottom: 12 }}>About</p>
           <h1 className="page-hero-title">Built to Make Sense of AI</h1>
           <p className="hero-sub" style={{ margin: '0 auto' }}>
-            Glancer AI is an AI intelligence hub — glossary, news, metrics, and expert writing in one place — built by an engineer who wanted a single source of truth for the AI and observability ecosystem.
+            Glancer AI is an AI intelligence hub — glossary, deep dives, metrics, and expert writing in one place — built by an engineer who wanted a single source of truth for the AI and observability ecosystem.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export default function AboutPage() {
             Glancer AI started as a searchable glossary for AIOps, Observability, and APM terminology — a place to quickly look up what "distributed tracing", "error budget", or "AIOps" actually means in the context of how modern engineering teams operate.
           </p>
           <p style={{ color:'var(--text-secondary)', lineHeight:1.75, marginBottom:14 }}>
-            It has since grown into a full intelligence hub: <strong style={{ color:'var(--text-primary)' }}>AI News</strong> covering breaking developments from labs and the industry; <strong style={{ color:'var(--text-primary)' }}>Metrics</strong> tracking the numbers that matter (funding, benchmarks, adoption); and <strong style={{ color:'var(--text-primary)' }}>Blogs</strong> with in-depth technical guides written for practitioners.
+            It has since grown into a full intelligence hub: <strong style={{ color:'var(--text-primary)' }}>Deep Dives</strong> with in-depth technical guides, vendor comparisons and benchmarks written for practitioners; <strong style={{ color:'var(--text-primary)' }}>Metrics</strong> tracking the numbers that matter (funding, benchmarks, adoption); and a <strong style={{ color:'var(--text-primary)' }}>Glossary</strong> of 2,200+ AIOps and observability terms.
           </p>
           <p style={{ color:'var(--text-secondary)', lineHeight:1.75 }}>
             Everything is free. There are no paywalls, no mandatory sign-ups. Ads help keep the lights on.

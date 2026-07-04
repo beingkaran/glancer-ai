@@ -109,7 +109,7 @@ export default function SocialShareSheet({ item, onClose }) {
         </div>
 
         <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)', margin: '14px 0 2px', lineHeight: 1.5 }}>
-          Your AI — News, Blogs &amp; Trends, all in one platform ·{' '}
+          AIOps &amp; observability deep dives, blogs &amp; trends ·{' '}
           {/* button, not <a>: this sheet can render inside a news-card link and nested anchors are invalid */}
           <button
             type="button"

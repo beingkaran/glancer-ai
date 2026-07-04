@@ -507,14 +507,40 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   .hero-grid { grid-template-columns: 1fr; gap: 28px; }
   .hero-desk-panel { max-width: 420px; }
 }
+@media (max-width: 900px) {
+  /* Grid gap already separates the copy column from the desk panel below it,
+     so the tab row doesn't need its own bottom margin once stacked. */
+  .hero-tabs { margin-bottom: 0; }
+}
 @media (max-width: 600px) {
   .hero { padding-top: 18px; padding-bottom: 20px; }
+  .hero-masthead { margin-bottom: 22px; }
   .hero-masthead-rule:not(:first-child) { display: none; }
   .hero-eyebrow { font-size: 0.66rem; letter-spacing: 0.1em; }
   .hero-title-line { font-size: clamp(2rem, 9vw, 2.65rem); }
   .hero-title-accent { font-size: clamp(1.35rem, 6.5vw, 1.85rem); }
   .hero-lead { font-size: 1rem; line-height: 1.62; max-width: none; }
   .hero-byline { font-size: 0.92rem; margin-bottom: 20px; }
+
+  /* Stats: on desktop these read as an inline strip, but at phone widths the
+     uneven label lengths ("Vendor-neutral") wrap into a lopsided 2-then-1
+     block. Reflow them into a tidy bordered card — one stat per row, value
+     left, label right, hairline dividers between. */
+  .hero-stats {
+    display: block; gap: 0; margin-bottom: 24px;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .hero-stats li {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 14px; padding: 13px 16px;
+  }
+  .hero-stats li + li { border-top: 1px solid var(--glass-border); }
+  .hero-stats strong { font-size: 1.1rem; }
+  .hero-stats span { text-align: right; font-size: 0.66rem; }
+
   .hero-quicklinks { max-width: none; gap: 10px; }
   .hero-quicklink {
     grid-template-columns: minmax(76px, max-content) 1fr; gap: 10px;
@@ -524,7 +550,10 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   .hero-quicklink-label { font-size: 0.92rem; line-height: 1.4; }
   .hero-desk-panel { max-width: none; }
   .hero-scroll-indicator { display: none; }
-  .hero-tabs { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 28px; }
+  .hero-tabs {
+    flex-direction: column; align-items: stretch; gap: 10px;
+    margin-bottom: 0;
+  }
   .hero-tabs .tab-switcher { width: 100%; display: flex; }
   .hero-tabs .tab-btn {
     flex: 1; justify-content: center; padding: 14px 12px;

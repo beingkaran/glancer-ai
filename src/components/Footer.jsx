@@ -15,7 +15,7 @@ export default function Footer() {
                 <span className="nav-logo-dot"> AI</span>
               </span>
             </Link>
-            <p>Practitioner-grade AIOps &amp; observability intelligence — vendor comparisons, benchmarks, a 2,200-term glossary and live industry news. Built by an engineer.</p>
+            <p>Practitioner-grade AIOps &amp; observability intelligence — vendor comparisons, benchmarks, in-depth deep dives and a 2,200-term glossary. Built by an engineer.</p>
             <a
               href="https://www.linkedin.com/in/beingkaran/"
               target="_blank"

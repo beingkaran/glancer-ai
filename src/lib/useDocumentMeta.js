@@ -34,7 +34,7 @@ function upsertLink(rel, href) {
 
 export function useDocumentMeta({ title, description, path = '', type = 'website', image, robots } = {}) {
   useEffect(() => {
-    const fullTitle = title ? `${title} · ${SITE}` : `${SITE} — AI News, Metrics & Intelligence Hub`;
+    const fullTitle = title ? `${title} · ${SITE}` : `${SITE} — AIOps & Observability Deep Dives`;
     const url = ORIGIN + path;
     document.title = fullTitle;
 
