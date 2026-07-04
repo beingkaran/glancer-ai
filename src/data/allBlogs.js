@@ -1,6 +1,191 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'claude-sonnet-5-2-dollar-pricing-enterprise-budget-math',
+    bannerImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1600&q=80',
+    title: "The $2-Per-Million Model That's Eating Enterprise AI Budgets: Claude Sonnet 5 Explained",
+    subtitle: 'Sonnet 5 costs $2 per million input tokens through August 31, then the rate moves to $3. That is a 50% jump with a date attached, and if your team runs agentic workflows at scale the difference is real money. This piece does the math instead of repeating the announcement.',
+    category: 'Enterprise AI',
+    icon: '🧮',
+    bgGradient: 'linear-gradient(135deg, #0a1f1a 0%, #92225F 55%, #EF7BAE 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-04',
+    readTime: 9,
+    tags: ['Claude Sonnet 5', 'Anthropic', 'LLM pricing', 'agentic AI', 'AI budgets', 'procurement', 'Gemini 3.5 Flash'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Sonnet 5 input tokens cost <strong>$2 per million through August 31</strong>, then the published rate moves to <strong>$3 per million</strong>. That is a 50% increase with a hard date on it.</li>
+    <li>Agentic workflows are <strong>input heavy</strong>. Every step re-sends context, so the input rate is the number that decides your bill, not the output rate.</li>
+    <li>Worked out over a year, the jump is roughly <strong>$3,600 for a heavy solo dev</strong>, <strong>$36,000 for a ten person platform team</strong>, and <strong>$240,000 for a production agent fleet</strong>.</li>
+    <li>Budget at $3 and treat the intro rate as upside. Teams that plan around the promo number are going to have an awkward September.</li>
+  </ul>
+</div>
+
+<h2>The deadline is the story</h2>
+<p>Most of the Sonnet 5 coverage reads like a press release with the logo swapped. Model got better, price is low, everyone claps. The detail that actually matters for anyone running this at scale is sitting in the pricing trackers at llm-stats.com and pricepertoken.com: the $2 per million input rate is introductory, and it runs through August 31. After that the listed rate is $3.</p>
+<p>A 50% price move on your dominant cost line, with eight weeks of notice, is not a footnote. It is a procurement event. TechCrunch covered the launch, the Rentier Digital write up on Medium flagged the window, and almost nobody has walked through what the numbers mean for a real team. So lets do that.</p>
+
+<h2>Why agent workflows eat input tokens for breakfast</h2>
+<p>If your mental model of LLM cost comes from chat, you will get this wrong. A chat exchange sends a question and gets an answer, input and output stay roughly balanced. Agents don't work like that. An agent loop re-sends the accumulated context on every step: the system prompt, the repo excerpts, the tool outputs, the conversation so far. Ten steps in, the model has read your context ten times and written its answers once.</p>
+<p>In practice we see input to output ratios of 15:1 or 20:1 on coding agents. A single task that runs ten steps can pull 40,000 to 60,000 input tokens without doing anything exotic. That is why the input rate is the whole ballgame, and why a 50% move on it lands so hard. The output rate could double tomorrow and alot of agent-heavy teams would barely notice.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1280&q=80" alt="A laptop, notes and a pen on a desk during planning work" loading="lazy" /><figcaption>Agent loops re-read the same context on every step. The input line on the invoice is where the money actually goes.</figcaption></figure>
+
+<h2>The actual math</h2>
+<p>Here are three honest scenarios. Assumptions first so you can argue with them: an average agent run consumes about 50,000 input tokens, a heavy individual user fires 250 to 300 runs a day, a platform team of ten runs shared pipelines on top of individual use, and a production fleet processes about a million runs a month at a leaner 20,000 tokens per run because the prompts are tuned.</p>
+
+<table class="ctable">
+  <thead><tr><th>Scenario</th><th>Input tokens / month</th><th>At $2 / M</th><th>At $3 / M</th><th>Extra per year</th></tr></thead>
+  <tbody>
+    <tr><th>Heavy solo dev</th><td>~300M</td><td>$600</td><td>$900</td><td class="best">+$3,600</td></tr>
+    <tr><th>10 person platform team</th><td>~3B</td><td>$6,000</td><td>$9,000</td><td class="best">+$36,000</td></tr>
+    <tr><th>Production agent fleet</th><td>~20B</td><td>$40,000</td><td>$60,000</td><td class="best">+$240,000</td></tr>
+  </tbody>
+</table>
+
+<p>None of these numbers include output tokens, retries, or eval runs, so treat them as floors. The point isn't the exact figures, its the shape. At solo scale the jump is an annoyance. At team scale it is a line item someone has to defend. At fleet scale it is a quarter million dollars appearing in the budget because of a calendar date.</p>
+<blockquote><strong>Worth reframing:</strong> stop thinking in price per token and start thinking in price per completed task. A task that takes 50k input tokens costs about a dime today and fifteen cents in September. Multiply by how many tasks your org actually runs and the abstraction gets very concrete.</blockquote>
+
+<h2>Sonnet 5 against Gemini 3.5 Flash</h2>
+<p>The obvious counter is Google. Gemini 3.5 Flash pushes roughly 4x the token throughput of the frontier tier, and for some workloads speed is the currency that matters. The honest comparison is not one model versus the other, it is workload versus workload.</p>
+<p>Interactive loops, the kind where a human is watching the agent work, favor Flash. Nobody enjoys watching a spinner, and 4x throughput turns a two minute agent task into thirty seconds. Batch work flips it. If a pipeline runs overnight, nobody cares whether a step took four seconds or one, and Sonnet 5's 63.2% on agentic coding benchmarks means fewer failed runs to re-pay for. A failed run costs you its full token bill and gives you nothing, so per-step reliability is a cost lever too, and people keep leaving it out of the spreadsheet.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="Analytics dashboards with charts on a screen" loading="lazy" /><figcaption>Speed wins when a human is waiting. Reliability wins when the pipeline runs at 3am. Price them separately.</figcaption></figure>
+
+<h2>What to tell procurement</h2>
+<p>Engineers read the benchmark table, finance reads the rate card, and the deal gets signed somewhere in between. This is one of the rare cases where both sides need the same brief.</p>
+
+<div class="callout">
+  <div class="callout-title">Five moves before August 31</div>
+  <strong>(1) Budget at $3.</strong> Model the fleet at the post-intro rate. If the economics only work at $2, they dont work. <strong>(2) Measure your real ratio.</strong> Pull one week of usage and compute your actual input to output split, not the industry guess. <strong>(3) Trim the loop.</strong> Prompt caching and tighter context windows cut the input bill at any rate, and the work pays back forever. <strong>(4) Don't sign annuals on a promo.</strong> Any committed spend deal priced off the intro rate should have the September number written in. <strong>(5) Re-run the Flash comparison on your workload.</strong> Not on the leaderboard. Your tasks, your latency budget, your failure rates.</div>
+
+<h2>Bottom line</h2>
+<p>Sonnet 5 at $2 per million is a genuinely good deal, and it is a deal with an expiry date printed on it. The teams that will feel fine in September are the ones doing the arithmetic in July: measure the real input ratio, budget at three dollars, cache what you can, and decide per workload where Flash's speed beats Sonnet's reliability. The model is not eating anyone's budget. Unexamined token flow is. The math takes an afternoon, and this particular afternoon has a deadline.</p>
+    `
+  },
+  {
+    id: 'openai-jalapeno-inference-chip-developers',
+    bannerImage: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=1600&q=80',
+    title: "OpenAI Is Building Its Own Chips: What the 'Jalapeño' Inference ASIC Means for Developers",
+    subtitle: 'The GPT-5.6 preview landed the same week as news of Jalapeño, an inference ASIC OpenAI is building in house. Most coverage filed it under cost cutting. The bigger story is control: whoever owns the silicon owns the speed and price curve, and third party latency comparisons quietly stop meaning much.',
+    category: 'AI Infrastructure',
+    icon: '🌶️',
+    bgGradient: 'linear-gradient(135deg, #1a0a05 0%, #9a3412 55%, #fb923c 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-04',
+    readTime: 8,
+    tags: ['OpenAI', 'Jalapeño', 'inference ASIC', 'GPT-5.6', 'AI infrastructure', 'custom silicon', 'latency'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>OpenAI confirmed <strong>Jalapeño</strong>, a custom inference ASIC, alongside the <strong>GPT-5.6 preview</strong>. The two announcements are really one announcement.</li>
+    <li>This is not mainly about saving money on GPUs. It is about <strong>owning the speed and price curve</strong> the way Apple owns its silicon roadmap.</li>
+    <li>Once model and metal are co-designed, <strong>third party latency comparisons lose their meaning</strong>. A tokens-per-second number only describes one vendor's stack on one day.</li>
+    <li>For teams choosing providers, the practical shift is that speed becomes a product feature that can be repriced, wich changes how you should write your evals and your contracts.</li>
+  </ul>
+</div>
+
+<h2>Two announcements that are really one</h2>
+<p>The GPT-5.6 preview got the headlines, the chip got a paragraph. Flip that. The MarketingProfs AI update on July 3 mentioned Jalapeño almost in passing, and OpenAI's own post is careful to frame it as an efficiency project. Read the two together and the picture is different: the next model generation and the hardware it runs on are being designed by the same company, on the same schedule, for each other.</p>
+<p>We already saw what happens when OpenAI rents speed. GPT-5.6 Sol previewing on Cerebras hardware at up to 750 tokens a second was the demo, and it proved latency is a product people will pay for. Renting that speed from someone else's fab is a bridge. Jalapeño is the destination, the same speed without the landlord.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="Macro shot of a circuit board" loading="lazy" /><figcaption>Inference is a physics problem before it is a software problem. Owning the silicon means owning the physics.</figcaption></figure>
+
+<h2>The Apple playbook, applied to inference</h2>
+<p>Apple did not build the M series chips to save money on Intel invoices. They built them so that performance, battery life and release timing stopped being someone else's decision. Ask any Mac user what changed after 2020, the answer is everything got faster and nobody outside Apple can explain exactly why or copy it directly. That is the position OpenAI is playing for.</p>
+<p>A model vendor that owns its inference silicon can do things a GPU tenant cannot. It can ship a model that only hits its advertised latency on its own metal. It can price aggressive speed tiers because the margin lives in-house. It can tune the hardware for one architecture instead of every architecture, its a completely different efficiency game. And it can time model releases to silicon availability, the way Apple times software to hardware every autumn.</p>
+<blockquote><strong>Worth reframing:</strong> the API was never the product. The product is a speed and price curve, and custom silicon is how you bend that curve without asking Nvidia or a cloud landlord for permission.</blockquote>
+
+<h2>Why third party latency comparisons stop meaning much</h2>
+<p>Sites like llm-stats.com do useful work, and their tokens-per-second tables are about to get a lot less comparable. Today a latency number roughly describes how a model behaves on broadly similar accelerators. Once vendors co-design model and chip, that number describes one vertically integrated stack at one moment, on hardware you cannot rent, benchmark independently, or reason about from the outside.</p>
+<p>The comparison problem gets worse, not better, as each vendor goes vertical. Google already runs Gemini on TPUs. OpenAI is building Jalapeño. The number that used to feel like a property of the model becomes a property of the company, and companies change their serving stack whenever they want, without a changelog entry.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1280&q=80" alt="Rows of servers in a dark data center" loading="lazy" /><figcaption>When the serving stack is proprietary end to end, a public latency table is a snapshot of a black box.</figcaption></figure>
+
+<h2>What this means when you pick a provider</h2>
+<p>The practical consequences are less abstract than the strategy talk. Speed is becoming a priced feature, so expect latency tiers the same way you get storage tiers, and expect the fast tier to cost real money once it runs on scarce custom silicon. Lock-in is moving below the API too. Prompts port between vendors with some pain. A workflow built around one vendor's latency profile ports much worse, because the competitor physically cannot match the response curve.</p>
+<p>Your evals need to change with this. A leaderboard latency number tells you almost nothing about what your workload will experience next quarter. Measure your own p95 on your own tasks, from your own region, and re-measure on a schedule, because the stack under you is now allowed to change silently.</p>
+
+<div class="callout">
+  <div class="callout-title">Four practical moves</div>
+  <strong>(1) Benchmark your workload, not the leaderboard.</strong> Your prompts, your context sizes, your region, monthly. <strong>(2) Put latency in the contract.</strong> If response time matters to your product, get a p95 commitment in writing, not a marketing page. <strong>(3) Price the fast tier separately.</strong> Model your costs assuming speed becomes a paid add-on, because it will. <strong>(4) Keep one workload portable.</strong> Maintain a second provider path for your most latency-tolerant pipeline, it keeps the negotiation honest.</div>
+
+<h2>Bottom line</h2>
+<p>Jalapeño is not a procurement story about GPU bills. It is OpenAI deciding that the speed of its models should be a thing it controls all the way down, the same bet Apple made and won. For developers the takeaway is simple and slightly uncomfortable: latency numbers are becoming vendor property, comparisons are becoming snapshots, and the only benchmark that will keep telling you the truth is the one you run yourself.</p>
+    `
+  },
+  {
+    id: 'google-1-billion-ai-mode-users-gemini-flash-distribution',
+    bannerImage: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80',
+    title: "1 Billion AI Mode Users: What Google's Gemini 3.5 Flash Tells Us About the Real AI Race",
+    subtitle: 'Google says AI Mode in Search crossed a billion monthly users, about 100 million ahead of the weekly number ChatGPT reports. The model behind it is Gemini 3.5 Flash, and the lesson is not about benchmarks. It is about what happens when good enough ships inside the default.',
+    category: 'AI Industry',
+    icon: '📡',
+    bgGradient: 'linear-gradient(135deg, #050a1f 0%, #052962 55%, #378ADD 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-04',
+    readTime: 8,
+    tags: ['Google', 'Gemini 3.5 Flash', 'AI Mode', 'ChatGPT', 'distribution', 'AI adoption', 'Search'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Google reports <strong>1 billion monthly AI Mode users</strong>, roughly 100 million more than the weekly active figure ChatGPT publishes. The metrics dont line up cleanly, and the gap is still the story.</li>
+    <li>The engine behind it is <strong>Gemini 3.5 Flash</strong>, running about 4x faster than 3.1 Pro. Not the smartest model Google has. The one fast and cheap enough to put in front of everyone.</li>
+    <li>The real moat is <strong>distribution</strong>: Search, Android, Chrome, Workspace. Google does not acquire AI users, it flips defaults.</li>
+    <li>For builders the lesson is uncomfortable but useful: the winner of the AI era gets decided by defaults and distribution, not by teh top of the benchmark table.</li>
+  </ul>
+</div>
+
+<h2>A billion users, with an asterisk</h2>
+<p>Let me do the honest thing the press releases skipped and point at the asterisk first. Google's number is monthly users of AI Mode. The ChatGPT figure everyone compares it against is weekly actives. Monthly versus weekly is not a fair fight, a monthly count will always flatter, and anyone who has ever owned a metrics dashboard know exactly why the comparison got framed that way.</p>
+<p>Here is the thing though. Discount the number however you like. Halve it. The corrected picture is still hundreds of millions of people touching a Gemini model every month without ever downloading an app, creating an account, or making a single deliberate choice to use AI. The coverage on USAII and StartupHub.ai focused on the race framing. The mechanism underneath is more interesting than the horse race.</p>
+
+<h2>Good enough, everywhere, beats best, somewhere</h2>
+<p>Gemini 3.5 Flash is not the strongest model Google can build. It is the strongest model Google can afford to run for a billion people, and that distinction is the whole strategy. Flash runs roughly 4x faster than 3.1 Pro, cheap enough to serve inside a free product, fast enough that the answer appears before the user's patience runs out. On a leaderboard it sits below the frontier tier. Inside a Search results page, against the alternative of nothing, it is magic.</p>
+<blockquote><strong>Worth reframing:</strong> the question that decides adoption is never "wich model is best." It is "which model is already there when a normal person has a question." Those are different competitions with different winners.</blockquote>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1280&q=80" alt="A desk with multiple screens showing work in progress" loading="lazy" /><figcaption>Nobody at this desk chose a model off a leaderboard. The model that wins is the one already sitting in the tools they open anyway.</figcaption></figure>
+
+<h2>The moat is the funnel</h2>
+<p>OpenAI spends real money and effort getting people to open ChatGPT. Google skips the entire acquisition problem. The Search box is already the default question-asking surface for most of the planet. Android is in a few billion pockets. Workspace sits in front of office workers all day. Turning AI Mode on inside those surfaces converts existing habits into AI usage at a marginal acquisition cost of about zero.</p>
+<p>This is the part benchmark-first analysis keeps missing. Model quality gaps shrink every quarter, distribution gaps dont. A two point benchmark lead evaporates with the next release cycle. A default placement inside the world's search engine has to be pried away, by regulators or by a habit shift, and both of those move on decade timescales.</p>
+
+<h2>What this means for builders</h2>
+<p>If you are building on these models, the race framing matters less than three practical consequences. Price pressure flows downhill: a vendor serving a billion free users needs cheap inference, and that scale keeps pushing API prices down for everyone, Flash-class models are the proof. Meeting users in defaults beats dragging them to destinations: the product pattern that wins is the one that shows up inside an existing workflow, not the one that asks for a new habit. And leaderboard deltas are a bad roadmap input: build against the capability tier that is cheap and everywhere, upgrade opportunistically when the frontier gets commoditized, wich it reliably does.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1280&q=80" alt="A person working with information on a laptop" loading="lazy" /><figcaption>The AI your users meet first will be whatever their existing tools ship by default. Plan for that, not for the leaderboard.</figcaption></figure>
+
+<div class="callout">
+  <div class="callout-title">Three things to take away</div>
+  <strong>(1) Read past the metric.</strong> Monthly versus weekly is spin, the distribution story survives the correction anyway. <strong>(2) Watch defaults, not demos.</strong> The adoption curve lives in Search, Android and Workspace settings screens, not in launch keynotes. <strong>(3) Build for the Flash tier.</strong> Fast, cheap and everywhere is the tier your users will actually meet, design your product around it.</div>
+
+<h2>Bottom line</h2>
+<p>A billion monthly users is a squishy number wearing a precise costume, and it still tells you who is winning what. Google is not trying to win the benchmark race, it is converting the largest distribution machine ever built into an AI delivery system, one default toggle at a time. Gemini 3.5 Flash is the ammunition, not the story. The story is that in this market, the shortest path to a user beats the highest score, and Google owns most of the short paths.</p>
+    `
+  },
+  {
     id: 'claude-fable-5-19-day-blackout-enterprise-risk-playbook',
     bannerImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=80',
     title: 'The 19-Day AI Blackout That Rewrote the Enterprise Risk Playbook',
