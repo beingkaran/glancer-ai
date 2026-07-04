@@ -20,6 +20,7 @@ import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import PrivacyPage from './pages/PrivacyPage';
+import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -88,6 +89,7 @@ export default function App() {
           <Route path="/about"             element={<AboutPage />} />
           <Route path="/faq"               element={<FAQPage />} />
           <Route path="/privacy"           element={<PrivacyPage />} />
+          <Route path="/contact"           element={<ContactPage />} />
           <Route path="/terms"             element={<TermsPage />} />
           <Route path="/_glancer-admin"    element={<AdminPage />} />
           <Route path="*"                  element={<NotFoundPage />} />
