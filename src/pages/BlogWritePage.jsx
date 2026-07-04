@@ -9,6 +9,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useAuth } from '../context/AuthContext';
 import { addBlog, updateBlog, getBlogById, canCurrentUserWrite } from '../lib/blogStore';
+import { sanitizeBlogHtml } from '../lib/sanitizeHtml';
 import AuthForm from '../components/AuthForm';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 
@@ -233,7 +234,9 @@ export default function BlogWritePage() {
       author: user?.name || 'Community',
       readTime: Number(readTime),
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
-      body: editor.getHTML(),
+      // Sanitize before persisting so active content never reaches the DB
+      // (render paths sanitize again — defense in depth for existing records).
+      body: sanitizeBlogHtml(editor.getHTML()),
     };
 
     setSubmitting(true);

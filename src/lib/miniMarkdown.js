@@ -8,11 +8,17 @@
 const esc = (s) => s
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Only allow http(s), mailto, and relative link targets — blocks javascript:,
+// data:, and other active-content URI schemes from Markdown link syntax.
+const safeHref = (url) =>
+  /^(?:https?:\/\/|mailto:|\/|#|[^:]*$)/i.test(url.trim()) ? url : '#';
+
 const inline = (s) => esc(s)
   .replace(/`([^`]+)`/g, '<code>$1</code>')
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
-  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  .replace(/\[([^\]]+)\]\(([^)]+)\)/g,
+    (_, text, url) => `<a href="${safeHref(url)}" target="_blank" rel="noopener noreferrer">${text}</a>`);
 
 function renderTable(rows) {
   const cells = (line) => line.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());

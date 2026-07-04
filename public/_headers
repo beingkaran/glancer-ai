@@ -1,0 +1,15 @@
+# Security headers for Cloudflare Pages (this file is served from dist/ root).
+# Vercel deploys read the equivalent block in vercel.json — keep the two in sync.
+#
+# The CSP intentionally allows Google Tag Manager / Analytics, AdSense (and the
+# many *.doubleclick.net / *.googlesyndication.com hosts it fans out to), and
+# Supabase, while blocking script from any other origin and framing of the site.
+# 'unsafe-inline' is required by the inline gtag bootstrap and AdSense; the real
+# XSS defense for blog content is DOMPurify (see src/lib/sanitizeHtml.js).
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com https://adservice.google.com https://*.adtrafficquality.google https://www.google.com https://*.g.doubleclick.net https://*.doubleclick.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: https:; connect-src 'self' https: wss://*.supabase.co; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.doubleclick.net https://www.google.com https://*.googlesyndication.com; manifest-src 'self'; worker-src 'self' blob:
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains

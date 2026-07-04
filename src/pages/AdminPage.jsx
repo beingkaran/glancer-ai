@@ -9,6 +9,7 @@ import {
   getAllBlogs, updateBlogStatus, deleteBlog,
   getWriterAccess, setRestrictWriters, addWriter, removeWriter,
 } from '../lib/blogStore';
+import { sanitizeBlogHtml } from '../lib/sanitizeHtml';
 
 /*
  * AdminPage — content + access dashboard, gated by REAL auth.
@@ -412,7 +413,7 @@ export default function AdminPage() {
 
                   {preview?.id === blog.id && (
                     <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--glass-border)' }}>
-                      <div className="blog-preview-content" dangerouslySetInnerHTML={{ __html: blog.body }} />
+                      <div className="blog-preview-content" dangerouslySetInnerHTML={{ __html: sanitizeBlogHtml(blog.body) }} />
                     </div>
                   )}
                 </div>

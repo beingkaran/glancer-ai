@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { getBlogById, getApprovedUserBlogs } from '../lib/blogStore';
 import { BLOG_POSTS } from '../data/allBlogs';
 import { figuresForPost, injectFiguresIntoHtml } from '../lib/blogImages';
+import { sanitizeBlogHtml } from '../lib/sanitizeHtml';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 import { buildArticleSchema, buildBreadcrumb, useArticleSchema } from '../lib/structuredData';
 import BlogBanner from '../components/BlogBanner';
@@ -57,7 +58,9 @@ export default function BlogPostPage() {
   // posts that already embed their own <img> are left untouched).
   const bodyHtml = useMemo(() => {
     if (!post) return '';
-    const base = post.body || '<p>This article has no content.</p>';
+    // Sanitize the stored body BEFORE any figure injection — this is the gate
+    // that neutralizes stored XSS in community-authored posts.
+    const base = sanitizeBlogHtml(post.body) || '<p>This article has no content.</p>';
     if (base.includes('<img')) return base;
     return injectFiguresIntoHtml(base, figuresForPost(post));
   }, [post]);
