@@ -93,65 +93,84 @@ export default function Navbar({ theme, onToggleTheme }) {
 
   return (
     <header className={`navbar${hidden ? ' navbar-hidden' : ''}`}>
-      <div className="navbar-inner">
-        <Link className="nav-logo" to="/" aria-label="Glancer AI home">
-          <span className="nav-logo-word">
-            <span className="nav-logo-text">Glancer</span>
-            <span className="nav-logo-dot"> AI</span>
-          </span>
-          <span className="nav-logo-sub">The AI Intelligence Desk</span>
-        </Link>
-
-        <nav className="nav-links" aria-label="Main navigation">
-          {NAV_LINKS.map(link => (
-            <NavLink
-              key={link.label}
-              to={link.to.startsWith('/#') ? '/' : link.to}
-              className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
-              onClick={() => {
-                if (link.to === '/#news') {
-                  navigate('/');
-                  setTimeout(() => document.getElementById('home-tabs')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }
-              }}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="nav-actions">
-          <Link to="/blog/write" className="write-btn" aria-label="Publish your own blogs" title="Publish your own blogs" onClick={handleWrite}>
-            <PenIcon />
+      <div className="masthead-top">
+        <div className="masthead-left">
+          <Link
+            className="masthead-pill"
+            to="/"
+            onClick={() => {
+              navigate('/');
+              setTimeout(() => document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' }), 100);
+            }}
+          >
+            Get the newsletter
           </Link>
-          {isAuthed ? (
-            <Link to="/profile" className="nav-avatar" aria-label="Your profile" title={user.name}>
-              {user.picture
-                ? <img src={user.picture} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                : <span>{initials}</span>}
+          <div className="masthead-utils">
+            <Link to="/ai-tools">Free AI tools</Link>
+            <Link to="/metrics">Live metrics</Link>
+            <Link to="/blog/write" onClick={handleWrite}>Write a blog</Link>
+          </div>
+        </div>
+
+        <div className="masthead-right">
+          <div className="nav-actions">
+            <Link to="/blog/write" className="write-btn" aria-label="Publish your own blogs" title="Publish your own blogs" onClick={handleWrite}>
+              <PenIcon />
             </Link>
-          ) : (
-            <Link to="/profile" className="icon-btn" aria-label="Sign in">
-              <UserIcon />
-            </Link>
-          )}
-          <button
-            className="icon-btn"
-            onClick={onToggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
-          <button
-            className="icon-btn menu-btn"
-            onClick={() => setMobileOpen(o => !o)}
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <XIcon /> : <MenuIcon />}
-          </button>
+            {isAuthed ? (
+              <Link to="/profile" className="nav-avatar" aria-label="Your profile" title={user.name}>
+                {user.picture
+                  ? <img src={user.picture} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                  : <span>{initials}</span>}
+              </Link>
+            ) : (
+              <Link to="/profile" className="icon-btn" aria-label="Sign in">
+                <UserIcon />
+              </Link>
+            )}
+            <button
+              className="icon-btn"
+              onClick={onToggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <button
+              className="icon-btn menu-btn"
+              onClick={() => setMobileOpen(o => !o)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <XIcon /> : <MenuIcon />}
+            </button>
+          </div>
+          <Link className="nav-logo" to="/" aria-label="Glancer AI home">
+            <span className="nav-logo-word">
+              <span className="nav-logo-text">Glancer</span>
+              <span className="nav-logo-dot">AI</span>
+            </span>
+            <span className="nav-logo-sub">The AI Intelligence Desk</span>
+          </Link>
         </div>
       </div>
+
+      <nav className="masthead-pillars" aria-label="Main navigation">
+        {NAV_LINKS.map(link => (
+          <NavLink
+            key={link.label}
+            to={link.to.startsWith('/#') ? '/' : link.to}
+            className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
+            onClick={() => {
+              if (link.to === '/#news') {
+                navigate('/');
+                setTimeout(() => document.getElementById('home-tabs')?.scrollIntoView({ behavior: 'smooth' }), 100);
+              }
+            }}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
 
       <nav className={`mobile-nav${mobileOpen ? ' open' : ''}`} aria-label="Mobile navigation">
         {NAV_LINKS.map(link => (

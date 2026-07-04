@@ -67,7 +67,7 @@ export default function HomePage() {
     <>
       <Hero activeTab="news" onTabChange={handleTabChange} />
       <IntelligenceFeed segment={segment} />
-      <div className="container"><NewsletterInline source="home" /></div>
+      <div className="container" id="newsletter"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />
       <SearchSection />
       <NewsFaq />

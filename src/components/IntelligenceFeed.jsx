@@ -317,6 +317,14 @@ function FeedSection({
   const visible = expanded || !capped ? items : items.slice(0, initialCount);
   const hidden = total - visible.length;
 
+  // Front-page arrangement: the newest story runs as a large lead on the
+  // left, the next three as a headline-only rail behind a vertical hairline;
+  // everything else flows into the regular card grid below.
+  const useLead = visible.length >= 4;
+  const lead = useLead ? visible[0] : null;
+  const rail = useLead ? visible.slice(1, 4) : [];
+  const rest = useLead ? visible.slice(4) : visible;
+
   return (
     <section className={`feed-section${className ? ` ${className}` : ''}`} aria-label={title}>
       <header className="feed-section-head">
@@ -327,7 +335,13 @@ function FeedSection({
         </h3>
         {subtitle && <p className="feed-section-sub">{subtitle}</p>}
       </header>
-      <div className="news-grid feed-card-grid">{visible}</div>
+      {useLead && (
+        <div className="feed-lead-package">
+          <div className="feed-lead-slot">{lead}</div>
+          <div className="feed-rail">{rail}</div>
+        </div>
+      )}
+      {rest.length > 0 && <div className="news-grid feed-card-grid">{rest}</div>}
       {capped && (
         <div className="feed-expand-wrap">
           <button

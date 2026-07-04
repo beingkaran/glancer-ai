@@ -28,7 +28,8 @@ import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
 
 export default function App() {
-  const [theme, setTheme] = useState('dark');
+  // Editorial front reads light-first; dark remains via the toggle.
+  const [theme, setTheme] = useState('light');
   const { pathname, state } = useLocation();
 
   useEffect(() => {
