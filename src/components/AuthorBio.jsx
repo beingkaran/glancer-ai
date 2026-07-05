@@ -27,18 +27,6 @@ export default function AuthorBio({ post }) {
 
   return (
     <aside className="author-bio" aria-label="About the author">
-      <picture>
-        <source srcSet="/karan.webp" type="image/webp" />
-        <img
-          className="author-bio-photo author-portrait author-portrait-md"
-          src="/karan.jpg"
-          alt={PRIMARY_AUTHOR.name}
-          width={80}
-          height={80}
-          loading="lazy"
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-        />
-      </picture>
       <div className="author-bio-body">
         <p className="author-bio-name">
           <Link to="/about">{PRIMARY_AUTHOR.name}</Link>
