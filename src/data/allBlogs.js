@@ -2,7 +2,7 @@
 export const BLOG_POSTS = [
   {
     id: 'ai-agents-breaking-traditional-monitoring-observability',
-    bannerImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&h=675&q=80',
+    bannerImage: 'https://images.unsplash.com/photo-1698668975271-2ba9a323be6b?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'Observing the Observer: How AI Agents Are Breaking Traditional Monitoring',
     subtitle: 'Anthropic spent 145 pages on how agents fail, not on how fast they code. That tells you where the next infrastructure crisis is. Your dashboards were built for services that crash loudly. Agents fail quietly, and most AIOps runbooks have not caught up.',
     category: 'Observability',
@@ -37,7 +37,7 @@ export const BLOG_POSTS = [
 <p>Classic monitoring rests on an assumption that has held for twenty years: when something breaks, it breaks loudly. A process dies, a request returns a 500, latency spikes, a disk fills. The four golden signals catch it, an alert fires, someone gets paged. The whole discipline is tuned to detect the moment a system stops doing its job.</p>
 <p>Agents dont fail that way. An LLM based agent almost never crashes. It returns a confident, well formatted answer that happens to be wrong. It calls a tool with a subtly bad argument and keeps going. It reads a poisoned web page and follows the instruction hidden inside it. From your APM view, everything is green: 200s all the way down, latency normal, no errors thrown. The service is healthy. The behavior is broken. Thats the gap, and its not a gap you close by adding another CPU chart.</p>
 
-<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="Close up of a circuit board representing layered system internals" loading="lazy" /><figcaption>An agent run is a tree of tool calls, not a single request. Traditional traces see the HTTP layer and miss the decisions.</figcaption></figure>
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1682559736721-c2e77ff4c650?auto=format&fit=crop&w=1280&q=80" alt="Network cables running into a server rack in a data center" loading="lazy" /><figcaption>An agent run is a tree of tool calls, not a single request. Traditional traces see the HTTP layer and miss the decisions.</figcaption></figure>
 
 <h2>Three things your stack cant see yet</h2>
 <p>Walk it down to specifics. Here is what an LLM agent generates that a service does not, and what your current observability layer does with each signal today.</p>
@@ -59,7 +59,7 @@ export const BLOG_POSTS = [
 <p>The honest caveat: as of mid 2026 most of these conventions are still marked experimental, or in development status. They are not frozen. But experimental in OTel land is not the same as unusable, its the same place distributed tracing sat a few years before everyone depended on it.</p>
 <p>On the emit side, the interesting recent drop is Observra, which Exabeam open sourced in the same news cycle as the Sonnet 5 card. It is a framework agnostic telemetry layer that captures token usage, tool calls, cost, and errors with zero per-agent instrumentation. It has adapters for Claude, OpenAI Agents, LangGraph, Pydantic AI and Google ADK that intercept the framework callbacks and normalize them, then fan the events out to OTel spans and logs, webhooks, local JSONL, or a SIEM. It also does PII redaction and per-session cost math before anything leaves the box. You dont have to adopt it, but it is a clean signal of where the plumbing is heading: agent telemetry as a first class stream, not an afterthought.</p>
 
-<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="Analytics dashboards showing charts and metrics on a screen" loading="lazy" /><figcaption>The instrumentation exists. What most teams are missing is the panel that turns agent spans into something on-call can act on.</figcaption></figure>
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=1280&q=80" alt="A monitor on a desk displaying a live metrics interface" loading="lazy" /><figcaption>The instrumentation exists. What most teams are missing is the panel that turns agent spans into something on-call can act on.</figcaption></figure>
 
 <h2>The runbook problem nobody updated</h2>
 <p>Heres the uncomfortable part. Even the shops that have wired up GenAI spans mostly stopped there. The telemetry lands in a backend, and then what. Theres no SLO for tool-call accuracy. No alert that fires when injection defenses trip. No page-worthy signal for an agent that has started looping. The runbook still says restart the pod and check the error rate, which is exactly the wrong instinct for a system that fails while reporting perfect health.</p>
