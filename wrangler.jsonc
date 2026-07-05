@@ -12,6 +12,18 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
+  // Daily Cron Trigger (06:00 UTC) → rebuilds the global tech-events feed and
+  // writes it to KV. See worker/index.js `scheduled()` and worker/eventsCore.js.
+  "triggers": {
+    "crons": ["0 6 * * *"]
+  },
+  // KV namespace backing the events feed. Create it once and paste the id here:
+  //   npx wrangler kv namespace create EVENTS_KV
+  // The worker guards a missing binding, so the site still runs before this is
+  // wired up — it just rebuilds on demand and edge-caches instead of reading KV.
+  "kv_namespaces": [
+    { "binding": "EVENTS_KV", "id": "REPLACE_WITH_EVENTS_KV_NAMESPACE_ID" }
+  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,

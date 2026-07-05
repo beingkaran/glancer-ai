@@ -78,9 +78,33 @@ function newsDevApi() {
   }
 }
 
+// Dev-only middleware mirroring the production Worker's /api/events route, so
+// the global tech-events aggregator works under `npm run dev` too (no KV/cron in
+// dev — it rebuilds on each call, which is fine locally).
+function eventsDevApi() {
+  return {
+    name: 'events-dev-api',
+    configureServer(server) {
+      server.middlewares.use('/api/events', async (req, res) => {
+        try {
+          const { buildRawEvents } = await server.ssrLoadModule('/worker/eventsCore.js')
+          const events = await buildRawEvents()
+          res.setHeader('content-type', 'application/json')
+          res.setHeader('access-control-allow-origin', '*')
+          res.end(JSON.stringify({ ts: Date.now(), count: events.length, events }))
+        } catch (e) {
+          res.statusCode = 502
+          res.setHeader('content-type', 'application/json')
+          res.end(JSON.stringify({ error: e?.message || 'events build failed', events: [] }))
+        }
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), llmDevApi(mode), proxyDevApi(), newsDevApi()],
+  plugins: [react(), llmDevApi(mode), proxyDevApi(), newsDevApi(), eventsDevApi()],
   // Honor a PORT assigned by the harness/preview tooling; fall back to Vite's
   // default when run directly.
   server: { port: Number(process.env.PORT) || 5184 },

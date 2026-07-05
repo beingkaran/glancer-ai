@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TECH_EVENTS, EVENT_CATEGORIES } from '../data/techEvents';
+import { EVENT_CATEGORIES } from '../data/techEvents';
+import { useLiveEvents } from '../lib/eventsFeed';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const parse = (d) => new Date(`${d}T00:00:00`);
@@ -24,14 +25,15 @@ export default function UpcomingEventsTeaser({ limit = 10 }) {
     return () => clearInterval(t);
   }, []);
 
+  const liveEvents = useLiveEvents();
   const events = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return TECH_EVENTS
+    return liveEvents
       .filter((ev) => parse(ev.end || ev.start) >= today)
       .sort((a, b) => parse(a.start) - parse(b.start))
       .slice(0, limit);
-  }, [limit, dayKey]);
+  }, [limit, dayKey, liveEvents]);
 
   if (!events.length) return null;
 

@@ -4,11 +4,34 @@
  *   - GET /api/news         → edge-aggregated AI news feed (see newsCore.js),
  *                             cached at the edge for 1 hour and shared by all
  *                             visitors so the browser makes ONE fast request
+ *   - GET /api/events       → aggregated global tech-events feed (eventsCore.js),
+ *                             refreshed daily by a Cron Trigger into KV and read
+ *                             KV-first, so every visitor gets the same fresh list
+ *   - GET /events.ics       → the same events as a live subscribable calendar
  *   - everything else       → served from ./dist via the ASSETS binding,
  *                             with SPA fallback (configured in wrangler.jsonc)
  */
 import { proxyFetch } from './proxyCore.js';
 import { buildRawNews } from './newsCore.js';
+import { buildRawEvents } from './eventsCore.js';
+import { calendarText } from '../src/lib/calendarLinks.js';
+
+// Events are rebuilt at most daily, so a long shared TTL is fine. Browsers may
+// reuse for 5 min; the edge/KV copy is authoritative for a day.
+const EVENTS_CACHE_CONTROL = 'public, max-age=300, s-maxage=86400';
+const EVENTS_KV_KEY = 'events:v1';
+
+function jsonResponse(bodyStr, { status = 200, cacheControl } = {}) {
+  const headers = { ...CORS, 'content-type': 'application/json; charset=utf-8' };
+  if (cacheControl) headers['cache-control'] = cacheControl;
+  return new Response(bodyStr, { status, headers });
+}
+
+// Build the events payload once (shared by the request path and the cron job).
+async function buildEventsPayload() {
+  const events = await buildRawEvents();
+  return JSON.stringify({ ts: Date.now(), count: events.length, events });
+}
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -94,7 +117,71 @@ export default {
       }
     }
 
+    // Global tech-events feed. Read order: KV (written daily by the cron) →
+    // edge cache → build on demand. KV-first means every visitor gets the same
+    // list the cron produced, and the binding is optional so the site keeps
+    // working (edge-cache + on-demand build) before the namespace is wired up.
+    if (url.pathname === '/api/events') {
+      if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+      try {
+        if (env.EVENTS_KV) {
+          const cached = await env.EVENTS_KV.get(EVENTS_KV_KEY);
+          if (cached) return jsonResponse(cached, { cacheControl: EVENTS_CACHE_CONTROL });
+        }
+      } catch { /* KV miss/unavailable → fall through to build */ }
+
+      const cache = caches.default;
+      const cacheKey = new Request(new URL('/api/events', url.origin).toString());
+      const hit = await cache.match(cacheKey);
+      if (hit) return hit;
+      try {
+        const bodyStr = await buildEventsPayload();
+        const resp = jsonResponse(bodyStr, { cacheControl: EVENTS_CACHE_CONTROL });
+        ctx.waitUntil(cache.put(cacheKey, resp.clone()));
+        if (env.EVENTS_KV) ctx.waitUntil(env.EVENTS_KV.put(EVENTS_KV_KEY, bodyStr, { expirationTtl: 172800 }));
+        return resp;
+      } catch (e) {
+        return jsonResponse(JSON.stringify({ error: String(e?.message || e), events: [] }), { status: 502 });
+      }
+    }
+
+    // Live subscribable calendar built from the same events. Falls through to the
+    // build-time static /events.ics asset when KV hasn't been populated yet.
+    if (url.pathname === '/events.ics') {
+      try {
+        if (env.EVENTS_KV) {
+          const cached = await env.EVENTS_KV.get(EVENTS_KV_KEY);
+          if (cached) {
+            const { events } = JSON.parse(cached);
+            if (Array.isArray(events) && events.length) {
+              return new Response(calendarText(events), {
+                headers: {
+                  'content-type': 'text/calendar; charset=utf-8',
+                  'cache-control': EVENTS_CACHE_CONTROL,
+                  'access-control-allow-origin': '*',
+                },
+              });
+            }
+          }
+        }
+      } catch { /* fall through to the static asset */ }
+    }
+
     // Static assets (the Vite build) + SPA fallback for client-side routes.
     return withSecurityHeaders(await env.ASSETS.fetch(request));
+  },
+
+  // Cron Trigger (see wrangler.jsonc `triggers.crons`): rebuild the events feed
+  // once a day and store it in KV so the next request serves it instantly. The
+  // request path reads KV first, so no cache purge is needed.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil((async () => {
+      try {
+        const bodyStr = await buildEventsPayload();
+        if (env.EVENTS_KV) await env.EVENTS_KV.put(EVENTS_KV_KEY, bodyStr, { expirationTtl: 172800 });
+      } catch (e) {
+        console.error('events cron failed:', e?.message || e);
+      }
+    })());
   },
 };

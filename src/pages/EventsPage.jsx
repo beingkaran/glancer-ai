@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { TECH_EVENTS, EVENT_CATEGORIES } from '../data/techEvents';
+import { EVENT_CATEGORIES } from '../data/techEvents';
+import { useLiveEvents } from '../lib/eventsFeed';
 import {
   calendarText, downloadIcs, WEBCAL_URL, FEED_URL, googleSubscribeUrl,
 } from '../lib/calendarLinks';
@@ -84,14 +85,17 @@ export default function EventsPage() {
     path: '/events',
   });
 
-  // Keep only events that haven't finished yet, sorted soonest-first.
+  // Live global feed (curated flagships + aggregated long-tail), with the static
+  // list as the instant-paint fallback. Keep only events that haven't finished
+  // yet, sorted soonest-first.
+  const liveEvents = useLiveEvents();
   const upcoming = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return TECH_EVENTS
+    return liveEvents
       .filter((ev) => parse(ev.end || ev.start) >= today)
       .sort((a, b) => parse(a.start) - parse(b.start));
-  }, []);
+  }, [liveEvents]);
 
   useArticleSchema([
     buildBreadcrumb([
