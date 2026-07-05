@@ -1,6 +1,80 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'ai-agents-breaking-traditional-monitoring-observability',
+    bannerImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Observing the Observer: How AI Agents Are Breaking Traditional Monitoring',
+    subtitle: 'Anthropic spent 145 pages on how agents fail, not on how fast they code. That tells you where the next infrastructure crisis is. Your dashboards were built for services that crash loudly. Agents fail quietly, and most AIOps runbooks have not caught up.',
+    category: 'Observability',
+    icon: '🛰️',
+    bgGradient: 'linear-gradient(135deg, #05131f 0%, #0e4d64 55%, #22d3ee 100%)',
+    author: 'Glancer Editorial Team',
+    authorRole: 'AIOps & Observability Desk',
+    authorBio: 'The Glancer Editorial Team covers AIOps, observability, and applied AI for engineers and SREs. We read the primary sources so you dont have to, and we write it plainly, with no vendor spin and no filler.',
+    authorImage: 'https://glancerai.com/icon-512.png',
+    authorLinkedIn: 'https://www.linkedin.com/company/glancerai/',
+    avatar: 'GE',
+    date: '2026-07-05',
+    readTime: 10,
+    tags: ['observability', 'AI agents', 'OpenTelemetry', 'AIOps', 'prompt injection', 'Claude Sonnet 5', 'Observra', 'SRE'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>The Claude Sonnet 5 system card runs to <strong>145 pages</strong> and spends most of them on how agents browse, use tools, and recover from failures. The benchmarks are almost a footnote. That framing is the story.</li>
+    <li>Traditional monitoring assumes failures are <strong>loud</strong>: a crash, a 500, a saturated CPU. Agent failures are <strong>quiet</strong>. A tool call that returns wrong data, a prompt injection that succeeds, a loop that burns tokens. Your dashboards were not built to see any of it.</li>
+    <li>OpenTelemetry now has a <strong>vocabulary for agents</strong>. As of v1.41 the GenAI conventions define agent, workflow, tool, and model spans. Exabeam open sourced <strong>Observra</strong> to emit that telemetry without per-agent code.</li>
+    <li>The tooling moved. The <strong>runbooks did not</strong>. Most on-call teams still have no page-worthy signal for an agent that goes off the rails.</li>
+  </ul>
+</div>
+
+<h2>The system card is a warning label</h2>
+<p>Anthropic shipped the Claude Sonnet 5 system card on June 30, and the thing worth noticing is what got the ink. At 145 pages, it barely lingers on benchmark wins. The bulk of the document is about how agents behave when you turn them loose: how they browse the web, chain tool calls, plan across long running tasks, resist prompt injection, and recover when a step fails. There are whole evaluations, SHADE-Arena and LinuxArena, built to check whether an agent is quietly pursuing a goal you didnt give it.</p>
+<p>Read that as a message to infrastructure people, because it is one. The frontier labs are telling you that reliability, not raw capability, is the hard part now. The prompt injection numbers make the point concrete: attack success on browser use dropped from roughly 50% on Sonnet 4.6 to under 1% on Sonnet 5, and effectively zero with safeguards on. That is real progress. It is also an admission that half the browser sessions on the last model could be hijacked. If the model makers are spending their best pages on failure modes, the teams running these agents in production should be spending their best dashboards on the same thing.</p>
+
+<h2>Your dashboards were built for the wrong failure</h2>
+<p>Classic monitoring rests on an assumption that has held for twenty years: when something breaks, it breaks loudly. A process dies, a request returns a 500, latency spikes, a disk fills. The four golden signals catch it, an alert fires, someone gets paged. The whole discipline is tuned to detect the moment a system stops doing its job.</p>
+<p>Agents dont fail that way. An LLM based agent almost never crashes. It returns a confident, well formatted answer that happens to be wrong. It calls a tool with a subtly bad argument and keeps going. It reads a poisoned web page and follows the instruction hidden inside it. From your APM view, everything is green: 200s all the way down, latency normal, no errors thrown. The service is healthy. The behavior is broken. Thats the gap, and its not a gap you close by adding another CPU chart.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="Close up of a circuit board representing layered system internals" loading="lazy" /><figcaption>An agent run is a tree of tool calls, not a single request. Traditional traces see the HTTP layer and miss the decisions.</figcaption></figure>
+
+<h2>Three things your stack cant see yet</h2>
+<p>Walk it down to specifics. Here is what an LLM agent generates that a service does not, and what your current observability layer does with each signal today.</p>
+
+<table class="ctable">
+  <thead><tr><th>Agent signal</th><th>What it looks like</th><th>What most stacks do with it today</th></tr></thead>
+  <tbody>
+    <tr><th>Prompt injection</th><td>A tool result or web page carries hidden instructions the agent obeys</td><td class="best">Nothing. No span, no alert, invisible.</td></tr>
+    <tr><th>Tool-call chains</th><td>A branching tree of model turns and tool calls, ten deep, per task</td><td class="best">Flattened into one HTTP trace, the reasoning is lost.</td></tr>
+    <tr><th>Cost signals</th><td>Token spend per run, per user, per loop, wildly variable</td><td class="best">Shows up on the monthly invoice, not on a graph.</td></tr>
+  </tbody>
+</table>
+
+<p>Take the tool-call chain, because its the one people underestimate. A single agent task is not one request, its a recursive tree. The model thinks, calls a search tool, reads the result, thinks again, calls a database, hits an error, retries, calls a third tool, and finally answers. Your distributed tracing was designed for service to service hops, so it sees the outbound HTTP calls and nothing about why the agent made them. When the task produces garbage, the trace tells you every call returned 200. Useless. You need the decision layer, the prompt, the tool inputs, the intermediate outputs, or you are debugging blind.</p>
+<p>Cost is the other one that bites teams late. An agent loop that gets stuck can re-send its whole context on every step and quietly burn thousands of dollars of tokens in an afternoon, and there wont be a single error in your logs. Cost is a reliability signal now, not just a finance line. If you cant see token spend per run in near real time, you are one bad loop away from a surprise.</p>
+
+<h2>OpenTelemetry grew a vocabulary for agents</h2>
+<p>The encouraging part is that the standards body already moved. The OpenTelemetry GenAI special interest group has been at this since April 2024, and as of the v1.41 conventions there are defined span types for the things that matter: agent, workflow, tool, and model, plus required metrics for latency and token usage. The point of the standard is that a span from a LangGraph agent should look identical to a span from a raw model call, so your backend can reason about all of it the same way. Datadog was among the first commercial platforms to natively support the newer GenAI conventions.</p>
+<p>The honest caveat: as of mid 2026 most of these conventions are still marked experimental, or in development status. They are not frozen. But experimental in OTel land is not the same as unusable, its the same place distributed tracing sat a few years before everyone depended on it.</p>
+<p>On the emit side, the interesting recent drop is Observra, which Exabeam open sourced in the same news cycle as the Sonnet 5 card. It is a framework agnostic telemetry layer that captures token usage, tool calls, cost, and errors with zero per-agent instrumentation. It has adapters for Claude, OpenAI Agents, LangGraph, Pydantic AI and Google ADK that intercept the framework callbacks and normalize them, then fan the events out to OTel spans and logs, webhooks, local JSONL, or a SIEM. It also does PII redaction and per-session cost math before anything leaves the box. You dont have to adopt it, but it is a clean signal of where the plumbing is heading: agent telemetry as a first class stream, not an afterthought.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="Analytics dashboards showing charts and metrics on a screen" loading="lazy" /><figcaption>The instrumentation exists. What most teams are missing is the panel that turns agent spans into something on-call can act on.</figcaption></figure>
+
+<h2>The runbook problem nobody updated</h2>
+<p>Heres the uncomfortable part. Even the shops that have wired up GenAI spans mostly stopped there. The telemetry lands in a backend, and then what. Theres no SLO for tool-call accuracy. No alert that fires when injection defenses trip. No page-worthy signal for an agent that has started looping. The runbook still says restart the pod and check the error rate, which is exactly the wrong instinct for a system that fails while reporting perfect health.</p>
+<p>Adapting the runbook is not glamorous work but its the work. What is the blast radius when an agent with write access to a database makes a wrong call. Who gets paged, and on what signal. What does rollback even mean for an autonomous process that already took the action. These are the questions the Sonnet 5 card is implicitly asking, and most on-call rotations havent written the answers down.</p>
+
+<div class="verdict">
+  <h3>Where to start this quarter</h3>
+  <p><strong>(1) Instrument the decision layer, not just the HTTP layer.</strong> Adopt the OTel GenAI spans, or emit them through a layer like Observra, so tool inputs and intermediate outputs are captured, not just outbound calls. <strong>(2) Make cost a monitored signal.</strong> Token spend per run, alerted, so a stuck loop pages someone in minutes instead of surfacing on the invoice. <strong>(3) Add an injection tripwire.</strong> If the model has safeguards that detect and refuse injected instructions, log those events and alert on the rate. <strong>(4) Rewrite one runbook.</strong> Pick your highest-privilege agent and write down the blast radius, the page trigger, and what rollback means. Just one, this quarter.</p>
+</div>
+
+<h2>Bottom line</h2>
+<p>The Sonnet 5 system card is not really a model announcement, its a preview of the next infrastructure headache. Agents are getting reliable enough to trust with real access, and the failures that remain are the quiet kind your current stack was never built to catch. The instrumentation caught up faster than most people noticed. OpenTelemetry has the vocabulary, Observra has the plumbing, the vendors are lighting up support. What hasnt caught up is the operational muscle: the SLOs, the alerts, the runbooks that assume an agent can be confidently, silently wrong. That is a people and process gap, and its the one worth closing before you put your next agent in front of production.</p>
+    `
+  },
+  {
     id: 'claude-sonnet-5-2-dollar-pricing-enterprise-budget-math',
     bannerImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1600&q=80',
     title: "The $2-Per-Million Model That's Eating Enterprise AI Budgets: Claude Sonnet 5 Explained",
