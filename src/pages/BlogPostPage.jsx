@@ -168,7 +168,7 @@ export default function BlogPostPage() {
             <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>{post.subtitle}</p>
           )}
           <div className="blog-byline">
-            {/karan|admin|glancer/i.test(post.author || '') && !/editorial|team/i.test(post.author || '') ? (
+            {/karan|admin|glancer/i.test(post.author || '') ? (
               <picture>
                 <source srcSet="/karan.webp" type="image/webp" />
                 <img

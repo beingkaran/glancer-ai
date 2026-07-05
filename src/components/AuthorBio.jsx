@@ -10,10 +10,9 @@ const LinkedInIcon = () => (
 export default function AuthorBio({ post }) {
   const name = post?.author || PRIMARY_AUTHOR.name;
   const isKaran =
-    !/editorial|team/i.test(post?.author || '') &&
-    (/karan\s*shah/i.test(name) ||
-      !post?.author ||
-      /admin|glancer/i.test(post?.author || ''));
+    /karan\s*shah/i.test(name) ||
+    !post?.author ||
+    /admin|glancer/i.test(post?.author || '');
 
   if (!isKaran) {
     return (
