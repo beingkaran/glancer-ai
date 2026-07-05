@@ -1566,7 +1566,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
    Reader (news + blog) — back bar + content
    ============================================================ */
 .reader-backbar {
-  position: sticky; top: calc(var(--navbar-h) + 6px); z-index: 20;
+  position: static;
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 14px; margin: calc(var(--navbar-h) + 16px) 0 20px;
   border-radius: 12px; background: var(--glass-bg);
@@ -1619,7 +1619,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 @keyframes skShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 @media (max-width: 480px) {
-  .reader-backbar { top: calc(var(--navbar-h) + 2px); }
   .reader-hero-img, .reader-hero-fallback { height: 200px; }
 }
 
