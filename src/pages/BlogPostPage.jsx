@@ -36,12 +36,6 @@ function formatDate(d) {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-const BackIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-  </svg>
-);
-
 function blogsReturnPath(from) {
   if (from === '/profile') return '/profile';
   return '/';
@@ -87,8 +81,6 @@ export default function BlogPostPage() {
     const from = location.state?.from;
     navigate(from ? blogsReturnPath(from) : '/');
   };
-
-  const backLabel = location.state?.from === 'home-feed' ? 'Back to feed' : 'Back to home';
 
   // Per-article SEO: title/description/canonical/OG + Article & Breadcrumb
   // JSON-LD. Hooks run every render (no-op while loading) to respect hook order.
@@ -144,12 +136,6 @@ export default function BlogPostPage() {
   return (
     <div className="page-section">
       <article className="container" style={{ maxWidth: 760 }}>
-        <div className="reader-backbar">
-          <button type="button" className="reader-back-btn" onClick={goBack}>
-            <BackIcon /> {backLabel}
-          </button>
-        </div>
-
         {/* Banner */}
         <BlogBanner post={post} className="blog-read-banner" emojiSize="5rem" />
 
