@@ -1236,8 +1236,9 @@ export const BLOG_POSTS = [
     authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
     avatar: 'KS',
     date: '2026-06-12',
-    readTime: 9,
-    tags: ['AIOps', 'machine learning', 'anomaly detection', 'alert fatigue', 'automation'],
+    updatedAt: '2026-07-06',
+    readTime: 11,
+    tags: ['AIOps', 'machine learning', 'anomaly detection', 'alert fatigue', 'automation', 'autonomous remediation'],
     featured: false,
     body: `
 <div class="key-takeaways">
@@ -1281,6 +1282,22 @@ export const BLOG_POSTS = [
 <h2>Alert Fatigue: The Problem AIOps Was Born to Solve</h2>
 <p>Industry surveys consistently show that operations teams receive thousands of alerts per day, of which only 5 - 30% require human action. Engineers habituate to the noise and start ignoring alerts - including real ones. This is alert fatigue, and it's one of the leading causes of prolonged outages.</p>
 <p>AIOps noise reduction typically achieves 70 - 95% reduction in actionable alert volume. The remaining alerts are higher quality and better contextualized, making on-call rotations more sustainable and mean time to resolution shorter.</p>
+
+<h2>2026 Update: From ML-Assisted to Autonomous Remediation</h2>
+<p>Everything above describes AIOps as it was mostly practiced through 2024 - 2025: machine learning <em>assists</em> a human. The model finds the anomaly, correlates the alerts, and proposes a root cause, but a person still decides what to do and executes the fix. In 2026 the frontier has moved. The combination of capable LLM-based agents and MCP-style tool access means AIOps platforms are starting to <strong>close the loop</strong> - not just diagnosing incidents but resolving a defined subset of them without a human in the critical path.</p>
+<p>This is a genuine category shift, not a marketing rebrand. It's worth being precise about the difference:</p>
+<ul>
+  <li><strong>ML-assisted (the classic model above):</strong> detect → correlate → suggest. A human approves and acts. The AI's output is a recommendation.</li>
+  <li><strong>Autonomous remediation (the 2026 model):</strong> detect → correlate → reason → <em>act</em> → verify. An agent selects a runbook or writes a fix, executes it against a guarded scope, checks whether the signal recovered, and rolls back if it didn't. The human reviews after the fact.</li>
+</ul>
+<p>What made this practical was less a leap in anomaly detection and more the arrival of agents that can reason over an incident and safely invoke tools. Cloud vendors now ship first-party remediation agents, and the interesting engineering questions have shifted from "can it find the problem?" to "how far do we let it act, and how do we observe the agent itself?" The honest answer for most teams in 2026 is <strong>bounded autonomy</strong>: let agents auto-remediate well-understood, low-blast-radius failures (restart a wedged pod, scale a saturated pool, roll back a bad deploy) while everything novel or high-impact still routes to a human.</p>
+<p>If this is where your roadmap is heading, three of our newer pieces pick up exactly where this article ends:</p>
+<ul>
+  <li><a href="/blog/aiops-autonomous-remediation-self-healing-2026">From Noise Reduction to Self-Healing: AIOps Crosses Into Autonomous Remediation in 2026</a> - the deep dive on how the loop actually closes and where the guardrails go.</li>
+  <li><a href="/blog/aws-devops-agent-vs-azure-sre-agent-remediation-faceoff">AWS DevOps Agent vs Azure SRE Agent</a> - a head-to-head of the first real autonomous-remediation agents from the major clouds.</li>
+  <li><a href="/blog/ai-agents-observability-blind-spot">Why Every New AI Agent Is an Observability Blind Spot</a> - the flip side: the remediation agents themselves become systems you have to monitor.</li>
+</ul>
+<blockquote><strong>The through-line:</strong> autonomous remediation doesn't retire the fundamentals in this article - clean data, good instrumentation, and correlated signals are exactly what an agent needs to act safely. Weak observability made ML-assisted AIOps produce confusing suggestions; it makes autonomous AIOps produce confident <em>mistakes</em>. The bar on data quality goes up, not down.</blockquote>
 
 <div class="callout">
   <div class="callout-title">Evaluating AIOps Tools</div>
@@ -1619,8 +1636,9 @@ export const BLOG_POSTS = [
     authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
     avatar: 'KS',
     date: '2026-06-10',
-    readTime: 11,
-    tags: ['Datadog', 'New Relic', 'Splunk', 'APM comparison', 'observability'],
+    updatedAt: '2026-07-06',
+    readTime: 13,
+    tags: ['Datadog', 'New Relic', 'Splunk', 'APM comparison', 'observability', 'MCP'],
     featured: false,
     body: `
 <div class="key-takeaways">
@@ -1657,7 +1675,7 @@ export const BLOG_POSTS = [
 <p>Log analytics is Splunk's original product and remains its strongest suit. SPL (Search Processing Language) is more powerful than Datadog's or New Relic's query languages for complex log transformations, statistical analysis, and building operational intelligence dashboards. Splunk Enterprise Security (ES) integrates log data with threat intelligence for a combined observability + SIEM workflow.</p>
 <p>If your primary use case is log-heavy - compliance, security investigations, complex operational analytics - Splunk wins this dimension clearly. If logs are one of several signals, Datadog and New Relic are both capable enough.</p>
 
-<h2>Pricing: The Real-World Comparison</h2>
+<h2>Pricing: The Real-World Comparison (Updated for 2026)</h2>
 <p>Pricing varies enormously by usage pattern, so these are indicative rather than precise:</p>
 <ul>
   <li><strong>100 hosts, 100 GB logs/month, light tracing:</strong> Datadog ≈ $3,000 - 5,000/month; New Relic ≈ $1,500 - 2,500/month; Splunk ≈ $2,500 - 4,000/month</li>
@@ -1665,8 +1683,29 @@ export const BLOG_POSTS = [
 </ul>
 <p>New Relic's per-GB model becomes most predictable at scale. Datadog's multi-dimensional pricing (hosts + GB + spans + custom metrics) requires careful management. Splunk's pricing is highly dependent on log compression ratios and whether you're on enterprise vs. cloud.</p>
 
+<h3>What Changed in Datadog's 2026 Enterprise Tiers</h3>
+<p>The biggest pricing shift this year came from Datadog, which restructured its enterprise packaging. The old approach - buy each product (Infrastructure, APM, Log Management, Cloud SIEM) as a separate per-unit line item - has been consolidated into committed-use <strong>platform bundles</strong> negotiated as an annual observability spend commitment rather than a stack of individual SKUs. Three things matter for buyers:</p>
+<ul>
+  <li><strong>Committed-use discounting is now the default.</strong> Large accounts negotiate a single annual commitment across products and draw down against it, replacing the old per-product on-demand rates. This rewards accurate forecasting and punishes lumpy usage - unused commitment doesn't roll over cleanly.</li>
+  <li><strong>Flex Logs and ingestion/indexing split.</strong> Datadog now separates cheap high-volume ingest from the more expensive indexed/queryable tier, so enterprise log bills depend heavily on how much you actually index versus archive. Modeled correctly, this lowers cost; modeled lazily, it doesn't.</li>
+  <li><strong>New usage dimensions carry their own pricing.</strong> AI/LLM Observability, per-agent monitoring, and the newer autonomous-remediation features are priced as their own dimensions on top of the platform bundle - budget for them explicitly rather than assuming they're included.</li>
+</ul>
+<p>The net effect: Datadog's headline per-host number is less meaningful in 2026 than the total committed spend and how disciplined your team is about which data gets indexed. For enterprise finalists, model your cost against the committed-use bundle at 2× your current data volume, not the on-demand list price - the gap between the two is where budget surprises live.</p>
+
+<h2>MCP Support: Connecting Your Observability Data to AI Agents</h2>
+<p>The most important capability that didn't exist when most APM comparisons were written is <strong>Model Context Protocol (MCP)</strong> support. MCP is the open standard - originally introduced by Anthropic and now broadly adopted - that lets AI assistants and agents query a tool's data and take actions through a well-defined server interface. In practice, an MCP server for your observability platform means an engineer (or an autonomous SRE agent) can ask "why is checkout latency up?" in natural language and have the agent pull the relevant traces, logs, and dashboards directly. In 2026 this has moved from novelty to a real selection criterion.</p>
+<table>
+  <thead><tr><th>Platform</th><th>MCP approach</th><th>What you can do today</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Datadog</strong></td><td>Official Datadog MCP server</td><td>Query metrics, logs, traces, monitors, and incidents from an AI agent; pull Watchdog findings and dashboard context into a chat or triage workflow. Tightly aligned with its Bits AI assistant.</td></tr>
+    <tr><td><strong>New Relic</strong></td><td>MCP server over NerdGraph/NRQL</td><td>Run NRQL from an agent, retrieve entities and alerts, and expose the full data model programmatically. The OTel-native, query-first design maps cleanly onto MCP's tool model.</td></tr>
+    <tr><td><strong>Splunk</strong></td><td>MCP access to SPL and Observability Cloud</td><td>Drive SPL searches and pull APM/log results from an agent; Cisco-era investment has pushed AI-assistant and MCP integration across the Splunk and AppDynamics portfolio.</td></tr>
+  </tbody>
+</table>
+<p>Two things to check before you weight this heavily. First, <strong>scope</strong>: some MCP servers are read-only (query and retrieve) while others also expose write actions (acknowledge an alert, silence a monitor, trigger a runbook) - read-only is safer to adopt first. Second, <strong>authentication and governance</strong>: an MCP server is a new access path into production telemetry, so confirm it respects your existing RBAC, scopes tokens per agent, and logs what the agent did. If your roadmap includes AI-assisted triage or <a href="/blog/aiops-autonomous-remediation-self-healing-2026">autonomous remediation</a>, first-class MCP support is quickly becoming as important as the quality of the dashboards themselves.</p>
+
 <h2>Making the Decision</h2>
-<p>Rather than picking the "best" platform, ask wich pain you're solving first:</p>
+<p>Rather than picking the "best" platform, ask which pain you're solving first:</p>
 <ul>
   <li><strong>Primary pain: slow incident triage across many services →</strong> Datadog's unified UX and Watchdog AI reduce MTTR fastest.</li>
   <li><strong>Primary pain: vendor lock-in and OTel standardization →</strong> New Relic's OTel-first strategy gives you the most portable foundation.</li>
@@ -2212,8 +2251,9 @@ export const BLOG_POSTS = [
     authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
     avatar: 'KS',
     date: '2026-06-24',
-    readTime: 7,
-    tags: ['AI', 'observability', 'beginner', 'AIOps', 'monitoring'],
+    updatedAt: '2026-07-06',
+    readTime: 8,
+    tags: ['AI', 'observability', 'beginner', 'AIOps', 'monitoring', 'LLM observability'],
     featured: false,
     body: `
 <div style="display:inline-flex;align-items:center;gap:8px;background:#dcfce7;color:#166534;font-size:.8rem;font-weight:800;padding:6px 14px;border-radius:50px;margin-bottom:20px;letter-spacing:.04em">🟢 LEVEL 1 OF 5 - BEGINNER</div>
@@ -2290,6 +2330,17 @@ export const BLOG_POSTS = [
   <li><strong>Splunk ITSI</strong> - AI-powered service health scoring and episode review</li>
   <li><strong>AppDynamics Cognition Engine</strong> - learns baselines per Business Transaction and generates root cause narratives</li>
 </ul>
+
+<h2>One Important Distinction: Observability <em>of</em> AI vs. AI <em>for</em> Observability</h2>
+<p>Everything so far has been about <strong>AI for observability</strong> - using machine learning to watch normal software systems (web apps, databases, servers) more intelligently. In 2026 there's a second, newer meaning of the term that's easy to confuse with it, and as a beginner it's worth getting the distinction straight early.</p>
+<p>As teams build products on top of large language models (LLMs) and <strong>AI agents</strong>, those AI systems themselves need to be observed - and they misbehave in ways a normal app doesn't. This newer discipline is called <strong>LLM observability</strong> or <strong>agentic observability</strong>. A traditional APM tool asks "is this service fast and error-free?" LLM observability has to ask harder questions:</p>
+<ul>
+  <li><strong>Was the answer actually correct?</strong> An LLM can return a confident, fluent, completely wrong response with a 200 OK status and 300ms latency. Classic monitoring sees a healthy request; the user got a hallucination.</li>
+  <li><strong>What did it cost?</strong> Every request burns tokens, and tokens are money. Cost-per-request and token usage become first-class signals, not afterthoughts.</li>
+  <li><strong>What did the agent actually do?</strong> An AI agent chains multiple steps and calls tools. You need to trace the whole reasoning path - which prompt, which tool calls, which retrieved documents - to understand why it did something.</li>
+  <li><strong>Is it drifting or being misused?</strong> Prompt quality, jailbreak attempts, and slow degradation in answer quality are things you have to watch for that simply don't exist in a normal database.</li>
+</ul>
+<p>So the field has genuinely split into two related tracks: the AI-powered monitoring of ordinary systems that this guide introduces, and the observability of AI systems themselves. They share tooling and ideas but answer different questions. If the second one is what brought you here, it's a deeper topic - our <a href="/blog/ai-agents-observability-blind-spot">guide to why every AI agent is an observability blind spot</a> is the right next stop.</p>
 
 <h2>How This Fits the Bigger Observability Picture</h2>
 <p>AI observability doesn't replace the fundamentals. You still need solid <a href="/blog/observability-vs-monitoring">monitoring and observability foundations</a>, meaningful <a href="/blog/four-golden-signals">golden signals</a>, and eventually <a href="/blog/distributed-tracing-explained">distributed tracing</a> as your architecture grows. AI layers on top to reduce noise and speed up investigation - especially when you are comparing platforms in our <a href="/blog/datadog-vs-newrelic-vs-splunk-2026">Datadog vs New Relic vs Splunk shootout</a> or building an <a href="/blog/slo-sla-sli-practical-guide">SLO practice</a>.</p>

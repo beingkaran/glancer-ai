@@ -55,13 +55,15 @@ const topicRoutes = TOPICS.map((t) => ({
   lastmod: today,
 }));
 
-// One <url> per curated blog post, with its publish date as lastmod and the
-// banner exposed via image sitemap extension (helps Discover image selection).
+// One <url> per curated blog post. lastmod reflects the most recent edit
+// (updatedAt) when present, falling back to the publish date — so refreshed
+// evergreen posts send an accurate freshness signal. The banner is exposed via
+// the image sitemap extension (helps Discover image selection).
 const blogRoutes = BLOG_POSTS.map((p) => ({
   loc: `/blog/${p.id}`,
   changefreq: 'monthly',
   priority: p.featured ? '0.8' : '0.7',
-  lastmod: (p.date || today).slice(0, 10),
+  lastmod: (p.updatedAt || p.date || today).slice(0, 10),
   // bannerImage may be an absolute URL (e.g. Unsplash) or a site-relative path;
   // only prefix the origin for relative paths so we don't double it up.
   image: p.bannerImage ? (/^https?:\/\//.test(p.bannerImage) ? p.bannerImage : ORIGIN + p.bannerImage) : null,

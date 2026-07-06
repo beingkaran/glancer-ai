@@ -186,7 +186,7 @@ export default function BlogPostPage() {
             <div>
               <div className="blog-byline-name">{post.author || PRIMARY_AUTHOR.name}</div>
               <div className="blog-byline-meta">
-                {post.authorRole || PRIMARY_AUTHOR.role} · {formatDate(post.date)} · {post.readTime} min read
+                {post.authorRole || PRIMARY_AUTHOR.role} · {formatDate(post.date)}{post.updatedAt && post.updatedAt !== post.date ? ` · Updated ${formatDate(post.updatedAt)}` : ''} · {post.readTime} min read
               </div>
             </div>
           </div>
