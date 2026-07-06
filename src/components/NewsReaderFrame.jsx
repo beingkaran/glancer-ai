@@ -40,17 +40,23 @@ const ExtIcon = () => (
 );
 
 
+// One or two short summary paragraphs for the blocked-page fallback panel.
+function summaryParas(item) {
+  const raw = item.excerpt || item.html || '';
+  const text = raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text ? [text.length > 600 ? `${text.slice(0, 597).trim()}…` : text] : [];
+}
+
 export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
-  // Ref mirror of "loaded" so the 10s timer reads the latest value without a
-  // stale closure.
+  // 'checking' → asking /api/framecheck whether the article allows embedding;
+  // 'frame'    → publisher allows it (or the check was unavailable) — live iframe;
+  // 'blocked'  → publisher forbids framing — show the summary + link-out panel
+  //              instead of the browser's grey "content is blocked" error page.
+  const [mode, setMode] = useState('checking');
+  // Ref mirror of "loaded" so the slow-load timer reads the latest value
+  // without a stale closure.
   const loadedRef = useRef(false);
-  // Ref mirror of onBack so the 10s timer can return to the slideshow WITHOUT
-  // taking onBack as an effect dependency: the parent passes a fresh onBack each
-  // render, and depending on it would re-arm (and thus reset) the timer on every
-  // background feed update — the exact churn that used to leave this frame stuck.
-  const onBackRef = useRef(onBack);
-  useEffect(() => { onBackRef.current = onBack; }, [onBack]);
   const swipe = useSwipeDown(onBack);
 
   // Esc returns to the slideshow rather than closing the whole reader.
@@ -60,33 +66,52 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
 
-  // Give the source 10s to load inside the frame. If it loads, do nothing — the
-  // user reads and interacts with the live page in the frame. If it hasn't
-  // loaded by then (blocked by X-Frame-Options/CSP, or just too slow), open the
-  // original article in a NEW TAB and return to the slideshow, leaving
-  // glancerai.com open behind it instead of navigating the whole tab away.
+  // Preflight: ask our own edge (/api/framecheck) whether THIS article's
+  // headers allow cross-origin framing. The static per-source `frameable` flag
+  // samples the site root, but article pages can be stricter — and a blocked
+  // iframe still fires onLoad on its error page, so the browser gives us no
+  // reliable signal after the fact. If the check itself is unavailable, fall
+  // back to the optimistic iframe path.
   //
   // Keyed on `item.url` (a stable string), NOT the `item` object: the live news
   // feed revalidates in the background and hands down fresh item objects every
-  // few seconds, so depending on `item` here would clear and re-arm the timer on
-  // every feed update — it would never reach 10s, leaving the reader stuck on a
-  // blank "Loading…" frame forever. The URL is what actually identifies the page,
-  // so it re-arms only when the reader genuinely moves to a different story
-  // (e.g. Next), giving each one its own fresh 10s window.
+  // few seconds — see the git history of the old 10s-timer version.
   useEffect(() => {
+    let alive = true;
+    setMode('checking');
     setIframeLoaded(false);
     loadedRef.current = false;
-    const t = setTimeout(() => {
-      if (!loadedRef.current) {
-        // A popup-blocker may suppress a window.open that isn't from a user
-        // gesture; if so the user simply lands back on the slideshow, where the
-        // story's "Read Story" / source link is still one tap away.
-        window.open(item.url, '_blank', 'noopener,noreferrer');
-        onBackRef.current?.();
+    (async () => {
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 5000);
+        const res = await fetch(`/api/framecheck?url=${encodeURIComponent(item.url)}`, {
+          signal: ctrl.signal,
+          headers: { accept: 'application/json' },
+        });
+        clearTimeout(t);
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok || !ct.includes('application/json')) throw new Error('framecheck unavailable');
+        const verdict = await res.json();
+        if (alive) setMode(verdict.frameable === false ? 'blocked' : 'frame');
+      } catch {
+        if (alive) setMode('frame');
       }
-    }, 10000);
-    return () => clearTimeout(t);
+    })();
+    return () => { alive = false; };
   }, [item.url]);
+
+  // Even for allowed sources, give the page 12s to actually render; if it's
+  // still blank (slow network, or a policy the headers didn't declare), swap to
+  // the summary panel — its "Read on <source>" button is a real user gesture,
+  // so it never trips popup blockers the way an automatic window.open did.
+  useEffect(() => {
+    if (mode !== 'frame') return undefined;
+    const t = setTimeout(() => {
+      if (!loadedRef.current) setMode('blocked');
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [mode, item.url]);
 
   return (
     <div className="reader-frame reader-frame-live" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
@@ -115,7 +140,7 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
       </div>
 
       <div className="reader-frame-live-body">
-        {!iframeLoaded && (
+        {mode !== 'blocked' && !iframeLoaded && (
           <div className="reader-loading-pill reader-frame-live-loading">
             <span className="reader-spinner" /> Loading {item.source}…
           </div>
@@ -125,14 +150,36 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
             The sandbox permits scripts/forms/popups so the page is fully
             interactive, but withholds top-navigation so the site can't frame-bust
             the reader out from under the user. */}
-        <iframe
-          className="reader-frame-iframe"
-          src={item.url}
-          title={item.title}
-          referrerPolicy="no-referrer"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
-          onLoad={() => { loadedRef.current = true; setIframeLoaded(true); }}
-        />
+        {mode === 'frame' && (
+          <iframe
+            className="reader-frame-iframe"
+            src={item.url}
+            title={item.title}
+            referrerPolicy="no-referrer"
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
+            onLoad={() => { loadedRef.current = true; setIframeLoaded(true); }}
+          />
+        )}
+
+        {/* Publisher forbids embedding (X-Frame-Options / CSP) — we respect
+            that and show our own summary with a link out, instead of the
+            browser's grey error page. */}
+        {mode === 'blocked' && (
+          <div className="reader-blocked">
+            <span className={`news-category-tag ${item.categoryClass || ''}`}>{item.category}</span>
+            <h2 className="reader-blocked-title">{item.title}</h2>
+            <p className="reader-blocked-meta">
+              {item.source}{item.date ? ` · ${item.date}` : ''}
+            </p>
+            {summaryParas(item).map((p, i) => <p key={i} className="reader-blocked-text">{p}</p>)}
+            <a className="carousel-btn primary reader-blocked-cta" href={item.url} target="_blank" rel="noopener noreferrer">
+              Read on {item.source} <ExtIcon />
+            </a>
+            <p className="reader-blocked-note">
+              {item.source} doesn't allow reading inside other sites, so this story opens in a new tab.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

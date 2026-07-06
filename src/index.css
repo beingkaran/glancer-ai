@@ -3492,3 +3492,24 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
   .masthead-band { padding: 18px 0 16px; }
   .masthead-byline { display: none; }
 }
+
+/* --- live feed rotation + deep-dive entries --- */
+.front-wire-list--tick { animation: frontFeedIn 0.4s ease; }
+@keyframes frontFeedIn {
+  from { opacity: 0.35; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .front-wire-list--tick { animation: none; } }
+.front-wire-time--dive { color: var(--accent); }
+.front-wire-item--dive:hover .front-wire-title { color: var(--accent); }
+
+/* --- reader fallback when a publisher forbids embedding --- */
+.reader-blocked {
+  max-width: 640px; margin: 0 auto; padding: 48px 22px 40px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+}
+.reader-blocked-title { font-size: clamp(1.3rem, 3vw, 1.7rem); line-height: 1.25; margin: 0; }
+.reader-blocked-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin: 0; }
+.reader-blocked-text { font-size: 0.95rem; line-height: 1.62; color: var(--text-secondary); margin: 0; }
+.reader-blocked-cta { margin-top: 6px; }
+.reader-blocked-note { font-size: 0.78rem; color: var(--text-muted); margin: 0; }

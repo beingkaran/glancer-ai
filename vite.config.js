@@ -54,6 +54,30 @@ function proxyDevApi() {
   }
 }
 
+// Dev-only middleware mirroring the production Worker's /api/framecheck route,
+// so the reader's per-article frameability preflight works under `npm run dev`.
+function frameCheckDevApi() {
+  return {
+    name: 'framecheck-dev-api',
+    configureServer(server) {
+      server.middlewares.use('/api/framecheck', async (req, res) => {
+        try {
+          const { frameCheck } = await server.ssrLoadModule('/worker/frameCheckCore.js')
+          const u = new URL(req.originalUrl, 'http://localhost')
+          const verdict = await frameCheck(u.searchParams.get('url'))
+          res.setHeader('content-type', 'application/json')
+          res.setHeader('access-control-allow-origin', '*')
+          res.end(JSON.stringify(verdict))
+        } catch (e) {
+          res.statusCode = 502
+          res.setHeader('content-type', 'application/json')
+          res.end(JSON.stringify({ error: e?.message || 'framecheck failed' }))
+        }
+      })
+    },
+  }
+}
+
 // Dev-only middleware mirroring the production Worker's /api/news route, so the
 // edge news aggregator works under `npm run dev` too (no edge cache in dev — it
 // rebuilds each call, which is fine locally).
@@ -104,7 +128,7 @@ function eventsDevApi() {
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), llmDevApi(mode), proxyDevApi(), newsDevApi(), eventsDevApi()],
+  plugins: [react(), llmDevApi(mode), proxyDevApi(), frameCheckDevApi(), newsDevApi(), eventsDevApi()],
   // Honor a PORT assigned by the harness/preview tooling; fall back to Vite's
   // default when run directly.
   server: { port: Number(process.env.PORT) || 5184 },

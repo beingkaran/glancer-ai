@@ -1,6 +1,10 @@
 /*
  * Cloudflare Worker entry. Runs in front of the static Vite build:
  *   - GET /api/proxy?url=…  → first-party CORS proxy (see proxyCore.js)
+ *   - GET /api/framecheck?url=… → does this article allow being iframed?
+ *                             Inspects the page's own X-Frame-Options / CSP
+ *                             frame-ancestors (the reader respects the block —
+ *                             it never works around it)
  *   - GET /api/news         → edge-aggregated AI news feed (see newsCore.js),
  *                             cached at the edge for 1 hour and shared by all
  *                             visitors so the browser makes ONE fast request
@@ -12,6 +16,7 @@
  *                             with SPA fallback (configured in wrangler.jsonc)
  */
 import { proxyFetch } from './proxyCore.js';
+import { frameCheck } from './frameCheckCore.js';
 import { buildRawNews } from './newsCore.js';
 import { buildRawEvents } from './eventsCore.js';
 import { calendarText } from '../src/lib/calendarLinks.js';
@@ -86,6 +91,23 @@ export default {
       } catch (e) {
         return new Response('Upstream fetch failed: ' + (e?.message || e), { status: 502, headers: CORS });
       }
+    }
+
+    // Per-article frameability check, edge-cached for a day per URL so repeat
+    // readers don't re-hit the publisher.
+    if (url.pathname === '/api/framecheck') {
+      if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+      const target = url.searchParams.get('url') || '';
+      const cache = caches.default;
+      const cacheKey = new Request(new URL(`/api/framecheck?url=${encodeURIComponent(target)}`, url.origin).toString());
+      const hit = await cache.match(cacheKey);
+      if (hit) return hit;
+      const verdict = await frameCheck(target);
+      const resp = jsonResponse(JSON.stringify(verdict), {
+        cacheControl: 'public, max-age=3600, s-maxage=86400',
+      });
+      ctx.waitUntil(cache.put(cacheKey, resp.clone()));
+      return resp;
     }
 
     // Edge-cached news aggregator. The first request each hour (per edge PoP)

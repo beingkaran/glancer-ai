@@ -140,7 +140,9 @@ export const NEWS_FEEDS = [
   { url: 'https://hamel.dev/index.xml', source: 'Hamel Husain', category: 'Tools', frameable: true },
   // Industry / news
   { url: 'https://dataconomy.com/feed/', source: 'Dataconomy', category: 'Industry', frameable: true },
-  { url: 'https://readwrite.com/feed/', source: 'ReadWrite', category: 'Industry', frameable: true },
+  // Root allows framing but article pages block it (seen live 2026-07); the
+  // runtime /api/framecheck would catch it anyway — this just skips the detour.
+  { url: 'https://readwrite.com/feed/', source: 'ReadWrite', category: 'Industry', frameable: false },
   { url: 'https://www.geeky-gadgets.com/feed/', source: 'Geeky Gadgets', category: 'Industry', frameable: true },
   { url: 'https://thenextweb.com/neural/feed', source: 'TNW Neural', category: 'Industry', frameable: true },
   { url: 'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml', source: 'ScienceDaily AI', category: 'Industry', frameable: true },

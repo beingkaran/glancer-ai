@@ -270,23 +270,6 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
           </button>
         </div>
 
-        {showAnalysis && feedAnalysis.length > 0 && (
-          <FeedSection
-            key={`analysis-${segment}`}
-            label="Practitioner Analysis"
-            title={skipAnalysis > 0 ? 'More Deep Dives' : 'Deep Dives'}
-            count={feedAnalysis.length}
-            subtitle="Articles created by tech authors in AI and observability — practitioner guides, comparisons and deep dives."
-            initialCount={TOP}
-          >
-            {feedAnalysis.map((post) => (
-              <BlogCard key={post.id} post={post} onOpen={openBlog} />
-            ))}
-          </FeedSection>
-        )}
-
-        {segment === 'all' && <UpcomingEventsTeaser />}
-
         {showNews && feedNews.length > 0 && (
           <FeedSection
             key={`news-${segment}`}
@@ -294,11 +277,28 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
             title="News Right Now"
             count={feedNews.length}
             subtitle="Today's AI headlines — tap any card to read in the swipe reader."
-            className={showAnalysis ? 'feed-section-spaced' : ''}
             initialCount={TOP}
           >
             {feedNews.map((item) => (
               <NewsCard key={item.rid} item={item} onOpen={openNews} />
+            ))}
+          </FeedSection>
+        )}
+
+        {segment === 'all' && <UpcomingEventsTeaser />}
+
+        {showAnalysis && feedAnalysis.length > 0 && (
+          <FeedSection
+            key={`analysis-${segment}`}
+            label="Practitioner Analysis"
+            title={skipAnalysis > 0 ? 'More Deep Dives' : 'Deep Dives'}
+            count={feedAnalysis.length}
+            subtitle="Articles created by tech authors in AI and observability — practitioner guides, comparisons and deep dives."
+            className={showNews ? 'feed-section-spaced' : ''}
+            initialCount={TOP}
+          >
+            {feedAnalysis.map((post) => (
+              <BlogCard key={post.id} post={post} onOpen={openBlog} />
             ))}
           </FeedSection>
         )}
