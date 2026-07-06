@@ -54,7 +54,7 @@ function SlideImage({ item, onOpen }) {
   const [stage, setStage] = useState(item.image ? 0 : 2);
   useEffect(() => { setStage(item.image ? 0 : 2); }, [item.image]);
 
-  const canOpen = !item.internal && !!onOpen;
+  const canOpen = !!onOpen;
   const openProps = canOpen ? { onClick: onOpen, role: 'button', tabIndex: 0, 'aria-label': `Read: ${item.title}` } : { 'aria-hidden': true };
 
   const coverSrc = stage === 0 ? displayImage(item.image, 1400) : stage === 1 ? item.image : null;
@@ -139,22 +139,22 @@ function Slide({ item, onRead }) {
   const [shareOpen, setShareOpen] = useState(false);
 
   // "Read Story" behaviour depends on the source:
-  //  • internal blog  → its own in-app route
+  //  • internal blog  → in-app iframe reader too (same-origin, so framing is
+  //    always allowed — the reader keeps the Slideshow/Next chrome)
   //  • frameable news → in-app iframe reader (never leaves glancerai.com)
   //  • blocked news   → opens the original in a NEW tab (publisher forbids
   //    embedding via X-Frame-Options/CSP, so an iframe would just show
   //    "refused to connect"). frameable is precomputed in src/data/newsFeeds.js.
   const openReader = () => {
-    if (item.internal) return;
-    if (item.frameable) onRead(item);
+    if (item.internal || item.frameable) onRead(item);
     else window.open(item.url, '_blank', 'noopener,noreferrer');
   };
   const paras = twoParagraphs(item);
 
   const ReadBtn = item.internal ? (
-    <a className="carousel-btn primary" href={item.url} target="_self" rel="noopener noreferrer">
+    <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
       Read full article <ExtIcon />
-    </a>
+    </button>
   ) : item.frameable ? (
     <button type="button" className="carousel-btn primary" onClick={() => onRead(item)}>
       Read Story <ExtIcon />
@@ -178,8 +178,10 @@ function Slide({ item, onRead }) {
         <div className="carousel-body">
           <span className={`news-category-tag ${item.categoryClass}`}>{item.category}</span>
           <h2
-            className={`carousel-title${item.internal ? '' : ' carousel-title-tap'}`}
-            {...(item.internal ? {} : { role: 'button', tabIndex: 0, onClick: openReader })}
+            className="carousel-title carousel-title-tap"
+            role="button"
+            tabIndex={0}
+            onClick={openReader}
           >
             {item.title}
           </h2>

@@ -78,9 +78,15 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   // few seconds — see the git history of the old 10s-timer version.
   useEffect(() => {
     let alive = true;
-    setMode('checking');
     setIframeLoaded(false);
     loadedRef.current = false;
+    // Our own pages (Deep Dives at /blog/:id) are same-origin — framing is
+    // always allowed, no preflight needed.
+    if (item.internal || item.url.startsWith('/')) {
+      setMode('frame');
+      return undefined;
+    }
+    setMode('checking');
     (async () => {
       try {
         const ctrl = new AbortController();
@@ -99,7 +105,7 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
       }
     })();
     return () => { alive = false; };
-  }, [item.url]);
+  }, [item.url, item.internal]);
 
   // Even for allowed sources, give the page 12s to actually render; if it's
   // still blank (slow network, or a policy the headers didn't declare), swap to

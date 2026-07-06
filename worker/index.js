@@ -58,7 +58,11 @@ const SECURITY_HEADERS = {
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: https: blob:",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep1.adtrafficquality.google",
-    "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://challenges.cloudflare.com",
+    // 'self' → Deep Dives open in the in-app reader frame; https: → the reader
+    // iframes frameable news sources (publishers that forbid it are filtered by
+    // /api/framecheck and their own X-Frame-Options — this only governs what WE
+    // are willing to embed).
+    "frame-src 'self' https:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
