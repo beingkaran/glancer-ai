@@ -17,12 +17,10 @@
   "triggers": {
     "crons": ["0 6 * * *"]
   },
-  // KV namespace backing the events feed. Create it once and paste the id here:
-  //   npx wrangler kv namespace create EVENTS_KV
-  // The worker guards a missing binding, so the site still runs before this is
-  // wired up — it just rebuilds on demand and edge-caches instead of reading KV.
+  // KV namespace backing the events feed (created via
+  // `npx wrangler kv namespace create EVENTS_KV`).
   "kv_namespaces": [
-    { "binding": "EVENTS_KV", "id": "REPLACE_WITH_EVENTS_KV_NAMESPACE_ID" }
+    { "binding": "EVENTS_KV", "id": "e5dad022067b43fb948f7b3343c80165" }
   ],
   "observability": {
     "enabled": true,
