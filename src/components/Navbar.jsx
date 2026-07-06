@@ -37,7 +37,7 @@ const PenIcon = () => (
 // to a secondary utility link (mobile menu + footer) so it still gets crawled
 // for long-tail SEO without diluting the observability positioning.
 const NAV_LINKS = [
-  { label: 'Deep Dives', to: '/#deep-dives' },
+  { label: 'News', to: '/news' },
   { label: 'Events', to: '/events' },
   { label: 'Topics', to: '/topics' },
   { label: 'Glossary', to: '/glossary' },
@@ -155,14 +155,8 @@ export default function Navbar({ theme, onToggleTheme }) {
         {NAV_LINKS.map(link => (
           <NavLink
             key={link.label}
-            to={link.to.startsWith('/#') ? '/' : link.to}
-            className={({ isActive }) => `nav-link${isActive && !link.to.startsWith('/#') ? ' active' : ''}`}
-            onClick={() => {
-              if (link.to === '/#deep-dives') {
-                navigate('/');
-                setTimeout(() => document.getElementById('intelligence-feed')?.scrollIntoView({ behavior: 'smooth' }), 100);
-              }
-            }}
+            to={link.to}
+            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
           >
             {link.label}
           </NavLink>
@@ -173,7 +167,7 @@ export default function Navbar({ theme, onToggleTheme }) {
         {NAV_LINKS.map(link => (
           <NavLink
             key={link.label}
-            to={link.to.startsWith('/#') ? '/' : link.to}
+            to={link.to}
             className="nav-link"
             onClick={() => setMobileOpen(false)}
           >

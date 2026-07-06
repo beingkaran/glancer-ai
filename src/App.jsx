@@ -15,6 +15,7 @@ import TopicsIndexPage from './pages/TopicsIndexPage';
 import TopicHubPage from './pages/TopicHubPage';
 import BlogPostPage from './pages/BlogPostPage';
 import EventsPage from './pages/EventsPage';
+import NewsReaderPage from './pages/NewsReaderPage';
 import BlogWritePage from './pages/BlogWritePage';
 import ProfilePage from './pages/ProfilePage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -70,10 +71,8 @@ export default function App() {
         <ErrorBoundary>
         <Routes>
           <Route path="/"                  element={<HomePage />} />
-          {/* Live news feed retired — legacy news URLs fold back to the home Deep Dives. */}
-          <Route path="/news"              element={<Navigate to="/" replace />} />
-          <Route path="/news/topic/:topicSlug" element={<Navigate to="/" replace />} />
-          <Route path="/news/:id"          element={<Navigate to="/" replace />} />
+          <Route path="/news"              element={<HomePage />} />
+          <Route path="/news/topic/:topicSlug" element={<HomePage />} />
           <Route path="/blogs"             element={<Navigate to="/" replace />} />
           <Route path="/blog/write"        element={<BlogWritePage />} />
           <Route path="/blog/edit/:id"     element={<BlogWritePage />} />
@@ -81,6 +80,7 @@ export default function App() {
           <Route path="/events"            element={<EventsPage />} />
           <Route path="/topics"            element={<TopicsIndexPage />} />
           <Route path="/topic/:slug"       element={<TopicHubPage />} />
+          <Route path="/news/:id"          element={<NewsReaderPage />} />
           <Route path="/metrics"           element={<MetricsPage />} />
           <Route path="/glossary"          element={<GlossaryPage />} />
           <Route path="/ai-tools"          element={<AIToolsPage />} />

@@ -139,6 +139,8 @@ function normalize(item, i) {
     emoji: EMOJIS[i % EMOJIS.length],
     gradient: GRADIENTS[i % GRADIENTS.length],
     date: formatDate(item.pubDate),
+    // Raw publish timestamp — the front-page wire renders it as HH:MM.
+    ts: item.pubDate || '',
     readMin: Math.max(2, Math.round((text.split(' ').length || 200) / 200)),
     image,
     live: true,

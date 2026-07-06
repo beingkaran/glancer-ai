@@ -3397,3 +3397,98 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 
 /* The masthead pill is a button now (opens the newsletter box on demand). */
 .masthead-pill { border: none; cursor: pointer; font-family: var(--font-body); }
+
+/* ================================================================
+   FRONT PAGE — masthead band + above-the-fold split
+   (Deep Dives desk, pink accent · The Wire, cyan accent)
+   ================================================================ */
+
+.masthead-band { padding: 24px 0 20px; border-bottom: 1px solid var(--glass-border); }
+.masthead-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.masthead-copy .hero-eyebrow { margin-bottom: 8px; }
+.masthead-title { font-size: clamp(1.5rem, 3.4vw, 2rem); line-height: 1.18; letter-spacing: -0.01em; }
+.masthead-title-accent { color: var(--accent); font-style: italic; }
+.masthead-byline { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin: 0 0 4px; letter-spacing: 0.02em; }
+
+.front-page { padding: 26px 0 8px; }
+.front-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.front-desk { padding: 22px 26px 20px; border-right: 1px solid var(--glass-border); min-width: 0; }
+.front-wire { background: var(--glass-bg); padding: 20px 22px 18px; min-width: 0; display: flex; flex-direction: column; }
+
+.front-kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+.front-kicker-label { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+.front-kicker--desk .front-kicker-label { color: var(--accent); }
+.front-kicker--wire .front-kicker-label { color: var(--cyan); }
+.front-kicker-sub { font-family: var(--font-mono); font-size: 0.64rem; color: var(--text-muted); }
+.front-kicker-mark { width: 18px; height: 3px; border-radius: 2px; background: var(--accent); }
+
+.front-wire-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex: none; }
+.front-wire-dot.is-live { background: var(--cyan); animation: frontPulse 2.2s ease-in-out infinite; }
+@keyframes frontPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(84, 178, 230, 0.45); }
+  50%      { box-shadow: 0 0 0 6px rgba(84, 178, 230, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .front-wire-dot.is-live { animation: none; } }
+
+/* --- the analysis desk (left) --- */
+.front-lead { display: block; text-decoration: none; color: inherit; }
+.front-lead-banner { position: relative; border-radius: 4px; overflow: hidden; aspect-ratio: 21 / 9; margin-bottom: 14px; border: 1px solid var(--glass-border); }
+.front-lead-banner .feed-blog-banner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.front-lead-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+  background: var(--accent-soft); border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: var(--border-radius-pill); padding: 3px 10px;
+}
+.front-lead-title { font-size: clamp(1.35rem, 2.6vw, 1.72rem); line-height: 1.22; margin: 10px 0 8px; transition: var(--transition); }
+.front-lead:hover .front-lead-title { color: var(--accent); }
+.front-lead-sub {
+  font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55; margin: 0 0 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.front-lead-meta { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); margin: 0; }
+
+.front-rail { margin-top: 16px; border-top: 1px solid var(--glass-border); }
+.front-rail-item {
+  display: flex; gap: 12px; align-items: baseline; padding: 10px 0;
+  border-bottom: 1px solid var(--glass-border); text-decoration: none; color: inherit;
+}
+.front-rail-cat { flex: none; min-width: 92px; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.front-rail-title { font-family: var(--font-body); font-size: 0.93rem; font-weight: 500; line-height: 1.4; transition: var(--transition); }
+.front-rail-item:hover .front-rail-title { color: var(--accent); }
+
+.front-more {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 0;
+  font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); background: none; border: 0; cursor: pointer;
+  text-decoration: none;
+}
+.front-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+.front-more--wire { color: var(--cyan); }
+
+/* --- the wire (right) --- */
+.front-wire-list { list-style: none; margin: 0; padding: 0; flex: 1; }
+.front-wire-item { display: block; padding: 9px 0; border-bottom: 1px solid var(--glass-border); text-decoration: none; color: inherit; }
+.front-wire-list li:last-child .front-wire-item { border-bottom: 0; }
+.front-wire-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.front-wire-time { font-family: var(--font-mono); font-size: 0.64rem; color: var(--cyan); letter-spacing: 0.04em; }
+.front-wire .news-category-tag { font-size: 0.56rem; padding: 1px 7px; margin: 0; }
+.front-wire-title { display: block; font-family: var(--font-body); font-size: 0.86rem; font-weight: 500; line-height: 1.42; transition: var(--transition); }
+.front-wire-item:hover .front-wire-title { color: var(--cyan); }
+
+/* --- responsive: wire-first on phones, desk below --- */
+@media (max-width: 900px) {
+  .front-grid { grid-template-columns: 1fr; }
+  .front-desk { border-right: 0; padding: 20px 18px 18px; }
+  .front-wire { order: -1; border-bottom: 1px solid var(--glass-border); padding: 16px 18px 14px; }
+  .front-wire-list li:nth-child(n + 6) { display: none; }
+  .front-rail-cat { min-width: 78px; }
+  .masthead-band { padding: 18px 0 16px; }
+  .masthead-byline { display: none; }
+}

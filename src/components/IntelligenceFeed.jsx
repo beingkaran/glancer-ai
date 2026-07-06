@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useMemo, Children } from 'react';
 import { Link } from 'react-router-dom';
+import { segmentPath } from '../lib/feedRoutes';
+import { NEWS_CATEGORIES } from '../data/newsData';
+import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
 import { BLOG_POSTS } from '../data/allBlogs';
 import { getApprovedUserBlogs } from '../lib/blogStore';
 import { blogsToSlides } from '../lib/blogSlides';
@@ -9,14 +12,20 @@ import ReadLaterPanel from './ReadLaterPanel';
 import SaveButton from './SaveButton';
 import BlogBanner from './BlogBanner';
 import UpcomingEventsTeaser from './UpcomingEventsTeaser';
-import { ArrowIcon } from './feedBits';
-import { entryForBlog, getSavedCount } from '../lib/readLater';
+import { Thumb, ArrowIcon } from './feedBits';
+import { entryForNews, entryForBlog, getSavedCount } from '../lib/readLater';
 
 /*
- * IntelligenceFeed — the home stream of long-form Deep Dives (practitioner
- * analysis, comparisons and guides). The live RSS news section was removed;
- * this is now a single responsive card grid of blogs, newest first, with an
- * expand control for the full list. Cards open the in-app swipe reader.
+ * IntelligenceFeed — one continuous stream that leads with long-form Deep Dives
+ * (practitioner analysis) and follows with live AI News, so a reader sees both
+ * without switching tabs.
+ *
+ * Layout: two responsive card grids — Deep Dives first, then News Right Now.
+ * Each section shows the top 9 items with an expand control for the full list.
+ *
+ * Multi-page: the filter bar's chips are real links (/, /news,
+ * /news/topic/<slug>) so every view is its own page; the bar scrolls away with
+ * the content rather than sticking. Cards open the in-app swipe reader.
  */
 
 const TOP = 9;
@@ -35,13 +44,38 @@ function greetingFor(hour) {
   return 'Good evening';
 }
 
-export default function IntelligenceFeed() {
+const CaretIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+function filterBySegment(segment, news, analysis) {
+  if (segment === 'news') return { news, analysis: [] };
+  if (segment === 'all') return { news, analysis };
+
+  // Topic segment: both streams filtered to the category.
+  return {
+    news: news.filter((item) => item.category === segment),
+    analysis: analysis.filter((item) => item.category === segment),
+  };
+}
+
+// skipAnalysis: how many of the newest analysis posts to omit — the front
+// page already runs them as its lead package, so the feed picks up from there.
+export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) {
   const { user, isAuthed } = useAuth();
+  const [items, setItems] = useState(STATIC_NEWS);
+  const [live, setLive] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [analysis, setAnalysis] = useState(() => byNewest(BLOG_POSTS));
-  // Carousel opens a blogs-only slideshow starting at the tapped card.
+  // Carousel state: { mode: 'news' | 'blogs', at } — news cards open the merged
+  // news stream, Deep Dive cards open a blogs-only slideshow.
   const [carousel, setCarousel] = useState(null);
   const [readLaterOpen, setReadLaterOpen] = useState(false);
+  const [topicsOpen, setTopicsOpen] = useState(false);
   const [savedCount, setSavedCount] = useState(() => getSavedCount());
+  const topicsRef = useRef(null);
 
   useEffect(() => {
     const sync = () => setSavedCount(getSavedCount());
@@ -49,8 +83,29 @@ export default function IntelligenceFeed() {
     return () => window.removeEventListener('glancer:read-later-changed', sync);
   }, []);
 
+  // Close the Topics dropdown on any tap/click outside it.
+  useEffect(() => {
+    if (!topicsOpen) return undefined;
+    const close = (e) => {
+      if (!topicsRef.current?.contains(e.target)) setTopicsOpen(false);
+    };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [topicsOpen]);
+
   useEffect(() => {
     let alive = true;
+    (async () => {
+      try {
+        const { items: fresh, live: isLive } = await getNews();
+        if (alive && fresh?.length) { setItems(fresh); setLive(isLive); }
+      } catch {
+        /* keep static fallback */
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+
     const loadBlogs = async () => {
       const approved = (await getApprovedUserBlogs()).map((b) => ({ ...b, isUserBlog: true }));
       if (!alive) return;
@@ -58,28 +113,82 @@ export default function IntelligenceFeed() {
     };
     loadBlogs();
     window.addEventListener('glancer:blogs-changed', loadBlogs);
+
+    const onUpdate = () => {
+      const cached = getCachedNews();
+      if (alive && cached?.items?.length) {
+        setItems(cached.items);
+        if (cached.live) setLive(true);
+      }
+    };
+    window.addEventListener('glancer:news-updated', onUpdate);
     return () => {
       alive = false;
+      window.removeEventListener('glancer:news-updated', onUpdate);
       window.removeEventListener('glancer:blogs-changed', loadBlogs);
     };
   }, []);
 
-  // Blog slides derive straight from the analysis list, so the slideshow is
-  // always in sync with what the cards show.
+  // News ordering: frameable sources first, then those with real cover images.
+  const sortedNews = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const frame = (b.frameable ? 1 : 0) - (a.frameable ? 1 : 0);
+      if (frame !== 0) return frame;
+      return (b.image ? 1 : 0) - (a.image ? 1 : 0);
+    });
+  }, [items]);
+
+  // Index of each news item within sortedNews, so a card click maps to the
+  // right carousel slide.
+  const newsIndex = useMemo(() => {
+    const m = new Map();
+    sortedNews.forEach((it, i) => m.set(it.rid, i));
+    return m;
+  }, [sortedNews]);
+
+  // Blog slides derive straight from the analysis list, so the blogs-only
+  // slideshow is always in sync with what the cards show.
   const blogSlides = useMemo(() => blogsToSlides(analysis), [analysis]);
 
-  // Index of each blog within the slideshow, so a card click maps to its slide.
+  const carouselItems = useMemo(() => [...sortedNews, ...blogSlides], [sortedNews, blogSlides]);
+
+  // Index of each blog within the blogs-only slideshow.
   const blogIndex = useMemo(() => {
     const m = new Map();
     analysis.forEach((post, i) => m.set(post.id, i));
     return m;
   }, [analysis]);
 
+  const { news: feedNews, analysis: allFeedAnalysis } = useMemo(
+    () => filterBySegment(segment, sortedNews, analysis),
+    [segment, sortedNews, analysis],
+  );
+  const feedAnalysis = skipAnalysis > 0 ? allFeedAnalysis.slice(skipAnalysis) : allFeedAnalysis;
+
+  // Topic categories present in the live news set (shown in the dropdown).
+  const present = new Set(sortedNews.map((i) => i.category));
+  const topicCats = NEWS_CATEGORIES.filter((c) => c !== 'All' && present.has(c));
+  const baseSegments = [
+    { id: 'all', label: 'All' },
+    { id: 'news', label: 'News' },
+  ];
+  const isTopic = !baseSegments.some((s) => s.id === segment);
+
+  const showAnalysis = segment === 'all' || isTopic;
+  const showNews = segment === 'all' || segment === 'news' || isTopic;
+
+  const openNews = (rid) => (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    const idx = newsIndex.get(rid);
+    if (idx != null) setCarousel({ mode: 'news', at: idx });
+  };
+
   const openBlog = (postId) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
     const idx = blogIndex.get(postId);
-    if (idx != null) setCarousel({ at: idx });
+    if (idx != null) setCarousel({ mode: 'blogs', at: idx });
   };
 
   const hour = new Date().getHours();
@@ -91,12 +200,62 @@ export default function IntelligenceFeed() {
       <div className="container">
         <div className="news-header">
           <div>
-            <p className="section-label">Practitioner Analysis · Updated regularly</p>
-            <h2 className="section-title-lg">The AI &amp; Observability Deep Dives</h2>
+            <p className="section-label">
+              AI Intelligence · {loading ? 'Updating…' : live ? 'Live · 100+ sources' : 'Curated'} · Updated today
+            </p>
+            <h2 className="section-title-lg">The AI &amp; Observability Feed</h2>
             <p className="feed-sub">
-              {greeting} — practitioner-grade guides, comparisons and deep dives in one place.
+              {greeting} — practitioner-grade analysis and live headlines in one stream.
             </p>
           </div>
+        </div>
+
+        {/* Compact one-row filter bar: All/News + Topics ▾ + Read Later.
+            Chips are real links — each feed view is its own page/URL. */}
+        <div className="feed-segment-bar">
+          <div className="feed-segment" role="navigation" aria-label="Feed pages">
+            {baseSegments.map((s) => (
+              <Link
+                key={s.id}
+                to={segmentPath(s.id)}
+                state={{ keepScroll: true }}
+                aria-current={segment === s.id ? 'page' : undefined}
+                className={`filter-chip${segment === s.id ? ' active' : ''}`}
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
+          {topicCats.length > 0 && (
+            <div className="feed-topics-wrap" ref={topicsRef}>
+              <button
+                type="button"
+                className={`filter-chip feed-topics-btn${isTopic ? ' active' : ''}`}
+                aria-haspopup="listbox"
+                aria-expanded={topicsOpen}
+                onClick={() => setTopicsOpen((o) => !o)}
+              >
+                {isTopic ? segment : 'Topics'} <CaretIcon />
+              </button>
+              {topicsOpen && (
+                <div className="feed-topics-menu" role="menu" aria-label="Topics">
+                  {topicCats.map((c) => (
+                    <Link
+                      key={c}
+                      role="menuitem"
+                      to={segmentPath(c)}
+                      state={{ keepScroll: true }}
+                      aria-current={segment === c ? 'page' : undefined}
+                      className={`feed-topics-item${segment === c ? ' active' : ''}`}
+                      onClick={() => setTopicsOpen(false)}
+                    >
+                      {c}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <button
             type="button"
             className={`read-later-toggle${savedCount ? ' has-saved' : ''}`}
@@ -111,25 +270,42 @@ export default function IntelligenceFeed() {
           </button>
         </div>
 
-        {analysis.length > 0 && (
+        {showAnalysis && feedAnalysis.length > 0 && (
           <FeedSection
+            key={`analysis-${segment}`}
             label="Practitioner Analysis"
-            title="Deep Dives"
-            count={analysis.length}
+            title={skipAnalysis > 0 ? 'More Deep Dives' : 'Deep Dives'}
+            count={feedAnalysis.length}
             subtitle="Articles created by tech authors in AI and observability — practitioner guides, comparisons and deep dives."
             initialCount={TOP}
           >
-            {analysis.map((post) => (
+            {feedAnalysis.map((post) => (
               <BlogCard key={post.id} post={post} onOpen={openBlog} />
             ))}
           </FeedSection>
         )}
 
-        <UpcomingEventsTeaser />
+        {segment === 'all' && <UpcomingEventsTeaser />}
+
+        {showNews && feedNews.length > 0 && (
+          <FeedSection
+            key={`news-${segment}`}
+            label={loading ? 'Updating…' : live ? 'Live · 100+ sources' : 'Curated'}
+            title="News Right Now"
+            count={feedNews.length}
+            subtitle="Today's AI headlines — tap any card to read in the swipe reader."
+            className={showAnalysis ? 'feed-section-spaced' : ''}
+            initialCount={TOP}
+          >
+            {feedNews.map((item) => (
+              <NewsCard key={item.rid} item={item} onOpen={openNews} />
+            ))}
+          </FeedSection>
+        )}
 
         {carousel !== null && (
           <NewsCarousel
-            items={blogSlides}
+            items={carousel.mode === 'blogs' ? blogSlides : carouselItems}
             startIndex={carousel.at}
             onClose={() => setCarousel(null)}
           />
@@ -195,7 +371,27 @@ function FeedSection({
   );
 }
 
-// Blog card — mirrors the old news card layout so analysis reads like a feed.
+function NewsCard({ item, onOpen }) {
+  return (
+    <a className="news-card news-link" href={item.url} onClick={onOpen(item.rid)} rel="noopener noreferrer" aria-label={`Read: ${item.title}`}>
+      <Thumb item={item} className="news-card-thumb" emojiSize="3rem" />
+      <div className="news-card-body">
+        <span className={`news-category-tag ${item.categoryClass}`} style={{ marginBottom: 10, fontSize: '0.68rem' }}>{item.category}</span>
+        <h3 className="news-card-title">{item.title}</h3>
+        <p className="news-card-excerpt">{item.excerpt}</p>
+        <div className="news-card-footer">
+          <span>{item.source}{item.date ? ` · ${item.date}` : ''}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <SaveButton entry={entryForNews(item)} className="news-share" label={false} />
+            <span className="read-more-link">Read <ArrowIcon /></span>
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+// Blog card — mirrors the news card layout so analysis reads like "News Right Now".
 function BlogCard({ post, onOpen }) {
   return (
     <Link
