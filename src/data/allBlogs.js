@@ -1,6 +1,92 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'claude-sonnet-5-sre-triage-agent-oncall-rotation',
+    bannerImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Claude Sonnet 5 on the On-Call Rotation: What a 63% Agentic Coding Score Actually Means for SREs',
+    subtitle: "Sonnet 5 scores 63.2% on agentic coding at $2 per million input tokens. Opus 4.8 scores 69.2% at $5. The 6-point gap is real. Whether it's a dealbreaker for your triage agent depends on what you're actually asking it to do at 2am.",
+    category: 'SRE',
+    icon: '🚨',
+    bgGradient: 'linear-gradient(135deg, #0d1b2a 0%, #1e5f74 55%, #48cae4 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-06',
+    readTime: 11,
+    tags: ['Claude Sonnet 5', 'SRE', 'AIOps', 'triage agent', 'on-call', 'agentic AI', 'computer use', 'incident response', 'Anthropic'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Sonnet 5 scores <strong>63.2% on agentic coding</strong> benchmarks. Opus 4.8 scores 69.2%. The gap is 6 points, not 60 — and Sonnet 5 costs <strong>$2/M input tokens</strong> versus Opus 4.8's <strong>$5/M</strong>. For a triage agent running 50 incident investigations a day, that math matters.</li>
+    <li>The real upgrade over Sonnet 4.6 isn't raw intelligence — it's <strong>follow-through</strong>. Sonnet 5 checks its own output without being asked, retries failed tool calls with corrected arguments, and sustains focus across long agentic chains. Those are the properties that determine whether an autonomous incident workflow actually finishes.</li>
+    <li>Prompt injection resistance went from <strong>~50% attack success on Sonnet 4.6 to under 1% on Sonnet 5</strong> with safeguards on. If you're pointing a triage agent at runbooks, log queries, and external documentation, this is the safety number that should be on your threat model.</li>
+    <li>Computer use in Sonnet 5 can navigate browser-based dashboards, fill forms, and execute runbook steps on a real screen. It's not a toy. Early access partners are running full insurance intake and procurement workflows on it. On-call automation is a shorter path than it was six months ago.</li>
+  </ul>
+</div>
+
+<h2>The number everyone quoted wrong</h2>
+<p>When Anthropic published the Sonnet 5 system card on June 30, every tech recap grabbed the 63.2% agentic coding score and put it next to Opus 4.8's 69.2% to make a point about the gap. A few of them called Sonnet 5 "almost as good." A few others said the 6-point difference makes Opus the only real choice for production agentic work. Neither framing is right, and for SREs trying to decide whether to wire this model into a triage workflow, both miss what actually matters.</p>
+<p>The benchmark in question is SWE-bench Verified, which gives a model a real GitHub issue, access to the actual codebase, and a test suite, and asks it to write the fix that makes the tests pass. It's a hard test of exactly the skills that matter in autonomous operations: reading unfamiliar code, forming a hypothesis, calling the right tools, and iterating when the first attempt fails. A 63% pass rate means the model resolves six out of ten issues without human help. That's not a toy number — it was roughly where frontier models sat two years ago when the best researchers in the world were using them. The question for your on-call workflow isn't whether 63% is philosophically satisfying. It's whether it's good enough for the specific scope of what you want the agent to handle, and whether 6 additional points is worth paying 2.5x more per token to get.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1280&q=80" alt="Rows of servers in a data center with blue LED lighting" loading="lazy" /><figcaption>The benchmark is a proxy. What matters is whether the model finishes the task in front of it — and Sonnet 5's gains are mostly in follow-through, not raw knowledge.</figcaption></figure>
+
+<h2>What Sonnet 4.6 would do that Sonnet 5 actually finishes</h2>
+<p>The most useful thing Anthropic published wasn't the benchmark table — it was the partner quotes, because they describe failure modes, not just scores. One early tester from Augment Code put it directly: Sonnet 5 traces a failure to its actual root cause and ships a durable fix instead of patching the symptom. Another from Kiro said it conducts thorough explorations and sustains focus noticeably longer on complex tasks. A Neel Chotai at a Rust shop described asking Sonnet 5 to investigate a bug: unprompted, it wrote a reproducing test, implemented the fix, then stashed it to confirm the bug came back without the change. All in a single pass.</p>
+<p>That last one is the thing to pay attention to. The model didn't just write a fix — it ran the scientific method on itself without being asked. For an SRE context, that's the difference between an agent that tells you "I think the issue is in the connection pool" and one that tells you "I confirmed the issue is in the connection pool — I artificially reproduced the saturation condition and here's the proof." The former is a suggestion. The latter is actionable at 2am with a still-groggy on-call engineer in the loop.</p>
+<p>Sonnet 4.6 would frequently stop short. The task gets hard enough, the model hits an ambiguous decision point, and it surfaces a question or produces a partial answer. Sonnet 5 pushes through more of those forks — retrying with a corrected tool argument when the first call fails, re-reading context it already processed when a later step contradicts an earlier assumption, and flagging when it's reached a point where it genuinely needs human input rather than just going quiet. For autonomous workflows, "stops short" is often worse than "gives a wrong answer," because a wrong answer at least tells you where the model's reasoning broke down.</p>
+
+<h2>The cost math for a real triage fleet</h2>
+<p>Here's where the 63% versus 69% conversation gets concrete. Agentic workflows are input-heavy in a way that casual API users underestimate. Every step in an agent loop re-sends the accumulated context: the system prompt, the tool schema, every prior tool output, the full conversation. A triage agent investigating a P1 might run 15 to 20 steps by the time it's finished checking logs, querying the metrics API, reading the relevant runbook section, and drafting a summary. That's 15 to 20 full-context sends, not 15 to 20 small tokens.</p>
+<p>In practice, a substantive incident investigation consumes somewhere between 80,000 and 150,000 input tokens depending on how much log context you're feeding in. At $2/M, that's $0.16 to $0.30 per incident investigation. At $5/M (Opus 4.8), it's $0.40 to $0.75. The ratio compounds: a team running 200 incident investigations a day — a busy-but-not-unusual number for a mid-size SaaS platform during business hours — spends $32–60/day on Sonnet 5 versus $80–150/day on Opus 4.8. Monthly, that's a $1,400–2,700 difference on just this one workflow. For a triage agent that's running all the time, including nights and weekends, the gap widens further.</p>
+
+<table class="ctable">
+  <thead><tr><th>Model</th><th>Agentic coding score</th><th>Input cost (now)</th><th>Input cost (Sep 1+)</th><th>Output cost</th></tr></thead>
+  <tbody>
+    <tr><th>Sonnet 5</th><td>63.2%</td><td>$2/M tokens</td><td>$3/M tokens</td><td>$10/M tokens</td></tr>
+    <tr><th>Opus 4.8</th><td>69.2%</td><td>$5/M tokens</td><td>$5/M tokens</td><td>$25/M tokens</td></tr>
+    <tr><th>Sonnet 4.6</th><td>58.1%</td><td>$3/M tokens</td><td>$3/M tokens</td><td>$15/M tokens</td></tr>
+  </tbody>
+</table>
+
+<p>The calculus that makes sense for most teams: use Sonnet 5 for volume workflows where the stakes per incident are moderate — alert triage, runbook lookup, preliminary root cause narrowing, log summarization. Reserve Opus 4.8 for the genuinely complex cases: a cascading failure across three services, a novel incident type without a matching runbook, anything where you want the model's ceiling rather than its throughput. That's not a compromise — it's the same model tiering strategy every SRE team applies to human responders.</p>
+
+<h2>Scenario: the first-responder triage agent</h2>
+<p>The most immediately deployable use case is a first-responder agent that activates on PagerDuty alert, does the first ten minutes of work a human on-call would do, and either resolves it or produces a warm handoff with a hypothesis and evidence. This is the scenario Sonnet 5 is best suited for right now, and the one where the cost-to-capability ratio makes the strongest argument.</p>
+<p>In practice, a first-responder triage agent on Sonnet 5 would work roughly like this: alert fires, agent picks up the context (service name, alert text, recent deployment history), calls your metrics API to pull the relevant signals from the last 30 minutes, runs a structured log query for errors in that service, checks whether the service is behind a rollout or config change, and then either closes the alert with a "false positive, here's why" annotation or escalates with a draft hypothesis. That's four to six tool calls, a couple of read operations, and a synthesis step — squarely within what Sonnet 5 handles confidently.</p>
+<p>What it won't do reliably is handle an incident that requires correlating across six services, reasoning about a subtle interaction between two deployment changes, or making a judgment call about blast radius when the evidence is ambiguous. Those are Opus 4.8 cases, and the honest answer is that they should also involve a human. The goal of a first-responder agent isn't to replace the on-call engineer — it's to get them to the right context faster so their expertise is focused on the judgment call rather than the log grep.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=1280&q=80" alt="A developer's screen showing terminal output and code during a debugging session" loading="lazy" /><figcaption>A triage agent's job is to do the log grep and metrics pull so the human on-call can focus on the actual decision.</figcaption></figure>
+
+<h2>Scenario: browser-based runbook automation via computer use</h2>
+<p>The more surprising capability in Sonnet 5 is computer use, and for SREs who haven't tracked it closely, it's worth taking seriously now. Computer use lets the model control a real browser — it sees the screen, clicks, types, navigates, and reads content the way a human would. Anthropic says Sonnet 5 is substantially better at this than Sonnet 4.6, and the partner quotes back it up: Pace runs full insurance intake workflows on it, including submission intake and FNOL, using the same browser-based tools their operations teams use.</p>
+<p>For on-call specifically, this matters because a lot of runbooks aren't automatable via API. They assume you can see the Grafana dashboard, click into the right panel, export a specific query result, navigate to the deployment console, and confirm a config value. That whole chain is what computer use handles. Instead of rebuilding a custom API integration for every internal tool, you point Sonnet 5 at a headless browser and a well-written runbook step, and it executes the same sequence a human would.</p>
+<p>This isn't production-ready for every runbook — you'd want to start with read-only operations and verify outputs before giving it write access to anything with blast radius. But for the "gather evidence" phase of an incident, where the agent is navigating dashboards, pulling config values, and checking deployment states without changing anything, it's genuinely useful today. The injection resistance improvement (from ~50% attack success to under 1%) is what makes browser use feel less like a liability: the agent reading external documentation or a runbook wiki is much less likely to be hijacked mid-task than it was six months ago.</p>
+
+<h2>Scenario: error correction in long-running autonomous workflows</h2>
+<p>The third scenario is more subtle but probably the most important for teams thinking about putting agents into overnight or weekend autonomous windows. Error correction — the model's ability to detect that a previous step produced a wrong result and re-approach it — is what separates an agent that runs unattended for six hours from one that needs babysitting.</p>
+<p>Sonnet 5's improvement here is documented but not loudly marketed. The system card notes lower rates of sycophantic behavior, which in practice means it's less likely to tell you everything looks fine when it doesn't. It's better at refusing malicious requests and resisting prompt injection, which means it's less likely to be steered off-task by a bad tool result. And the partner feedback repeatedly describes it finishing tasks where Sonnet 4.6 would stop — which means it's making better decisions about when to retry versus when to escalate.</p>
+<p>For an overnight workflow — say, an agent that runs your weekly capacity planning analysis while your team sleeps, or one that runs nightly regression checks against your production API endpoints — these properties matter more than the agentic coding score. You're not asking the model to write perfect code, you're asking it to execute a workflow reliably and surface exceptions cleanly. That's a different threshold, and Sonnet 5 hits it for a lot of these use cases where Sonnet 4.6 was marginal.</p>
+
+<h2>What the 37% failure rate actually means</h2>
+<p>It's worth being direct about the gap. A 63% pass rate means 37 out of 100 issues weren't fully resolved by the agent alone. In a triage context, those 37 aren't disasters — they're escalations. The agent investigated, didn't close the incident autonomously, and handed off to a human. That's a reasonable outcome. What matters is the quality of the handoff: does the agent give the on-call engineer useful context about what it found and where it got stuck, or does it just silently time out?</p>
+<p>Sonnet 5 is better at the former than its predecessors, and that's the right frame for thinking about the 37%. You're not deploying a perfect incident resolver. You're deploying a first responder that handles a majority of incidents autonomously and makes the rest faster for the human who takes over. If your triage agent resolves 60% of alerts without a page, cuts time-to-hypothesis by 8 minutes on the remaining 40%, and costs $2/M input tokens to run, that's probably one of the highest ROI infrastructure investments your team makes this quarter.</p>
+
+<div class="verdict">
+  <h3>The production decision</h3>
+  <p>Run Sonnet 5 for your triage and first-responder workflows. The cost-to-capability ratio beats both Opus 4.8 (too expensive for volume) and Sonnet 4.6 (not reliable enough for autonomous follow-through). <strong>Budget at the September rate ($3/M)</strong> — the intro pricing runs out August 31 and you don't want to reprice a production agent in the middle of Q3. Set computer use to read-only initially and verify outputs before expanding scope. Log every tool call and intermediate output so when the model hits that 37% and escalates, your on-call engineer has context to work from, not a blank page. And keep Opus 4.8 in your tool belt — it still has the ceiling you want for the genuinely hard calls, the cascading failures, and the incidents nobody wrote a runbook for.</p>
+</div>
+
+<h2>One last thing about the system card</h2>
+<p>The previous post on this site looked at what the Sonnet 5 system card reveals about monitoring gaps — agents failing quietly, tool calls that return plausible-but-wrong results, loops that burn tokens without triggering an alert. If you haven't read it, that's the companion piece to this one. This post is about whether Sonnet 5 is capable enough to be the agent doing the work. The other post is about how to watch it. You need both answers before you put one on a PagerDuty hook.</p>
+<p>The short version: yes, Sonnet 5 is capable enough for well-scoped triage work at this price point. The infrastructure gaps in observing it are still real, and they're yours to close. The model is ready before the runbook is, which is usually how this goes.</p>
+    `,
+  },
+  {
     id: 'ai-agents-breaking-traditional-monitoring-observability',
     bannerImage: 'https://images.unsplash.com/photo-1698668975271-2ba9a323be6b?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'Observing the Observer: How AI Agents Are Breaking Traditional Monitoring',
