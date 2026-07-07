@@ -1,6 +1,233 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'monitoring-stack-cant-see-ai-agents-otel-genai-conventions',
+    bannerImage: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: "Your Monitoring Stack Can't See Your AI Agents. Here's How to Fix That",
+    subtitle: "OpenTelemetry's GenAI semantic conventions went production-stable and give you real span structures for LLM calls, tool invocations and token counts. Most teams still haven't wired them up, so their agents run in a blind spot the dashboards were never built to see.",
+    category: 'OpenTelemetry',
+    icon: '🛰️',
+    bgGradient: 'linear-gradient(135deg, #071a24 0%, #0e5563 55%, #34d0e0 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-07',
+    readTime: 10,
+    tags: ['OpenTelemetry', 'GenAI', 'AI agents', 'observability', 'tracing', 'LangSmith', 'Arize', 'AIOps'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>OpenTelemetry's GenAI semantic conventions moved from experimental to production-stable, and by 2026 they give every team a <strong>shared vocabulary</strong> for LLM calls, tool invocations and token counts. The catch is that most stacks still have not turned them on.</li>
+    <li>What gets captured cleanly today: model name, prompt and completion token counts, request latency, the tool an agent called, and the finish reason. For a single model call, that is genuinely good coverage.</li>
+    <li>What stays invisible: <strong>multi-agent coordination</strong>, cost attribution per business workflow, and the "why did the agent take this path" question. The spec does not answer those yet, so you have to bolt that context on yourself.</li>
+    <li>Proprietary SDKs like <strong>LangSmith</strong> and <strong>Arize</strong> give you prettier agent traces out of the box, however they park your telemetry inside one vendor. OTel is more work up front but your data stays portable.</li>
+  </ul>
+</div>
+
+<h2>Your traces stop at the API call</h2>
+<p>Here is the thing almost nobody notices until an agent misbehaves in production. Your APM already traces the HTTP request that reaches your service, and it traces the outbound call to the model provider. So on the dashboard it looks like you have coverage. But the span just says "POST /v1/messages, 4.2 seconds, 200 OK" and then it goes dark. What the agent actually did inside that window, which tools it reached for, how many tokens it burned, whether it retried a failed call three times before giving up, none of that shows up. The trace stops exactly where the interesting behaviour starts.</p>
+<p>That gap is not because your tooling is bad. It is because traditional traces were designed around request and response, and a agent is neither of those things. A agent is a loop. It reasons, calls a tool, reads the result, reasons again, and it can run that loop a dozen times before it produces an answer. Each turn is a decision point where things can go wrong quietly. If your telemetry treats the whole loop as one opaque span, you have no way to see which turn broke.</p>
+
+<h2>What the GenAI conventions actually capture</h2>
+<p>This is the problem the OpenTelemetry GenAI semantic conventions set out to fix. Instead of every framework inventing it's own attribute names, the spec defines a standard shape. A model call becomes a span with attributes like <code>gen_ai.request.model</code>, <code>gen_ai.usage.input_tokens</code>, <code>gen_ai.usage.output_tokens</code>, and <code>gen_ai.response.finish_reasons</code>. A tool call becomes it's own child span with the tool name and arguments. Because the names are standardised, a trace emitted by one library reads the same in any backend that understands the convention.</p>
+<p>In practice that means a few things become easy that used to be painful. You can graph token spend per model across every service without writing custom parsers. You can see the latency of the model call separated from the latency of the tool it triggered, so when a run is slow you know whether to blame the LLM or the database query it kicked off. And you can count how often a given tool gets called, which is the first real signal into what your agents spend their time doing. For a single call, honestly, this covers most of what you would want.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1280&q=80" alt="Developer working across multiple screens showing code and telemetry" loading="lazy" /><figcaption>The GenAI conventions turn each model call and each tool call into a named span, so you can finally see inside the loop instead of around it.</figcaption></figure>
+
+<h2>The blind spots nobody instrumented yet</h2>
+<p>So the conventions solve the single-call problem well. However, the moment you move to real agentic systems, three gaps open up, and it is worth naming them because vendors tend to gloss over it.</p>
+<p>First, multi-agent coordination. When one orchestrator agent hands work to three sub-agents that each call their own tools, the spec gives you spans for every individual call but not a clean way to express "these two agents were arguing about the same task." The parent-child span tree gets you part of the way there, still, the semantics of coordination, delegation, and hand-off are not standardised. You can see the pieces but the relationships between agents are something you have to model yourself.</p>
+<p>Second, cost attribution per workflow. Token counts land on individual spans just fine. But your finance team does not ask "how many tokens did span 4f2a burn," they ask "what did the invoice-processing workflow cost us last month." Rolling per-span token counts up into a per-business-process number is not something the convention does for you. You need to add your own workflow identifiers as attributes and aggregate on them, otherwise the cost data is technically present but practically unusable.</p>
+<p>Third, the reasoning path. A span can tell you the agent called the "refund" tool. It cannot tell you why the agent decided a refund was the right move, because that reasoning lives in the model output, which most teams do not capture in full for privacy and cost reasons. When an agent does something dumb, this is the exact context you wish you had, and it is the hardest to get.</p>
+
+<h2>OTel versus the proprietary SDKs</h2>
+<p>This is where the LangSmith and Arize question comes in, because those tools do give you agent-shaped traces today, with less setup. So which do you reach for. The honest answer depends on how much you value portability against time-to-first-dashboard.</p>
+
+<table class="ctable">
+  <thead><tr><th>Approach</th><th>Agent trace quality</th><th>Setup effort</th><th>Vendor lock-in</th><th>Best for</th></tr></thead>
+  <tbody>
+    <tr><th>OTel GenAI conventions</th><td>Good, improving</td><td>Higher</td><td>None, fully portable</td><td>Teams that already run OTel and want one pipeline</td></tr>
+    <tr><th>LangSmith</th><td>Excellent for LangChain</td><td>Low</td><td>High</td><td>Fast iteration on LangChain / LangGraph apps</td></tr>
+    <tr><th>Arize Phoenix</th><td>Excellent, OTel-based</td><td>Low to medium</td><td>Medium</td><td>Eval-heavy teams who want tracing plus scoring</td></tr>
+  </tbody>
+</table>
+
+<p>Worth noting that the line is blurring. Arize built Phoenix on top of OpenTelemetry, so it emits and reads OTel-compatible spans, which means you get the nicer agent views without fully leaving the open standard. New Relic went the same direction, they launched native support for the GenAI conventions so an agent instrumented with plain OTel shows up as a first-class trace in their platform, no proprietary agent required. That is the direction the whole market is heading. Start with the open convention and let the backends compete on how well they render it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1280&q=80" alt="Engineer reviewing dashboards and metrics on a large monitor" loading="lazy" /><figcaption>Phoenix and New Relic both read OTel GenAI spans natively, so you can adopt the open convention first and choose your backend later.</figcaption></figure>
+
+<h2>How to wire it up without boiling the ocean</h2>
+<p>You do not need a six-month project to close this gap. Because the conventions are stable, the fastest path is to add the OTel GenAI instrumentation package for whatever agent framework you run, point it at your existing collector, and confirm the spans land with the right attributes. Most frameworks now ship an auto-instrumentation hook, so this is often a config change rather than a code rewrite.</p>
+<p>After the basics work, do two things the spec will not do for you. Add a stable workflow identifier as a span attribute at the top of every agent run, so cost and latency roll up to a business process and not just a trace id. Then decide, deliberately, how much of the model's reasoning you are willing to log, and redact the rest. That single decision is the difference between a useful post-incident review and a shrug when an agent does something you cannot explain.</p>
+
+<div class="verdict">
+  <h3>The production decision</h3>
+  <p>Adopt the OpenTelemetry GenAI conventions now, even though they are incomplete, because they are the only agent telemetry that stays portable as the vendor landscape churns. <strong>Instrument the single-call basics first</strong>, that is where the spec is strongest and the payoff is immediate. Then layer your own workflow ids and a considered reasoning-capture policy on top to cover the multi-agent and cost-attribution gaps the standard has not reached yet. If you already live in LangChain and need dashboards this week, LangSmith is a reasonable shortcut, just know you are trading portability for speed and plan the migration path before the lock-in gets expensive.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://opentelemetry.io/blog/" target="_blank" rel="noopener">OpenTelemetry GenAI Blog</a></li>
+  <li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">OTel AI Agent semantic conventions</a></li>
+  <li><a href="https://newrelic.com/blog" target="_blank" rel="noopener">New Relic OpenTelemetry launch</a></li>
+</ul>
+    `,
+  },
+  {
+    id: 'agentic-ai-top-attack-vector-2026-observability-budget',
+    bannerImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: "Agentic AI Is 2026's Top Attack Vector. What That Means for Your Observability Budget",
+    subtitle: "A 2026 Dark Reading poll put agentic AI as the number-one attack vector, named by 48% of security pros. Agents hold elevated permissions, spawn subprocesses and call outside tools, and almost none of that shows up in a traditional APM trace.",
+    category: 'Security',
+    icon: '🛡️',
+    bgGradient: 'linear-gradient(135deg, #1a0812 0%, #6d1533 55%, #f0518a 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-07',
+    readTime: 9,
+    tags: ['security', 'agentic AI', 'attack vector', 'observability', 'AIOps', 'prompt injection', 'threat detection'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>A 2026 Dark Reading poll named <strong>agentic AI the top attack vector</strong>, picked by 48% of security professionals. That is not a hypothetical, it is where practitioners say the risk actually is right now.</li>
+    <li>The reason is structural. Agents hold <strong>elevated API permissions</strong>, they spawn subprocesses, and they call external tools. A compromised agent can do real damage while looking, to your APM, like a normal service doing normal work.</li>
+    <li>To catch a hijacked agent mid-run you need telemetry your current stack probably does not emit: per-tool-call audit spans, subprocess and outbound-network visibility, and a record of the prompt that triggered each action.</li>
+    <li>A handful of AIOps platforms can ingest this today if you feed them OTel GenAI spans, still, most teams have the budget line for "APM" and no line for "agent behaviour," and that is the gap that needs closing.</li>
+  </ul>
+</div>
+
+<h2>Why practitioners moved agents to the top of the list</h2>
+<p>When 48% of security pros in the Dark Reading poll put agentic AI at number one, they were not reacting to a single flashy breach. They were reacting to a shape of risk that their existing tools do not see. Think about what an agent actually is from a security standpoint. It is a piece of software that takes natural-language instructions, some of which come from untrusted users, and turns them into actions with real privileges. That combination, untrusted input plus real power, is the classic recipe for trouble, and agents put it right at the centre of the system.</p>
+<p>Traditional attack vectors are noisy. A SQL injection leaves a weird query, a port scan lights up your network monitor, a brute-force login floods the auth logs. A prompt injection that convinces an agent to exfiltrate data does none of that. The agent has permission to read the data. It has permission to call the tool. Every individual step looks legitimate because it is legitimate, the agent was just talked into doing it. So the attack hides inside authorised behaviour, which is exactly the kind of thing signature-based defences was never built to catch.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=1280&q=80" alt="Dark security operations room with data displayed on monitors" loading="lazy" /><figcaption>A prompt-injected agent does not trip signature-based defences, because every step it takes is an action it was already authorised to perform.</figcaption></figure>
+
+<h2>The three privileges that make agents dangerous</h2>
+<p>It helps to be concrete about why agents are risky, because the answer points straight at what you need to monitor.</p>
+<p>The first is elevated permissions. To be useful, an agent usually gets broad access. It can read the customer database, call the payments API, query internal wikis, hit third-party services. A human with that much access would be carefully audited. The agent often is not, because it was deployed as "just another service." So when it is compromised, the blast radius is whatever the sum of it's permissions allows, which is frequently enormous.</p>
+<p>The second is subprocess spawning. Many agent frameworks let the model execute code, run shell commands, or launch helper processes. That is powerful and it is also a direct path from "language model output" to "arbitrary execution on your infrastructure." If your APM is watching the parent service but not the children it spawns, an attacker who steers the agent into running a subprocess has effectively escaped your visibility.</p>
+<p>The third is external tool calls. Agents reach out. They fetch web pages, call APIs, read documents. Each of those is both a capability and an ingestion point for malicious instructions, the infamous indirect prompt injection where a poisoned document tells the agent what to do next. On top of that, an outbound call is how data leaves, so the tool-call boundary is exactly where exfiltration happens, and exactly where most traces say nothing useful.</p>
+
+<h2>What telemetry actually catches a compromised agent</h2>
+<p>So what would you need to see the attack while it is happening, not in the post-mortem. The list is shorter than you might fear, however it is different from what a standard APM emits.</p>
+<p>You need a span for every tool call with the tool name, the arguments, and the identity of the agent that made it. That is your audit trail, and it is the single most valuable signal, because anomalous tool usage is the clearest sign of a hijack. You need subprocess and outbound-network visibility tied to the agent run, so a shell command or a call to an unfamiliar domain raises a flag. And you need at least a redacted record of the input that triggered each action, because when you are investigating, "what did the agent read right before it did that" is the first question you will ask.</p>
+
+<table class="ctable">
+  <thead><tr><th>Agent behaviour</th><th>What normal APM shows</th><th>What you actually need</th></tr></thead>
+  <tbody>
+    <tr><th>Tool invocation</th><td>One outbound HTTP span</td><td>Named tool span with args and agent identity</td></tr>
+    <tr><th>Subprocess run</th><td>Nothing</td><td>Process span linked to the agent run</td></tr>
+    <tr><th>Data exfiltration</th><td>A normal 200 response</td><td>Outbound destination flagged against an allow-list</td></tr>
+    <tr><th>Prompt injection</th><td>Invisible</td><td>Redacted record of the triggering input</td></tr>
+  </tbody>
+</table>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=1280&q=80" alt="Network cabling and server hardware in a data center" loading="lazy" /><figcaption>The tool-call boundary is where data leaves the building. If your traces go quiet there, so does your ability to catch exfiltration.</figcaption></figure>
+
+<h2>Which platforms support this today</h2>
+<p>Here is the encouraging part. Because the OpenTelemetry GenAI conventions standardised how tool calls and model calls get expressed, several AIOps and security platforms can already ingest agent telemetry, if you emit it. Platforms that lean into OTel, like New Relic and the Arize Phoenix ecosystem, will show agent tool calls as first-class spans you can alert on. LogicMonitor and other AIOps vendors have been signalling this direction in their 2026 trend guidance too, flagging agent oversight as a priority rather than a nice-to-have.</p>
+<p>The gap is rarely the tool, it is the instrumentation and the budget. Most teams pay for APM and consider agent monitoring a research project. That framing is backwards for 2026. If practitioners rank agents as the top attack vector, then agent behaviour telemetry is not an experiment, it is table stakes, and the budget conversation should reflect it. Meanwhile the cost of getting this wrong is not theoretical, a single compromised agent with broad permissions is a breach waiting for a trigger.</p>
+
+<div class="verdict">
+  <h3>The production decision</h3>
+  <p>Treat agent behaviour telemetry as a security control, not an observability nicety, and fund it that way. <strong>Instrument every tool call, subprocess, and outbound destination</strong> tied to the agent that made it, using the OTel GenAI conventions so the data lands in whatever AIOps platform you already run. Set alerts on the anomalies that matter, an unfamiliar outbound domain, a tool called far more than baseline, a subprocess you did not expect. And scope agent permissions like you would a privileged human, least-access by default, because the cheapest way to shrink the blast radius is to hand the agent less power in the first place.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.darkreading.com" target="_blank" rel="noopener">Dark Reading 2026 attack-vector poll</a></li>
+  <li><a href="https://www.logicmonitor.com/blog" target="_blank" rel="noopener">LogicMonitor 2026 Trends</a></li>
+  <li><a href="https://www.fiddler.ai/blog" target="_blank" rel="noopener">Fiddler AI OpenTelemetry guide for AI agents</a></li>
+</ul>
+    `,
+  },
+  {
+    id: 'un-ai-governance-summit-cios-aiops-observability',
+    bannerImage: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'What the UN AI Governance Summit Means for CIOs Who Run AIOps Stacks',
+    subtitle: "The UN Global Dialogue on AI Governance just wrapped in Geneva. Skip the policy rehash. The real question for CIOs is operational, because IBM data shows organisations without AI governance policies paid $670K more per breach.",
+    category: 'Governance',
+    icon: '⚖️',
+    bgGradient: 'linear-gradient(135deg, #0a1420 0%, #1c3d5a 55%, #4a90d9 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-07',
+    readTime: 9,
+    tags: ['AI governance', 'CIO', 'AIOps', 'observability', 'audit trails', 'compliance', 'UN', 'model logging'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>The UN Global Dialogue on AI Governance wrapped in Geneva on July 6 to 7. The headlines are about policy, however the part that lands on a CIO's desk is operational, not diplomatic.</li>
+    <li>IBM's breach research puts a number on it: organisations <strong>without AI governance policies paid roughly $670K more per breach</strong>. Governance is not a compliance tax, it is a measurable risk reduction.</li>
+    <li>From an observability angle, "governance" translates into three concrete requirements: <strong>audit trails, model decision logging, and agent action replay</strong>. Those are telemetry problems before they are legal ones.</li>
+    <li>Some of this your AIOps stack can satisfy today. The rest is aspirational, so the useful exercise for a CIO is knowing which is which before you promise a regulator anything.</li>
+  </ul>
+</div>
+
+<h2>The summit is a deadline, not a debate</h2>
+<p>It is easy to read a story about a UN governance dialogue and file it under "interesting, not urgent." That would be a mistake for anyone who runs infrastructure. Whatever the exact wording that came out of Geneva, the direction has been clear for a while, regulators and boards are going to expect organisations to explain what their AI systems did and why. And "explain" is not a policy word, it is an engineering word. You cannot explain a decision you did not record.</p>
+<p>So the honest way for a CIO to read the summit is as a deadline with a fuzzy date. At some point, and probably sooner than the roadmap slides suggest, someone with authority is going to ask you to produce a record of what a model or an agent did in a specific situation. If your systems can produce that record, governance is a reporting task. If they cannot, it is a crisis. The difference between those two outcomes is decided long before the request arrives, in how you instrumented the system.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1280&q=80" alt="Empty conference hall with rows of seats and formal lighting" loading="lazy" /><figcaption>Governance frameworks set the expectation. Whether you can meet it is decided in your telemetry pipeline, not in the boardroom.</figcaption></figure>
+
+<h2>The $670K is a telemetry number in disguise</h2>
+<p>The IBM figure is the one to keep in your back pocket for budget conversations. Organisations without AI governance policies paid about $670K more per breach than those with them. It is tempting to read that as a story about paperwork and committees, still, look closer and it is really a story about visibility. The organisations that governed their AI well were also the ones who could see what their AI was doing, which meant they detected problems faster and scoped incidents tighter.</p>
+<p>That reframing matters because it tells a CIO where to spend. The $670K gap does not close by writing a policy document, it closes by being able to answer questions with data. When a model makes a bad call, can you show the input it received, the decision it produced, and the action it took as a result. If yes, your incident response is fast and your regulatory exposure is bounded. If no, every incident becomes an expensive archaeology project, and that archaeology is exactly what the extra $670K pays for.</p>
+
+<h2>What governance requires from observability</h2>
+<p>Strip away the policy language and AI governance asks for three things your telemetry stack either provides or does not.</p>
+<p>The first is audit trails. Every consequential action an AI system takes should leave a durable, tamper-evident record, who or what triggered it, when, and with what inputs. This is the most achievable of the three, because it is essentially structured logging with retention and access control, something mature ops teams already know how to do.</p>
+<p>The second is model decision logging. Beyond "the model was called," you want "the model was asked X and returned Y with this confidence and these alternatives considered." This is harder, because it means capturing model inputs and outputs at a fidelity that raises real cost and privacy questions. Most teams log a fraction of this and tell themselves it is enough, right up until it is not.</p>
+<p>The third, and the most aspirational, is agent action replay. The ability to take a past agent run and reconstruct it step by step, every tool call, every intermediate decision, every branch it considered. This is where the honesty is needed, because very few stacks can do it today. It needs the full trace of the agent loop preserved and re-playable, and that is a level of instrumentation the OTel GenAI conventions are only starting to make practical.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1280&q=80" alt="Modern office meeting space with a table and screens" loading="lazy" /><figcaption>Audit trails are achievable today. Full agent action replay is where the gap between what governance asks and what stacks deliver is widest.</figcaption></figure>
+
+<h2>Today versus aspirational, tool by tool</h2>
+<p>Here is the map a CIO actually needs, sorted by how real each capability is right now.</p>
+
+<table class="ctable">
+  <thead><tr><th>Governance requirement</th><th>Feasible today?</th><th>What it takes</th></tr></thead>
+  <tbody>
+    <tr><th>Audit trails</th><td>Yes</td><td>Structured logs, retention, tamper-evidence, access control</td></tr>
+    <tr><th>Model decision logging</th><td>Partly</td><td>Input and output capture with a deliberate redaction policy</td></tr>
+    <tr><th>Agent action replay</th><td>Aspirational</td><td>Full OTel GenAI trace of the agent loop, preserved and re-playable</td></tr>
+    <tr><th>Cost and access attribution</th><td>Partly</td><td>Workflow identifiers rolled up per business process</td></tr>
+  </tbody>
+</table>
+
+<p>Most mainstream AIOps platforms handle the top row well and the middle rows with effort. The bottom row is where every vendor's roadmap outruns it's shipping product, so if a sales deck promises full replay, ask to see it on your own workload before you believe it. In the meantime, the pragmatic move is to nail the audit trail, get model logging to a defensible standard, and be transparent with your board about where replay is still a work in progress rather than pretending it is solved.</p>
+
+<div class="verdict">
+  <h3>The production decision</h3>
+  <p>Read the Geneva summit as a countdown, and spend the runway building the telemetry that turns governance from a scramble into a report. <strong>Lock down audit trails first</strong>, because they are achievable now and they carry most of the $670K risk reduction. Bring model decision logging up to a fidelity you can defend to a regulator, with a clear redaction policy so cost and privacy do not blow up. Treat agent action replay as a stated goal, not a claimed capability, and hold your vendors to proof rather than roadmap. The organisations that come out ahead will not be the ones with the thickest policy binder, they will be the ones who can answer "what did your AI do, and why" with a trace instead of a shrug.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.un.org" target="_blank" rel="noopener">UN Global Dialogue on AI Governance</a></li>
+  <li><a href="https://www.informationweek.com" target="_blank" rel="noopener">InformationWeek CIO analysis</a></li>
+  <li><a href="https://www.ibm.com/reports/data-breach" target="_blank" rel="noopener">IBM Cost of a Data Breach report</a></li>
+</ul>
+    `,
+  },
+  {
     id: 'claude-sonnet-5-sre-triage-agent-oncall-rotation',
     bannerImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'Claude Sonnet 5 on the On-Call Rotation: What a 63% Agentic Coding Score Actually Means for SREs',
