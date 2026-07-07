@@ -3,13 +3,20 @@
 #
 # The CSP intentionally allows Google Tag Manager / Analytics, AdSense (and the
 # many *.doubleclick.net / *.googlesyndication.com hosts it fans out to), and
-# Supabase, while blocking script from any other origin and framing of the site.
-# 'unsafe-inline' is required by the inline gtag bootstrap and AdSense; the real
-# XSS defense for blog content is DOMPurify (see src/lib/sanitizeHtml.js).
+# Supabase, while blocking script from any other origin. 'unsafe-inline' is
+# required by the inline gtag bootstrap and AdSense; the real XSS defense for
+# blog content is DOMPurify (see src/lib/sanitizeHtml.js).
+#
+# Framing: frame-ancestors 'self' + X-Frame-Options SAMEORIGIN let the in-app
+# reader iframe our OWN Deep Dives (same-origin) while still blocking third-party
+# clickjacking. frame-src 'self' https: lets that reader embed frameable news
+# sources — publishers that forbid it are filtered by /api/framecheck and their
+# own headers. Keep this block in sync with worker/index.js SECURITY_HEADERS and
+# the vercel.json equivalent.
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com https://adservice.google.com https://*.adtrafficquality.google https://www.google.com https://*.g.doubleclick.net https://*.doubleclick.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: https:; connect-src 'self' https: wss://*.supabase.co; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.doubleclick.net https://www.google.com https://*.googlesyndication.com; manifest-src 'self'; worker-src 'self' blob:
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://tpc.googlesyndication.com https://adservice.google.com https://*.adtrafficquality.google https://www.google.com https://*.g.doubleclick.net https://*.doubleclick.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: https:; connect-src 'self' https: wss://*.supabase.co; frame-src 'self' https:; manifest-src 'self'; worker-src 'self' blob:
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
   Strict-Transport-Security: max-age=63072000; includeSubDomains

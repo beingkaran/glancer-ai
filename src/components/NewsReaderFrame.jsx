@@ -54,6 +54,12 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   // 'blocked'  → publisher forbids framing — show the summary + link-out panel
   //              instead of the browser's grey "content is blocked" error page.
   const [mode, setMode] = useState('checking');
+  // After a short grace we surface a manual "Read on source" escape bar over the
+  // live frame. We CANNOT detect from JS when a cross-origin page is blocked by
+  // X-Frame-Options/CSP — the browser paints its own "content is blocked" page
+  // and still fires the iframe's onLoad — so a permanent, obvious way out is the
+  // only reliable rescue for that grey error. Harmless when the page loads fine.
+  const [showEscape, setShowEscape] = useState(false);
   // Ref mirror of "loaded" so the slow-load timer reads the latest value
   // without a stale closure.
   const loadedRef = useRef(false);
@@ -79,6 +85,7 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   useEffect(() => {
     let alive = true;
     setIframeLoaded(false);
+    setShowEscape(false);
     loadedRef.current = false;
     // Our own pages (Deep Dives at /blog/:id) are same-origin — framing is
     // always allowed, no preflight needed.
@@ -107,16 +114,19 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
     return () => { alive = false; };
   }, [item.url, item.internal]);
 
-  // Even for allowed sources, give the page 12s to actually render; if it's
-  // still blank (slow network, or a policy the headers didn't declare), swap to
-  // the summary panel — its "Read on <source>" button is a real user gesture,
-  // so it never trips popup blockers the way an automatic window.open did.
+  // Two safety nets for the live frame, since a publisher's block can slip past
+  // the preflight (some sites send frame headers only to real browsers, not to
+  // our server-side framecheck):
+  //   • 3s → reveal a manual "Read on <source>" escape bar over the frame. This
+  //     is the ONLY rescue for a page that renders the browser's grey "content
+  //     is blocked" error (that error still fires onLoad, so we can't detect it).
+  //   • 6s → if the frame is still genuinely blank (never fired onLoad — a slow
+  //     network or a page that refused silently), fall back to the summary panel.
   useEffect(() => {
     if (mode !== 'frame') return undefined;
-    const t = setTimeout(() => {
-      if (!loadedRef.current) setMode('blocked');
-    }, 12000);
-    return () => clearTimeout(t);
+    const escapeT = setTimeout(() => setShowEscape(true), 3000);
+    const blankT = setTimeout(() => { if (!loadedRef.current) setMode('blocked'); }, 6000);
+    return () => { clearTimeout(escapeT); clearTimeout(blankT); };
   }, [mode, item.url]);
 
   return (
@@ -165,6 +175,22 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
             sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
             onLoad={() => { loadedRef.current = true; setIframeLoaded(true); }}
           />
+        )}
+
+        {/* Manual escape over the live frame. Appears after a short grace so that
+            if the page rendered the browser's grey "content is blocked" error
+            (undetectable from JS — see the timer effect), the reader is never a
+            dead end: one tap opens the article on its own site. Hidden for our
+            own same-origin Deep Dives, which always frame cleanly. */}
+        {mode === 'frame' && showEscape && !item.internal && (
+          <a
+            className="reader-frame-escape"
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Not loading? Read on {item.source} <ExtIcon />
+          </a>
         )}
 
         {/* Publisher forbids embedding (X-Frame-Options / CSP) — we respect

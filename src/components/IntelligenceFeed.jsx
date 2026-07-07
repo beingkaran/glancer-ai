@@ -138,19 +138,29 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
     });
   }, [items]);
 
-  // Index of each news item within sortedNews, so a card click maps to the
-  // right carousel slide.
-  const newsIndex = useMemo(() => {
-    const m = new Map();
-    sortedNews.forEach((it, i) => m.set(it.rid, i));
-    return m;
-  }, [sortedNews]);
-
   // Blog slides derive straight from the analysis list, so the blogs-only
   // slideshow is always in sync with what the cards show.
   const blogSlides = useMemo(() => blogsToSlides(analysis), [analysis]);
 
-  const carouselItems = useMemo(() => [...sortedNews, ...blogSlides], [sortedNews, blogSlides]);
+  // Slideshow order: everything that opens *inside* the reader first — frameable
+  // news + our own same-origin Deep Dives — then the sources that can only open
+  // in a new tab (publisher-blocked) at the very end, so the reader-native
+  // experience leads and the link-outs don't interrupt it.
+  const carouselItems = useMemo(() => {
+    const frameable = sortedNews.filter((it) => it.frameable);
+    const blocked = sortedNews.filter((it) => !it.frameable);
+    return [...frameable, ...blogSlides, ...blocked];
+  }, [sortedNews, blogSlides]);
+
+  // Index of each news item within the slideshow, so a card click maps to the
+  // right slide. Derived from carouselItems (NOT sortedNews) because the blocked
+  // sources are relocated to the tail above — indexing the pre-reorder list would
+  // open the wrong story for them.
+  const newsIndex = useMemo(() => {
+    const m = new Map();
+    carouselItems.forEach((it, i) => { if (it.rid != null) m.set(it.rid, i); });
+    return m;
+  }, [carouselItems]);
 
   // Index of each blog within the blogs-only slideshow.
   const blogIndex = useMemo(() => {

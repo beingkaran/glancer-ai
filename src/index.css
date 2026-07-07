@@ -2889,6 +2889,21 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .reader-frame-live-loading {
   position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2;
 }
+/* Manual "Read on source" escape floated over the live frame — the reliable way
+   out when a publisher's block paints the browser's grey error page inside the
+   iframe (which JS cannot detect). */
+.reader-frame-escape {
+  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 5;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.02em; font-weight: 600;
+  color: #fff; text-decoration: none; white-space: nowrap;
+  background: rgba(17, 17, 22, 0.92); border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28); backdrop-filter: blur(6px);
+  animation: reader-escape-in 0.28s ease both;
+}
+.reader-frame-escape:hover { background: var(--accent, #06b6d4); border-color: transparent; }
+@keyframes reader-escape-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 /* Source name in the bar is a link to the original article. */
 .reader-frame-source-link { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-muted); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .reader-frame-source-link:hover { color: var(--accent); }
