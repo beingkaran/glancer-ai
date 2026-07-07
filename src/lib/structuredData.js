@@ -25,6 +25,15 @@ function buildAuthorSchema(post) {
   if (/team|glancer/i.test(name) && !/karan/i.test(name)) {
     return { '@type': 'Organization', name: name || 'Glancer AI' };
   }
+  // A distinct, named guest author (not Karan) gets a minimal Person schema so
+  // we never attach Karan's photo, LinkedIn or email to someone else's byline.
+  if (!/karan/i.test(name)) {
+    const guest = { '@type': 'Person', name };
+    if (post?.authorRole) guest.jobTitle = post.authorRole;
+    if (post?.authorImage) guest.image = post.authorImage;
+    if (post?.authorBio) guest.description = post.authorBio;
+    return guest;
+  }
   return {
     '@type': 'Person',
     name: PRIMARY_AUTHOR.name,
