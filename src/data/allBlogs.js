@@ -1,6 +1,84 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'aiops-finance-market-6-36b-what-sres-can-steal',
+    bannerImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Why the AIOps Market for Finance Hit $6.36B, and What Engineers Can Steal From It',
+    subtitle: "Financial services AIOps grew 26.4% in a year to $6.36B (GlobeNewswire, July 2026). Banks are not buying faster because they love new tools. They buy faster because uptime is written into law, and every outage has to be explained on paper. That pressure built a playbook the rest of us can copy for free.",
+    category: 'AIOps',
+    icon: '🏦',
+    bgGradient: 'linear-gradient(135deg, #04140d 0%, #0c5a3a 55%, #21c17a 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-08',
+    readTime: 9,
+    tags: ['AIOps', 'financial services', 'SRE', 'incident correlation', 'SLA', 'observability', 'compliance'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Financial services AIOps reached <strong>$6.36B in 2026</strong>, up 26.4% from the year before, per a GlobeNewswire report. That is faster then almost any other vertical is adopting.</li>
+    <li>The driver is not hype. It is regulation. In banking, uptime is written into contracts and law, so an outage costs money and also has to be reconstructed for an auditor line by line.</li>
+    <li><strong>Autonomous incident correlation</strong> is doing the heavy lifting. It folds a storm of alerts into one incident, which lets a small on-call team defend a very large SLA.</li>
+    <li>You can copy the finance playbook without the compliance bill. Put a dollar figure on downtime, make every alert carry it's own trail, and correlate before you page anyone.</li>
+  </ul>
+</div>
+
+<h2>The number that made people look twice</h2>
+<p>A GlobeNewswire report this month put the financial services AIOps market at $6.36B, a 26.4% jump over the prior year. Sit with that growth rate for a second. Most enterprise software categories would be thrilled with low double digits right now. Banks and insurers and payment firms are throwing money at automated operations at a pace that looks almost impatient.</p>
+<p>The easy read is "finance has deep pockets, of course they spend." That misses the point. Plenty of industries have money and still drag their feet on ops tooling for years. What makes finance different is that the cost of an outage is not fuzzy. It is a number, it shows up fast, and someone in a suit is going to ask about it on Monday.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=1280&q=80" alt="A person entering a PIN on an ATM keypad" loading="lazy" /><figcaption>When the transaction has to clear right now, "we are investigating" is not an acceptable status. That constraint is what pulls banks toward AIOps early.</figcaption></figure>
+
+<h2>Why finance moves first, and it is not because they love new tools</h2>
+<p>Talk to an SRE at a bank and you will not hear a lot of excitement about the latest platform. You will hear about obligations. Three of them keep coming up.</p>
+<p>The first is regulatory uptime. Payment rails, trading windows, and settlement systems have availability targets that are not aspirational, they are contractual and in some cases legal. Miss them and you are not writing a blameless postmortem for your own comfort, you are writing an explanation for a regulator who can fine you. When five nines is a compliance line and not a bragging right, you find the budget.</p>
+<p>The second is the audit trail. In most companies an incident ends when the graph goes green again. In finance it ends when you can show, in order, what broke, when you knew, who was told, and what you did. That reconstruction has to hold up months later. A tool that quietly records the whole timeline of an incident is not a nice-to-have there, it is table stakes, and AIOps platforms happen to be good at exactly that recording.</p>
+<p>The third is that money is bolted directly onto seconds. A retailer that goes down for ten minutes loses some carts. A trading desk that goes down for ten minutes during market hours can lose more then the annual cost of the whole observability stack. When the math is that blunt, the case for automation writes itself.</p>
+
+<h2>What autonomous incident correlation actually buys them</h2>
+<p>Here is the part general SREs should pay attention too. The feature carrying most of this spend is not a chatbot or a fancy dashboard. It is autonomous incident correlation, the boring plumbing that takes four hundred alerts firing at 2am and says "these are all one thing, and it started in the payments database."</p>
+<p>Think about what an alert storm does to a human. A dependency wobbles, and every service downstream lights up at once. The on-call engineer now has to figure out which alert is the cause and which forty are just echoes. That triage is where the minutes bleed away, and in finance minutes have a price tag. Correlation collapses that pile into a single incident with a probable root, so the engineer starts at the answer instead of digging for it. Vendors like Ennetix have built their whole autonomous IT ops pitch around this, closing the loop from detect to correlate to act with less human in the middle.</p>
+<p>The quiet win is headcount math. You cannot hire your way to defending a nine-figure SLA with eyeballs on dashboards. Correlation is what lets a team of six hold a service that would otherwise need thirty. That is the real reason the money is flowing, it is cheaper then the alternative.</p>
+
+<table class="ctable">
+  <thead><tr><th>Pressure</th><th>Typical SaaS shop</th><th>Financial services</th><th>Why it changes the buy</th></tr></thead>
+  <tbody>
+    <tr><th>Uptime target</th><td>Internal goal, aspirational</td><td>Contractual and regulated</td><td>A miss becomes a fine, not a retro</td></tr>
+    <tr><th>Incident record</th><td>Ends when it is fixed</td><td>Must survive an audit months later</td><td>Automated timelines become mandatory</td></tr>
+    <tr><th>Cost of downtime</th><td>Lost signups, soft number</td><td>Lost trades and settlements, hard number</td><td>ROI on automation is obvious</td></tr>
+    <tr><th>On-call scale</th><td>Grows with the team</td><td>Must stay flat under load</td><td>Correlation replaces raw headcount</td></tr>
+  </tbody>
+</table>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1280&q=80" alt="A customer paying at a counter with a contactless card terminal" loading="lazy" /><figcaption>Every second of downtime in a payment path is a failed transaction with a name attached. Finance instruments for that reality, most other teams do not until it is too late.</figcaption></figure>
+
+<h2>The playbook you can steal without the compliance bill</h2>
+<p>You do not need a banking charter to use any of this. The mindset is portable, and the tools are the same ones on your shortlist already. Four things worth copying.</p>
+<p>Put a dollar figure on downtime, even when nobody forces you to. Finance has the number handed to them. You have to make it yourself, and it is worth the afternoon. Once "an hour down costs roughly X" exists on a slide, every argument about ops budget gets shorter, because now the spend is compared against a loss and not against zero.</p>
+<p>Make alerts carry their own context by default. The reason a bank can reconstruct an incident is that the trail was captured while it happened, not stitched together after. Bake the who, what, and when into the alert payload now, so your postmortems stop being archaeology. This costs almost nothing to set up and it pays back the first time an outage crosses a shift change.</p>
+<p>Correlate before you page. Most teams page a human on every threshold breach and let them sort out the mess. Flip it. Let the platform group related alerts first, and only wake someone for the deduplicated incident. Your on-call keeps their sanity, and your MTTR drops without hiring anyone. This one change is where the finance data says the value actually lives.</p>
+<p>Treat the SLA like a budget you can spend. Error budgets are old news in SRE circles, but finance lives them because the numbers is enforced from outside. Borrow the discipline. When you are under budget, ship faster. When you are burning it, freeze and fix. The point is to make reliability a shared number the whole team steers by, not a vibe the on-call carries alone.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>The $6.36B figure is not a story about finance being rich, it is a story about finance having no place to hide from its own outages. Regulated uptime and audit obligations turned reliability into a hard number with money attached, and once that happened, <strong>autonomous incident correlation stopped being optional</strong>. The rest of us get to skip the regulatory beating and keep the lesson. Price your downtime, capture the trail up front, correlate before you page, and run your SLA like a budget. None of that needs a bank behind it, it just needs you to decide that an outage is worth measuring before the next one shows up.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.globenewswire.com/" target="_blank" rel="noopener">GlobeNewswire, AIOps in Financial Services market report (July 2026)</a></li>
+  <li><a href="https://www.globenewswire.com/" target="_blank" rel="noopener">Top 10 AIOps Platforms 2026</a></li>
+  <li><a href="https://www.ennetix.com/" target="_blank" rel="noopener">Ennetix, Autonomous IT Operations</a></li>
+</ul>
+    `,
+  },
+  {
     id: 'monitoring-stack-cant-see-ai-agents-otel-genai-conventions',
     bannerImage: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&h=675&q=80',
     title: "Your Monitoring Stack Can't See Your AI Agents. Here's How to Fix That",

@@ -3,148 +3,176 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://glancerai.com/</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://glancerai.com/ai-tools</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://glancerai.com/metrics</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/events</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/glossary</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image><image:loc>https://glancerai.com/glossary-infographic.jpg</image:loc><image:title>AI, AIOps &amp; Observability Glossary Map — 2,200+ Terms</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/faq</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://glancerai.com/about</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://glancerai.com/privacy</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://glancerai.com/terms</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topics</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/openai</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/anthropic</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/google-gemini</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/meta-ai</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/microsoft-ai</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/nvidia</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/mistral</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/ai-agents</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/image-generation</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/coding-assistants</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/rag</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/aiops</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/observability</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/apm</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/aiops-finance-market-6-36b-what-sres-can-steal</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>Why the AIOps Market for Finance Hit $6.36B, and What Engineers Can Steal From It</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/monitoring-stack-cant-see-ai-agents-otel-genai-conventions</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>Your Monitoring Stack Can&apos;t See Your AI Agents. Here&apos;s How to Fix That</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/agentic-ai-top-attack-vector-2026-observability-budget</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>Agentic AI Is 2026&apos;s Top Attack Vector. What That Means for Your Observability Budget</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/un-ai-governance-summit-cios-aiops-observability</loc>
+    <lastmod>2026-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>What the UN AI Governance Summit Means for CIOs Who Run AIOps Stacks</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/claude-sonnet-5-sre-triage-agent-oncall-rotation</loc>
