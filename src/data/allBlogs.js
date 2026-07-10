@@ -1,6 +1,162 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'opentelemetry-default-half-your-stack-still-dark',
+    bannerImage: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'OpenTelemetry Is Now the Default. So Why Is Half Your Stack Still Dark?',
+    subtitle: "By 2026 OTel won the instrumentation war, and every major vendor reads it. The awkward part is that most teams put it on their web services and stopped. Your AI agents, internal tools, and async jobs are still running with the lights off, and that is exactly where the new incidents live.",
+    category: 'OpenTelemetry',
+    icon: '🔦',
+    bgGradient: 'linear-gradient(135deg, #0a1020 0%, #243b7a 55%, #4f8bff 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-10',
+    readTime: 9,
+    tags: ['OpenTelemetry', 'observability', 'instrumentation', 'AI agents', 'tracing', 'AIOps', 'SRE'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>OpenTelemetry is the default instrumentation layer in 2026. Every major observability vendor reads OTel spans natively, so the fight over which standard to use is basically <strong>over</strong>.</li>
+    <li>Winning the standard did not hand you coverage. Most teams bolted the OTel SDK onto their HTTP services, saw pretty traces, and called it done. That is the easy half.</li>
+    <li>The dark half is where the interesting failures now hide: an <strong>AI agent stuck in a loop</strong>, a queue quietly backing up, a nightly job that has been failing for a week and nobody noticed.</li>
+    <li>Instrument in order of blast radius, not in order of what is easy. Async pipelines and agents first, internal tools next, batch jobs last. Getting rough coverage everywhere beats getting perfect traces in one place.</li>
+  </ul>
+</div>
+
+<h2>The standard war is over, and OTel won</h2>
+<p>For years the honest answer to "which tracing standard should we pick" was a shrug. You had OpenTracing, OpenCensus, a pile of proprietary agents, and a real fear of betting on the wrong horse. That is done now. By 2026 OpenTelemetry is the thing everyone agreed to speak. Datadog, New Relic, Grafana, Dynatrace, the whole crowd reads OTel spans as first-class data, and a lot of them emit it too. You can instrument once and swap backends without re-wiring your code, which is the promise the space had been making for a decade and finally kept.</p>
+<p>That is a genuinely good place to be. It also created a trap that is easy to walk into. When the standard stops being the hard question, teams assume the hard part is finished. It is not. Picking OTel was step one. Actually pointing it at the parts of your system that can hurt you is the work, and that work is where most stacks quietly stall.</p>
+
+<h2>Winning the standard is not the same as coverage</h2>
+<p>Here is how it usually goes. A platform team adds the OTel SDK to the main web services, turns on auto-instrumentation, and within a day there are clean traces for every inbound request. HTTP in, database call, cache lookup, HTTP out. It looks great on the dashboard, and honestly for classic request-and-response traffic it is great. So the ticket gets closed and everyone moves on.</p>
+<p>The problem is that the request path was always the easy 50%. Auto-instrumentation hooks the web framework, and if a chunk of your system does not start with an inbound HTTP request, the hooks never fire. That describes a lot of what actually runs your business now. The nice traces you are looking at are real, they are just covering the half of the system that was never the scary half.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1280&q=80" alt="A laptop on a desk showing a code editor" loading="lazy" /><figcaption>Auto-instrumentation is often a single config line, which is why teams stop there. The web service lights up and the harder surfaces get forgotten.</figcaption></figure>
+
+<h2>The half you left dark</h2>
+<p>So what is sitting in the dark. Three things, and they are not edge cases anymore, they are the middle of most modern architectures.</p>
+<p>The first is AI agents. An agent does not answer one request and return. It loops, it calls tools, it retries, it makes decisions inside a window your trace treats as a single opaque span. When an agent misbehaves in prod, the exact place you need visibility is the exact place auto-instrumentation shrugs. If you have read the piece on GenAI semantic conventions you already know the shape of this gap, and it is the most expensive one to leave open.</p>
+<p>The second is internal tools and admin scripts. The little Slack bot that restarts a service, the migration script someone runs by hand, the internal dashboard that writes straight to the database. These often have the widest blast radius in the whole company and the least instrumentation, because nobody thinks of them as "services." When one of them does something dumb, there is no trace to explain it, just a confused channel and a person swearing they only clicked once.</p>
+<p>The third is async work. Queues, background workers, cron jobs, event consumers. There is no inbound HTTP request to hook, so the default instrumentation misses them completely. This is where backpressure builds with no alarm, and where a job can fail silently for days. A dead queue does not throw a 500 that your APM catches, it just gets slower and quieter until something downstream falls over.</p>
+
+<h2>What to instrument next, in order</h2>
+<p>You do not fix this by trying to instrument everything at once. You go in order of what can hurt you most while being blind. This is the sequence that has worked for the teams I have watched do it well.</p>
+<p>Start with async pipelines and queues. This is where silent failure lives, and adding span context to your producers and consumers is the single change that surfaces the most hidden risk. You have to propagate context manually across the queue boundary, because the trace id does not ride along for free, but the payoff is immediate.</p>
+<p>Go to AI agents next. Wrap each model call and each tool invocation in it's own span, and stamp a workflow id on the whole run so you can follow the loop. This is the surface that is growing fastest and breaking in the newest ways, so coverage here ages well.</p>
+<p>Then internal tools and admin actions. Even a thin span around "who ran this and what did it touch" turns your scariest untracked operations into something you can audit. Batch and cron jobs come last, not because they do not matter, but because they usually fail loudly enough that you find out eventually.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=1280&q=80" alt="A circuit board with many colored wires connected to it beside a keyboard" loading="lazy" /><figcaption>The dark surfaces need manual wiring. Auto-instrumentation cannot reach an async worker, so you propagate context across the boundary by hand.</figcaption></figure>
+
+<table class="ctable">
+  <thead><tr><th>Layer</th><th>Typical coverage</th><th>What breaks while it is dark</th><th>Priority</th></tr></thead>
+  <tbody>
+    <tr><th>HTTP services</th><td>Full, auto-instrumented</td><td>Little, this is the well-lit part</td><td>Already done</td></tr>
+    <tr><th>Async queues and workers</th><td>Almost none</td><td>Silent backpressure, jobs failing for days</td><td>First</td></tr>
+    <tr><th>AI agents</th><td>Opaque single span</td><td>Loops, bad tool calls, runaway cost</td><td>Second</td></tr>
+    <tr><th>Internal tools and admin</th><td>None</td><td>Wide blast radius with no audit trail</td><td>Third</td></tr>
+  </tbody>
+</table>
+
+<h2>You can do this without a big project</h2>
+<p>None of this needs a re-platforming effort. Because you already run OTel, the pieces you are missing are mostly manual spans in the places the auto hooks cannot see. Add a span at the top of each background worker, propagate the trace context across your queue so a job links back to the request that created it, and point everything at the one collector you already have. That is a week of focused work, not a quarter.</p>
+<p>The mindset shift is the real thing. Stop treating instrumentation as a box you checked when the web service lit up. Treat it as a map of your system, and go color in the parts that are still white. The incidents of the next two years are going to start in the async and agent layers, and the teams who can see them will spend a lot less of thier weekends guessing.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>OpenTelemetry winning is a real gift, it just is not the finish line teams treat it as. The standard is settled, so the only question left is coverage, and right now coverage is the thing almost everyone is short on. <strong>Instrument in order of blast radius</strong>: async pipelines and queues first, AI agents next, internal tools after that, batch jobs last. Lean on manual spans where the auto hooks go quiet, propagate context across every async boundary, and keep one collector. Do that and the dark half of your stack stops being the place your next outage gets to hide.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.techtarget.com/searchitoperations/" target="_blank" rel="noopener">TechTarget, observability trends 2026</a></li>
+  <li><a href="https://www.logicmonitor.com/blog" target="_blank" rel="noopener">LogicMonitor 2026 observability outlook</a></li>
+  <li><a href="https://openobserve.ai/blog/" target="_blank" rel="noopener">OpenObserve, AIOps platforms</a></li>
+</ul>
+    `,
+  },
+  {
+    id: 'aiops-4-percent-pilots-production-survivors-playbook',
+    bannerImage: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'The 4% Problem: Why Most AIOps Pilots Never Ship to Production, and What the Survivors Did Differently',
+    subtitle: "New survey data puts only 4% of organizations at fully operationalized AIOps, with 49% still stuck in pilots. The wall is not the model. It is organizational friction, telemetry debt, and a trust problem nobody likes to say out loud.",
+    category: 'AIOps',
+    icon: '🧗',
+    bgGradient: 'linear-gradient(135deg, #1a1004 0%, #7a4b12 55%, #f0a63a 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-09',
+    readTime: 10,
+    tags: ['AIOps', 'adoption', 'SRE', 'remediation', 'telemetry', 'observability', 'automation'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Only <strong>4% of organizations</strong> have AIOps actually running in production, and 49% are still piloting, per recent survey data. The pilot-to-prod cliff is the real story, not the tech.</li>
+    <li>The blocker is almost never the algorithm. It is three human-shaped problems: organizational friction, telemetry debt, and fear of letting software act on it's own.</li>
+    <li><strong>Telemetry debt</strong> is the quiet killer. Feed a model noisy, half-labeled, gap-ridden data and it hands you confident nonsense, which burns the exact trust you needed to get to prod.</li>
+    <li>The teams that made it treated autonomous remediation as a ladder, not a switch. They earned each rung with suggest-only mode, a scoped blast radius, and a rollback that always works.</li>
+  </ul>
+</div>
+
+<h2>The cliff nobody budgets for</h2>
+<p>Here is a number worth sitting with. Across recent surveys, only about 4% of organizations say they have operationalized AIOps, meaning it runs in production and people actually trust it. Nearly half, 49%, are still in pilots. So the median company has been "doing AIOps" for a while and has almost nothing in prod to show for it. That is not a technology gap. A pilot that looks great in a demo and then dies on the way to production is telling you the demo was never the hard part.</p>
+<p>The cliff is predictable once you have watched it a few times. The pilot runs in a sandbox, on a clean slice of data, with a champion babysitting it. It correlates some alerts, catches an anomaly, everyone nods. Then the plan is to roll it wider, and that is where it falls. The reasons are boringly human, and they repeat.</p>
+
+<h2>Organizational friction: the org chart is the real architecture</h2>
+<p>AIOps does not fit inside one team. It touches SRE, the platform group, security, and every app team whose alerts it wants to touch. So the first wall is ownership. A pilot usually rides on one motivated person, and when that person changes teams or just gets busy, the whole thing loses it's heartbeat. Nobody inherits it because it was never anybody's actual job.</p>
+<p>The second layer is approvals. The moment a system wants to take an action in production, it runs into change management, and change management was not built for software that decides on it's own. Who signs off when the tool wants to restart a service at 3am. What the review process is. Whether security is okay with it holding those permissions. These questions are slow, and a pilot with no owner does not have the political weight to push them through.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1280&q=80" alt="A small team taking notes around a table in a meeting" loading="lazy" /><figcaption>Most stalled pilots die in a meeting, not in the code. If no single team owns the rollout and its approvals, it quietly loses momentum.</figcaption></figure>
+
+<h2>Telemetry debt: garbage in, confident garbage out</h2>
+<p>The second big reason is the one vendors hate to bring up, because their demo data is always clean. Real telemetry is not. Most companies are sitting on years of inconsistent tags, metrics with no labels, logs that are just unstructured text, and cardinality that quietly explodes. That mess has a name worth using: telemetry debt. And an AIOps model trained on it does not fail gracefully, it fails confidently. It finds correlations that are noise and presents them like insight.</p>
+<p>That is how the trust dies. The team turns the model on, it fires a few alerts that are obviously wrong, and now every engineer has a reason to ignore it. You do not get a second first impression. The teams that stall usually spend the whole pilot discovering that half their data is unusable, then run out of runway before they ever prove value. The data cleanup was the project, they just did not budget for it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=1280&q=80" alt="A screen showing streaming terminal output and system process metrics" loading="lazy" /><figcaption>Telemetry debt is invisible until a model has to learn from it. Inconsistent tags and unstructured logs turn into confident, wrong correlations.</figcaption></figure>
+
+<h2>The autonomous remediation trust problem</h2>
+<p>Even when the org lines up and the data is decent, there is one more wall, and it is the tallest. It is the fear of letting software act on production by itself. Nobody wants to be the engineer who approved the bot that deleted a database. So the pilot gets stuck in read-only forever, showing what it would have done, never allowed to actually do it. And a remediation system that can only suggest is a very expensive dashboard.</p>
+<p>This is where the survivors think differently. They do not treat autonomy as a switch you flip from off to on. They treat it as a ladder. The tool starts by only observing. Then it is allowed to suggest, and humans grade the suggestions. Then it is allowed to act, but only on a small, low-risk, reversible set of things, like restarting a stateless pod, with a blast radius you could survive being wrong about. Each rung is earned by the rung below it working. That is how trust actually gets built, in small reversible steps and not a leap of faith.</p>
+
+<table class="ctable">
+  <thead><tr><th>Dimension</th><th>The stalled pilot</th><th>The one that shipped</th></tr></thead>
+  <tbody>
+    <tr><th>Ownership</th><td>One champion, no real mandate</td><td>A named owner with authority to change process</td></tr>
+    <tr><th>Data</th><td>Trained on whatever was there</td><td>Paid down telemetry debt before trusting output</td></tr>
+    <tr><th>Autonomy</th><td>All-or-nothing, stuck read-only</td><td>A ladder, low-risk reversible actions first</td></tr>
+    <tr><th>Safety net</th><td>Hope</td><td>Rollback that always works, human tripwire</td></tr>
+  </tbody>
+</table>
+
+<h2>What the survivors did differently</h2>
+<p>Pull it together and the 4% look pretty consistent. They named an owner who could actually move the org, not just run a script. They treated data quality as the real project and paid down enough telemetry debt that the model had a fair chance. They shipped remediation as a trust ladder, earning each level of autonomy on a scoped, reversible blast radius. And they kept a human tripwire and a rollback that works, so the cost of the model being wrong stayed small enough that people were willing to let it try.</p>
+<p>None of that is glamorous, and none of it is about a better algorithm. The predictive observability part, the correlation, the anomaly detection, that stuff mostly works now. The gap between 4% and everyone else is organizational and it is about trust. Which is good news, honestly, because those are things you can fix without waiting for a smarter model.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>The 4% number is not an indictment of AIOps tech, it is a mirror held up to how organizations adopt it. Pilots do not die because the model is dumb, they die because nobody owns them, the data underneath is a mess, and no one is willing to let the thing act. <strong>Fix the human parts first.</strong> Give it an owner with real authority, pay down telemetry debt before you trust a single alert, and roll out autonomy as a ladder with a rollback under every rung. Do that and you are building the thing the other 96% keep piloting and never ship.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.motadata.com/blog" target="_blank" rel="noopener">Motadata, AIOps trends</a></li>
+  <li><a href="https://rootly.com/blog" target="_blank" rel="noopener">Rootly, predictive observability</a></li>
+  <li><a href="https://www.idc.com/" target="_blank" rel="noopener">IDC, 2026 observability research</a></li>
+</ul>
+    `,
+  },
+  {
     id: 'aiops-finance-market-6-36b-what-sres-can-steal',
     bannerImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'Why the AIOps Market for Finance Hit $6.36B, and What Engineers Can Steal From It',
