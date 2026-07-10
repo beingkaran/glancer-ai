@@ -56,6 +56,21 @@ Supabase **Authentication → Providers → Email**:
 
 The app handles both: if confirmation is on, sign-up shows a "check your inbox" message.
 
+### 6. Set the auth URLs (required, or verification links point at localhost)
+Supabase **Authentication → URL Configuration**:
+- **Site URL** → `https://glancerai.com`
+- **Redirect URLs** → add each origin the app runs on, one per line:
+  ```
+  https://glancerai.com/**
+  https://www.glancerai.com/**
+  http://localhost:5173/**
+  ```
+
+Confirmation and password-reset links are built from the **Site URL** unless the
+app supplies a `redirectTo`/`emailRedirectTo` that matches one of the **Redirect
+URLs**. A default Supabase project ships with Site URL `http://localhost:3000`,
+so a verify-email click lands on a dead localhost page until this is changed.
+
 ---
 
 ---

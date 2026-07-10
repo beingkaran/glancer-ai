@@ -75,7 +75,14 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
-      options: { data: { name: name?.trim() || '' }, captchaToken },
+      options: {
+        data: { name: name?.trim() || '' },
+        captchaToken,
+        // Without this, the confirmation link is built from the Supabase
+        // project's Site URL (localhost by default). The origin must also be
+        // listed under Auth → URL Configuration → Redirect URLs.
+        emailRedirectTo: `${window.location.origin}/`,
+      },
     });
     if (error) throw error;
     // If email confirmation is ON, there is no session yet — caller shows a
