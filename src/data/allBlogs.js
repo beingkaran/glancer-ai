@@ -1,6 +1,166 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'opentelemetry-table-stakes-what-comes-after',
+    bannerImage: 'https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'OpenTelemetry Is Now Table Stakes. Here Is What Comes After',
+    subtitle: "OTel adoption hit critical mass, so shipping clean spans is not a differentiator anymore, it is the entry fee. The real race in 2026 is one layer up, in the query engines, AI correlators, and cost attribution tools that decide what your telemetry is actually worth.",
+    category: 'OpenTelemetry',
+    icon: '🧱',
+    bgGradient: 'linear-gradient(135deg, #06121a 0%, #0e4b52 55%, #22c3d6 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-11',
+    readTime: 9,
+    tags: ['OpenTelemetry', 'observability', 'query engines', 'AIOps', 'cost', 'telemetry', 'SRE'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>OpenTelemetry is table stakes in 2026. Every serious vendor ingests it natively, so emitting clean OTel spans is not a differentiator anymore, it is just the price of getting in the door.</li>
+    <li>The value moved up a layer. Once everyone reads the same telemetry, the pipe that carries it is a commodity. The fight is now about <strong>what you do with the data</strong> after it lands.</li>
+    <li>Three parts of that new layer are worth watching: query engines that let you ask hard questions without going broke, AI correlators that turn a flood of signals into a short list, and cost attribution that finally says who is spending the budget.</li>
+    <li>Pick your next tool for the layer above the pipe, not the pipe. Collection is a solved problem. "What does this data mean, and what is it costing me" is wide open, and that is where your money should go.</li>
+  </ul>
+</div>
+
+<h2>The standard stopped being the story</h2>
+<p>Two years ago the interesting question in observability was still which format to bet on. Today that question is boring, and boring is good. OpenTelemetry won. Datadog, Grafana, New Relic, Dynatrace, the whole field reads OTel spans as first class data, and most of them emit it too. You instrument once and you are portable. That is a real win and it took the industry a decade to get here.</p>
+<p>But a standard everyone supports is by definition not a thing anyone can sell you. When every vendor can ingest the same spans, the collection pipe becomes plumbing. Nobody brags about their plumbing. So the money, and the marketing, quietly moved somewhere else, and if your buying decisions are still framed around "does it support OTel" you are shopping for last years problem.</p>
+
+<h2>The value moved up the stack</h2>
+<p>Here is the shift in one line. For years the hard part was getting the data out of your systems and into one place. That part is mostly done now. The hard part today is making sense of the mountain you collected, and paying for it without your finance team staging an intervention. The data is the same everywhere now, the difference is what you ask of it.</p>
+<p>Read the 2026 trend pieces from IBM, LogicMonitor and APMdigest and you see the same three shapes over and over, even when they use different words for them. A query and analytics layer that treats telemetry like a real database. An AI layer that correlates and reasons over it. And a cost layer, because observability bills got genuinely scary. These are the three lands the vendors are racing to own, and it is worth knowing what each one actually does.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1280&q=80" alt="Rows of labeled wooden card catalog drawers" loading="lazy" /><figcaption>A query engine is the index over your telemetry. OTel got everything into the drawers, the engine is what lets you find one card fast without opening every drawer.</figcaption></figure>
+
+<h2>Query engines, or asking hard questions without going broke</h2>
+<p>The first land is the query engine. Collecting telemetry is easy now, so teams collect enormous amounts of it, and then discover that asking a real question across a week of data either times out or costs a fortune. The new generation of tools attacks that directly. They decouple storage from compute, keep the raw data in cheap object storage, and put a columnar query engine on top so an arbitrary question runs fast and the storage bill stays flat.</p>
+<p>Why this matters is simple. Old style tooling forced you to decide in advance what to index, which meant the one dimension you needed during an incident was always the one you did not pay to keep. A proper query layer lets you keep everything cheap and ask the weird question later, when the outage is happening and you finally know what to look for. That freedom to ask an unplanned question is the thing your paying for, not the storage.</p>
+
+<h2>AI correlators, from a signal flood to a short list</h2>
+<p>The second land is the one getting the loudest marketing, and for once the loud part is roughly deserved. If OTel made it trivial to emit a hundred thousand spans a minute, it also made your alert stream unreadable by a human. AI correlators sit above the data and do the grouping a tired on call engineer used to do in their head. They cluster related alerts, tie them to a probable root cause, and hand you three incidents instead of four hundred alerts.</p>
+<p>The good implementations are not just clustering by timestamp. They use the topology, the trace graph, and increasingly a language model that can read the telemetry and write a plain summary of what likely broke. That is a genuine change in the day to day. The catch is that a correlator is only as good as the data feeding it, so a team with messy, half labeled telemetry gets confident nonsense, which is its own kind of expensive. Garbage in still wins.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1280&q=80" alt="A laptop on a couch showing charts and a dashboard" loading="lazy" /><figcaption>Cost attribution is the least glamorous part of the new layer and often the one that pays for itself first. You cannot cut a bill you cannot break down by team.</figcaption></figure>
+
+<h2>Cost attribution, the bill nobody reads</h2>
+<p>The third land is the least exciting and the one I would actually buy first. Observability spend has quietly become one of the larger line items in a lot of engineering budgets, sometimes rivaling the compute it is meant to watch. And almost nobody can tell you which team, service, or noisy debug log is driving it. The data volume that OTel made easy to produce is exactly the thing making the invoice climb.</p>
+<p>Cost attribution tools break the bill down by team and by signal, flag the high cardinality metric that quietly doubled your ingest, and let you set budgets before the surprise instead of after. It is unglamorous work and it is the fastest payback in this whole list. A tool that shows one team they are paying for a log line nobody reads tends to pay for it's own license inside a quarter.</p>
+
+<table class="ctable">
+  <thead><tr><th>Layer</th><th>What it does</th><th>The problem it kills</th><th>Buy it when</th></tr></thead>
+  <tbody>
+    <tr><th>OTel collection</th><td>Emits and ships telemetry</td><td>Vendor lock in, re-instrumenting</td><td>Already table stakes</td></tr>
+    <tr><th>Query engine</th><td>Fast, cheap questions over raw data</td><td>Timeouts and pre-indexing regret</td><td>Queries are slow or you drop data to save money</td></tr>
+    <tr><th>AI correlator</th><td>Groups signals into incidents</td><td>Alert fatigue, slow root cause</td><td>Humans cannot read the alert stream</td></tr>
+    <tr><th>Cost attribution</th><td>Splits the bill by team and signal</td><td>An invoice nobody can explain</td><td>The observability bill scares finance</td></tr>
+  </tbody>
+</table>
+
+<h2>What to do about it</h2>
+<p>The practical move is to stop scoring tools on collection and start scoring them on the layer above it. When a vendor demos, skip past the part where they show you OTel ingest, because everyone has that. Ask how a year old arbitrary query performs and what it costs. Ask how the correlator behaves when you feed it your real, messy data instead of the clean demo set. Ask if you can see the bill broken down by team on day one.</p>
+<p>None of this means ripping anything out. You already run OTel, that was the right call and it keeps you portable. It just means recognising that the interesting decisions have moved. The teams that win the next couple of years are not the ones with better instrumentation, everyone has that now. They are the ones who can ask a hard question fast, cut the noise down to something a person can act on, and actually explain thier own bill.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>OpenTelemetry becoming table stakes is the best thing to happen to observability in years, and it also quietly ended the era where instrumentation was the differentiator. The pipe is a commodity now. <strong>The value is in the layer above it</strong>: a query engine that makes hard questions cheap, a correlator that turns a flood into a short list, and cost attribution that tells you who is spending the budget. Buy for that layer, make vendors prove it on your messy data, and stop paying extra for the part that is already free.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.ibm.com/think/insights" target="_blank" rel="noopener">IBM, observability trends 2026</a></li>
+  <li><a href="https://www.logicmonitor.com/blog" target="_blank" rel="noopener">LogicMonitor, 2026 observability trends</a></li>
+  <li><a href="https://www.apmdigest.com/" target="_blank" rel="noopener">APMdigest, 2026 predictions</a></li>
+</ul>
+    `,
+  },
+  {
+    id: 'autonomous-incident-remediation-which-aiops-close-the-loop',
+    bannerImage: 'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Autonomous Incident Remediation: Which AIOps Platforms Actually Close the Loop?',
+    subtitle: "Every AIOps vendor has autonomous remediation on the slide deck. Far fewer let software touch production on it's own. Here is a practitioner read on Dynatrace, BigPanda, OpenObserve and Selector, what each one really automates, and where a human is still holding the button.",
+    category: 'AIOps',
+    icon: '🔁',
+    bgGradient: 'linear-gradient(135deg, #12061a 0%, #4a1a6b 55%, #a855f7 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-11',
+    readTime: 10,
+    tags: ['AIOps', 'remediation', 'automation', 'Dynatrace', 'BigPanda', 'OpenObserve', 'Selector'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>"Autonomous remediation" is the most oversold phrase in AIOps right now. Almost every platform detects and correlates well. Very few will actually execute a fix in production without a human clicking approve.</li>
+    <li>Closing the loop is four steps: detect, decide, act, verify. Most tools nail the first two, hedge on the third, and quietly skip the fourth. The <strong>act</strong> and <strong>verify</strong> steps are where the real differences live.</li>
+    <li>On a practitioner read, Dynatrace goes furthest toward genuine automated action, BigPanda is strong at the decide step but leans on your runbooks to act, OpenObserve is excellent at detection with lighter native remediation, and Selector shines in the network and correlation lane.</li>
+    <li>Do not buy the demo. Ask any vendor to show the fix running end to end on a messy system, then ask what happens when the fix is wrong. That one question sorts the real closed loops from the dashboards.</li>
+  </ul>
+</div>
+
+<h2>What "close the loop" actually means</h2>
+<p>The phrase gets thrown around like it has one meaning, so let us pin it down. A closed loop has four steps. Detect that something is wrong. Decide what is wrong and what should be done. Act, meaning execute the fix. Verify that the fix worked and the incident is really over. A platform that does all four without waking a person up is autonomous. A platform that does the first two and then pages you is a very good assistant, which is fine, but it is not the same thing.</p>
+<p>Most of the market lives in that gap. Detection is basically a solved feature now, everyone does anomaly detection and correlation. The moment a tool wants to run a script against production is the moment the honest capabilities separate from the marketing ones. So when you read the comparisons from OpenObserve, the AIOps community, and the vendors themselves, keep asking one thing: does it act, or does it just recommend.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=1280&q=80" alt="A stylized sign showing a code logo next to a flowchart diagram" loading="lazy" /><figcaption>Detect, decide, act, verify. The loop only counts as closed when the act and verify steps run without a human in the middle, and that is the part most platforms hedge on.</figcaption></figure>
+
+<h2>Dynatrace: the closest to a real closed loop</h2>
+<p>Of the four, Dynatrace is the one that most comfortably talks about acting, not just advising. Its Davis engine does the detect and decide steps with a causal model rather than pure statistics, which matters, because it gives you a root cause you can actually automate against instead of a pile of correlated alerts. On top of that the workflow tooling can trigger remediation, scaling a service, restarting a component, running a defined action, when Davis is confident enough.</p>
+<p>The honest caveat is that "autonomous" here still means autonomous within the guardrails you set. You define the actions, you define the confidence bar, you decide which remediations are allowed to fire without a human. That is exactly how it should be, and it is also why the real answer to "is it autonomous" is "yes, for the narrow set of things you explicitly trusted it with." Which, to be clear, is the mature version of this, not a weakness.</p>
+
+<h2>BigPanda: brilliant at decide, borrows your hands to act</h2>
+<p>BigPanda made its name on the decide step and it is very good at it. It eats alerts from everything you already run and collapses them into a small number of real incidents, which is the single biggest time saver during a noisy outage. The correlation is the product, and if your problem is four hundred alerts and no clarity, this is a strong answer.</p>
+<p>Where it is more of an orchestrator than an actor is the act step. BigPanda closes the loop mostly by triggering your existing automation, a runbook, an Ansible job, a script, rather than being the thing that reaches into production itself. That is a reasonable design, it keeps the actual fixes in tools your team already trusts. But it means the loop is only as closed as the automation you plug into the far end. BigPanda decides, your runbooks do the deed.</p>
+
+<h2>OpenObserve: strong eyes, lighter hands</h2>
+<p>OpenObserve is the interesting open source entry, and its own comparison of the top AIOps platforms is a genuinely useful read even setting aside that they wrote it. As a platform it is excellent at the collection and detection end, a fast, cost efficient place to store and query telemetry and spot the anomaly. If your priority is seeing everything cheaply, it competes well above it's price.</p>
+<p>On native autonomous remediation it is lighter than the commercial incumbents, and the team is fairly upfront about that. You get the detect and a lot of the decide, and then you wire the act step through alerting and external automation. For a lot of teams that is the right trade, you own the stack, you avoid the lock in, and you accept that closing the loop is a bit more do it yourself. Great eyes, you bring the hands.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1280&q=80" alt="A person working at a laptop while holding a phone" loading="lazy" /><figcaption>Even on the most automated platforms, someone still owns the pager. The question is not whether a human is involved, it is how narrow and reversible the machine's actions are.</figcaption></figure>
+
+<h2>Selector: the network and correlation specialist</h2>
+<p>Selector comes at this from the network and infrastructure side, and that heritage shows in what it is good at. Its strength is correlating signals across a large, noisy, heterogeneous environment and turning them into a clear picture, plus a natural language layer so you can ask what is going on and get a straight answer. For network heavy and telco style operations it is a sharp fit.</p>
+<p>On remediation, Selector leans toward recommended and semi automated actions, suggesting the fix and letting it run through approved workflows, more than it claims to be a hands off actor for arbitrary production changes. In its lane that is the right posture, network changes are exactly where you want a human tripwire. Read its capabilities as strong detect and decide, with act kept deliberately on a leash.</p>
+
+<table class="ctable">
+  <thead><tr><th>Platform</th><th>Detect and decide</th><th>Act (execute the fix)</th><th>How closed is the loop</th></tr></thead>
+  <tbody>
+    <tr><th>Dynatrace</th><td>Causal root cause via Davis</td><td>Native, within your guardrails</td><td>Closest to fully closed, for scoped actions</td></tr>
+    <tr><th>BigPanda</th><td>Best in class correlation</td><td>Triggers your existing runbooks</td><td>Closed only as far as your automation reaches</td></tr>
+    <tr><th>OpenObserve</th><td>Strong, cost efficient detection</td><td>External, you wire it up</td><td>Half closed by design, DIY the act step</td></tr>
+    <tr><th>Selector</th><td>Deep network correlation, NL queries</td><td>Recommended and semi automated</td><td>Human kept on the button on purpose</td></tr>
+  </tbody>
+</table>
+
+<h2>What closing the loop really takes</h2>
+<p>Step back from the logos and the pattern is clear. The detect and decide steps are commodity now, all four do them somewhere between good and excellent. The separation is entirely in the act and verify steps, and the mature platforms treat those two with a lot of respect. Nobody serious is selling you a bot that will run any command against production because it feels confident. The good ones give you a narrow, reversible, guardrailed set of actions and a way to confirm the fix actually held.</p>
+<p>That is the real buyers question, and it is not "is it autonomous." It is "how small and reversible is the set of things it will do on it's own, and what happens the moment it is wrong." A platform that can restart a stateless pod by itself and roll back the instant the signal does not recover is worth ten that promise full autonomy in a keynote. Verify is the step everyone forgets, and it is the one that decides whether you can sleep.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>Autonomous remediation is real, it is just narrower than the slides suggest, and that narrowness is a feature. <strong>Detect and decide are solved, act and verify are where the truth is.</strong> On a practitioner read, Dynatrace goes furthest toward genuine automated action inside guardrails, BigPanda owns the decide step and hands off the doing to your runbooks, OpenObserve gives you superb detection and expects you to wire the act step yourself, and Selector is the correlation specialist that keeps a human on the button by design. Ignore the word autonomous. Ask each one to fix a real thing end to end, then ask what happens when it gets it wrong.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://openobserve.ai/blog/" target="_blank" rel="noopener">OpenObserve, top 10 AIOps platforms</a></li>
+  <li><a href="https://www.aiops.community/" target="_blank" rel="noopener">AIOps Community, platform comparison</a></li>
+  <li><a href="https://www.selector.ai/" target="_blank" rel="noopener">Selector, AIOps capabilities</a></li>
+</ul>
+    `,
+  },
+  {
     id: 'opentelemetry-default-half-your-stack-still-dark',
     bannerImage: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'OpenTelemetry Is Now the Default. So Why Is Half Your Stack Still Dark?',
