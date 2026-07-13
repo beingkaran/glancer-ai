@@ -3417,5 +3417,99 @@ export const BLOG_POSTS = [
   You've gone from the basics of AI in observability (Level 1) to the frontier of eBPF + LLMs (Level 5). The practical next step: pick one tool from the table above and run a proof-of-concept on your most critical service. Start with Coroot - it's free, eBPF-native, and deploys in one Helm command. See what the AI shows you that your existing monitoring missed.
 </div>
     `
+  },
+  {
+    id: 'langfuse-vs-arize-phoenix-vs-langsmith-vs-agentops-llm-observability-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Langfuse vs Arize Phoenix vs LangSmith vs AgentOps: The LLM Observability Comparison Engineers Actually Need (2026)',
+    subtitle: "Four tools keep showing up when a team goes looking for eyes on their LLM app. They are not the same product, and the marketing pages wont tell you where each one falls down. Here is a practitioner read on what Langfuse, Arize Phoenix, LangSmith and AgentOps really do, and which one to reach for.",
+    category: 'AI Observability',
+    icon: '🔭',
+    bgGradient: 'linear-gradient(135deg, #06121a 0%, #0e3b52 55%, #22c3d6 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-13',
+    readTime: 11,
+    tags: ['LLM observability', 'Langfuse', 'Arize Phoenix', 'LangSmith', 'AgentOps', 'AI Observability', 'evals', 'tracing'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>All four tools trace LLM calls, run evals, and help you debug a bad output. The real split is <strong>open-source and self-hostable</strong> (Langfuse, Phoenix) versus <strong>SaaS-first</strong> (LangSmith, AgentOps), and how much they lean on one framework.</li>
+    <li>Langfuse is the safe default if you want to own your data, run it on your own boxes, and not get married to a single framework. It does tracing, prompt management and evals without much fuss.</li>
+    <li>Arize Phoenix is the pick when evaluation and OpenTelemetry are the priority. It is Apache-licensed, runs in a notebook or a container, and its eval library is the strongest of the group.</li>
+    <li>LangSmith earns its keep if your whole stack is already LangChain or LangGraph. AgentOps is built for one job, watching multi-step agents run, and it is good at that one job.</li>
+    <li>Do not pick on the feature matrix alone. Point all four at the same messy trace from your own app for a week, then keep the one that made a real bug obvious fastest.</li>
+  </ul>
+</div>
+
+<h2>Why this category exploded</h2>
+<p>A year ago most teams shipping an LLM feature had almost no idea what it was doing in production. They could see the API bill and they could see angry users, and not much in between. A normal APM tool shows you a slow endpoint, but it says nothing about why the model returned garbage, which prompt version was live, or how much a single conversation cost in tokens. That gap is the whole reason this category exists. If you want the longer version of that argument, I wrote about it in <a href="/blog/ai-agents-observability-blind-spot">Why Every New AI Agent Is an Observability Blind Spot</a>.</p>
+<p>So a handful of tools showed up to fill the hole, and four of them keep landing on the shortlist: Langfuse, Arize Phoenix, LangSmith and AgentOps. They get talked about like competitors, and they overlap, but they were built by different people to solve slightly different problems. Treating them as interchangeable is how teams end up ripping one out three months later. Lets go through what each actually is.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=1280&q=80" alt="Eyeglasses in front of a monitor full of code, the code sharp through the lenses" loading="lazy" /><figcaption>LLM observability is not about the slow endpoint. It is about seeing the prompt, the model version, the tokens and the actual output, the stuff a normal APM tool never looks at.</figcaption></figure>
+
+<h2>What all four have in common</h2>
+<p>Before the differences, the shared floor. Every one of these gives you tracing, meaning a full record of a request as it moves through your app: the prompt that went in, the model that answered, the tokens burned, the latency, and for an agent, each tool call along the way. Every one of them lets you attach evaluations, so you can score outputs for quality instead of eyeballing them. And every one keeps a history so you can compare last weeks behaviour to today.</p>
+<p>That common floor is why they get confused for each other. The differences are not in the checklist of features. They are in what the tool assumes about how you work, where your data lives, and which framework you already bet on. Thats where the choice actually gets made.</p>
+
+<h2>Langfuse: own your data, stay framework-neutral</h2>
+<p>Langfuse is the open-source one most people reach for first, and for good reason. The core is on GitHub, you can self-host the whole thing with Docker, and your traces sit in your own Postgres and object storage instead of somebody elses cloud. For a team in a regulated shop, or anyone who just does not want prompts and user data leaving thier network, that alone shortens the list to two names.</p>
+<p>It is also framework-neutral in a way that matters. Langfuse does not care if you use the OpenAI SDK raw, LangChain, LlamaIndex, or your own hand-rolled loop. You drop in a decorator or an SDK call and traces show up. On top of tracing it does prompt management, so prompts live in Langfuse with versions instead of hard-coded in your app, and it does datasets and evals for testing changes before they ship. There is a hosted cloud tier too if you do not want to run it, priced on usage.</p>
+<p>Where it is less strong: the evaluation library is solid but not as deep as Phoenix, and the self-hosted setup, while not hard, is one more service your team now operates. If nobody wants to own another database, the cloud tier fixes that, but then your back to sending data out.</p>
+
+<h2>Arize Phoenix: evaluation and OpenTelemetry first</h2>
+<p>Phoenix comes out of Arize AI, and it shows. This is the tool built by people who think about model evaluation as the main event, not a side feature. It is Apache 2.0 licensed, it runs happily inside a Jupyter notebook for local work or as a container for a shared deployment, and its eval library, the LLM-as-a-judge templates and the retrieval-quality checks, is the most thorough of the four. If your problem is a RAG pipeline returning weak answers, Phoenix is very good at showing you whether retrieval or generation is the weak link.</p>
+<p>The other thing Phoenix gets right is standards. It is built on OpenTelemetry through a spec called OpenInference, so the traces it produces are not a proprietary blob, they are OTel spans you can also send elsewhere. That fits the direction the whole field is going, which I got into in <a href="/blog/opentelemetry-table-stakes-what-comes-after">OpenTelemetry Is Now Table Stakes. Here Is What Comes After</a>. If you already run an OTel pipeline, Phoenix slots in without inventing a second one.</p>
+<p>The trade is that Phoenix on its own is the open-source, self-managed piece. The bigger production features, long retention, team access controls, alerting at scale, live in Arize's paid platform. Phoenix is genuinely useful free, but a large org usually ends up looking at the commercial tier, so price it in early.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=1280&q=80" alt="A hand-drawn line chart on graph paper trending upward, with a ruler and pens" loading="lazy" /><figcaption>Evals are the part most teams skip and later regret. Phoenix treats scoring output quality as the main job, not a checkbox, which is the difference between guessing your model got better and knowing it.</figcaption></figure>
+
+<h2>LangSmith: the payoff for going all-in on LangChain</h2>
+<p>LangSmith is from the LangChain team, and that is both the pitch and the catch. If you already build on LangChain or LangGraph, LangSmith is the tightest fit you will find. Traces of a complex LangGraph agent render as a clean step-by-step tree, the prompt hub ties into your chains, and the eval and dataset tooling is well thought out. There is basically zero glue code, it just works because it was built by the same people.</p>
+<p>It is not locked to LangChain, to be fair. There is an SDK and OpenTelemetry support, so you can trace a non-LangChain app too. But the reason to choose LangSmith over the others is the LangChain integration, and if you are not using LangChain, a lot of that advantage evaporates and you are left comparing it to tools that are open-source or cheaper.</p>
+<p>The bigger thing to weigh is that LangSmith is SaaS-first and closed-source. Self-hosting exists but only on the enterprise plan, so for most teams your data lives in LangChain's cloud. Pricing runs on a mix of seats and trace volume, which is fine at small scale and something to model carefully before a high-traffic app sends your trace count through the roof.</p>
+
+<h2>AgentOps: a specialist for watching agents run</h2>
+<p>AgentOps did not try to be a general LLM observability platform, and that focus is the point. It is built for one thing, watching autonomous, multi-step agents do their work, and it is good at it. Session replays show you an agent's whole run as a waterfall: which tool it called, what came back, where it looped, where it burned tokens spinning on a dead end. If you have ever watched a CrewAI or AutoGen agent do something baffling and had no idea why, this is the view you wanted.</p>
+<p>It integrates with the popular agent frameworks out of the box, tracks cost and latency per session, and flags failures without much setup. The reason a team picks AgentOps over the broader tools is that agent-specific lens. When your product is an agent, seeing the run as a sequence of steps beats seeing it as a flat list of LLM calls.</p>
+<p>The flip side is scope. AgentOps is SaaS, and it is narrower than the other three. If you also need heavy prompt management, deep eval pipelines, or full self-hosting, you will likely run AgentOps next to something else rather than instead of it. For the pure agent-debugging job though, few things beat it. The wider problem of agents breaking normal monitoring is something I covered in <a href="/blog/monitoring-stack-cant-see-ai-agents-otel-genai-conventions">Your Monitoring Stack Cannot See Your AI Agents</a>.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1280&q=80" alt="Two laptops on a desk with a person's hands typing on one of them" loading="lazy" /><figcaption>The matrix will not settle this. Point two or three of these at the same real trace for a week and keep the one that surfaced a genuine bug fastest.</figcaption></figure>
+
+<h2>The comparison, side by side</h2>
+<table class="ctable">
+  <thead><tr><th>Tool</th><th>Best at</th><th>Open source</th><th>Self-host</th><th>Framework fit</th><th>Watch out for</th></tr></thead>
+  <tbody>
+    <tr><th>Langfuse</th><td>Owning your data, general tracing + prompt mgmt</td><td>Yes (core)</td><td>Yes, full</td><td>Neutral, works with anything</td><td>Evals less deep than Phoenix; one more service to run</td></tr>
+    <tr><th>Arize Phoenix</th><td>Evaluation and OTel-native tracing</td><td>Yes (Apache 2.0)</td><td>Yes</td><td>Neutral, OpenInference</td><td>Big production features sit in the paid Arize tier</td></tr>
+    <tr><th>LangSmith</th><td>LangChain / LangGraph apps</td><td>No</td><td>Enterprise plan only</td><td>Best with LangChain</td><td>Closed SaaS; trace-volume pricing at scale</td></tr>
+    <tr><th>AgentOps</th><td>Debugging multi-step agents</td><td>Partial</td><td>No (SaaS)</td><td>CrewAI, AutoGen, agent frameworks</td><td>Narrow scope; often runs alongside another tool</td></tr>
+  </tbody>
+</table>
+
+<h2>So which one</h2>
+<p>Skip the "it depends" and here is how I would actually decide. If data ownership or self-hosting is non-negotiable, your really choosing between Langfuse and Phoenix. Between those two, pick Langfuse when you want a well-rounded platform with prompt management built in, and pick Phoenix when evaluation quality and OpenTelemetry are what keep you up at night.</p>
+<p>If you have already committed to LangChain or LangGraph and you are fine with SaaS, LangSmith will save you the most glue code and it is the natural fit. And if your product is fundamentally an agent and the thing you keep needing to debug is a weird multi-step run, add AgentOps for that view, on it's own or next to one of the others. Most mature teams I see do not run just one of these. They run a broad tool for tracing and evals and a specialist for the agent piece, and that combination is fine.</p>
+<p>Whatever the matrix says, the honest test is your own data. These tools all demo beautifully on a clean example. Instrument one real, messy flow from your app, send it to two or three of them for a week, and watch which one made an actual bug jump out first. That is the tool that earns the license, everything else is a spec sheet.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>There is no single winner here, and anyone selling you one has not used all four. <strong>Langfuse</strong> is the default for teams that want to own their data and stay framework-neutral. <strong>Arize Phoenix</strong> wins on evaluation and OpenTelemetry. <strong>LangSmith</strong> pays off if you live in LangChain. <strong>AgentOps</strong> is the specialist when your problem is an agent misbehaving mid-run. Shortlist by data-ownership needs and framework first, then let a week of your own real traces settle it.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://langfuse.com/docs" target="_blank" rel="noopener">Langfuse documentation</a></li>
+  <li><a href="https://docs.arize.com/phoenix" target="_blank" rel="noopener">Arize Phoenix documentation</a></li>
+  <li><a href="https://docs.smith.langchain.com/" target="_blank" rel="noopener">LangSmith documentation</a></li>
+  <li><a href="https://docs.agentops.ai/" target="_blank" rel="noopener">AgentOps documentation</a></li>
+</ul>
+    `
   }
 ];
