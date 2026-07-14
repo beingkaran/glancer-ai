@@ -3511,5 +3511,94 @@ export const BLOG_POSTS = [
   <li><a href="https://docs.agentops.ai/" target="_blank" rel="noopener">AgentOps documentation</a></li>
 </ul>
     `
+  },
+  {
+    id: 'multi-model-ai-cost-attribution-hard-problem-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'One App, Four Models, No Idea What Anything Costs: Multi-Model Cost Attribution Is the Ugly Problem of 2026',
+    subtitle: "GPT-5.6 and Grok 4.5 landed in the same news cycle, and every team I know is now routing one product across three or four models. The invoices arrive per provider. The questions arrive per feature. Nothing in your stack connects the two, and that gap has quietly become a real engineering problem.",
+    category: 'AI Observability',
+    icon: '🧾',
+    bgGradient: 'linear-gradient(135deg, #06140a 0%, #0e5233 55%, #22d68f 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-14',
+    readTime: 10,
+    tags: ['cost attribution', 'FinOps', 'LLM observability', 'GPT-5.6', 'Grok 4.5', 'multi-model', 'token costs', 'AI Observability'],
+    featured: false,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Most serious AI products now call two, three, four models from different providers. The bill arrives <strong>per provider</strong>, but every question your PM or CFO asks arrives <strong>per feature</strong>. The gap between those two views is the whole problem.</li>
+    <li>Token counts are not dollars. Cached input, batch tiers, thinking tokens, retries and a 30x price spread between frontier and flash models mean the same user request costs wildly different money depending on the path it took.</li>
+    <li>Attribution is a metadata propagation problem, and engineering already solved that shape once. It is distributed tracing wearing a finance hat. Tag every model call with feature, team and customer, record the served model and token counts, and join against a versioned price table.</li>
+    <li>Start with showback, not chargeback. Show each team their number for a quarter before anyone starts sending internal invoices, or the project dies in a political knife fight.</li>
+  </ul>
+</div>
+
+<h2>The week the bill stopped making sense</h2>
+<p>This week alone we got GPT-5.6 and Grok 4.5, and if your company is like most of the ones I talk to, someone has already opened a pull request titled something like "add grok to the router". That is how it goes now. One product, one user-facing feature set, and underneath it a growing pile of models: a frontier model for the hard reasoning, a flash-tier model for the high volume cheap stuff, a coding specialist, and whatever launched this week because somebody wanted to try it.</p>
+<p>Then the month ends and finance opens four invoices from four providers, each one a single line that says API usage, and asks a completely reasonable question. What does the summarize button actually cost us? And the room goes quiet, because nobody knows. Not roughly, not directionally. Nobody knows.</p>
+<p>A year ago this was an annoyance. With one provider you could squint at the invoice and sort of guess. With four providers, model routing, fallback chains and agents that fan one click out into dozens of calls, guessing is dead. The multi-model world everyone cheered for has a bookkeeping problem, and it is landing on engineering, not finance, because finance does not have the data. Nobody does, unless you build for it.</p>
+
+<h2>Per-provider invoices, per-feature questions</h2>
+<p>Here is the mismatch in its simplest form. A provider invoice aggregates by API key, maybe by project if you were disciplined about key hygiene, which most teams are not. Every question anyone actually asks cuts a different way. Which feature is driving spend? Which customer? Did the new prompt version make the RAG pipeline cheaper or did it just feel cheaper? Is the free tier eating our margin?</p>
+<p>None of those questions can be answered from the provider side, ever, because the provider does not know your features exist. OpenAI knows you sent tokens. It does not know the tokens belonged to the onboarding flow for your biggest enterprise customer. That mapping lives only in your application, at the moment the call is made, and if you dont capture it right there it is gone. You cannot reconstruct it from the invoice later, believe me, people try every quarter and it always turns into a spreadsheet of lies.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1280&q=80" alt="A fountain pen resting on printed financial statements" loading="lazy" /><figcaption>The provider invoice is one line that says API usage. Every question worth asking, per feature, per customer, per prompt version, has to be answered from data the invoice does not contain.</figcaption></figure>
+
+<h2>Why tokens are not dollars</h2>
+<p>The naive fix is to log token counts and multiply by a price. That gets you maybe 60 percent of the way, and the missing 40 percent is where all the surprises live. Cached input is billed at a different rate than fresh input, and a chat app with long system prompts might have most of it's input tokens cached. Batch tiers cost half of interactive. Reasoning models burn thinking tokens that get billed as output you never even see in the response. And the price spread across your router is enormous, a frontier call can cost 30x what a flash-tier call costs for the same token count. I did the budget math on one of those price moves in <a href="/blog/claude-sonnet-5-2-dollar-pricing-enterprise-budget-math">the Sonnet 5 pricing piece</a>, and the spread has only gotten wider since.</p>
+<p>Then the routing itself starts lying to you. If a request goes through a fallback chain, the model you asked for and the model that answered are not the same thing, and unless you record the served model per call, your cost model is fiction. Retries double the cost of a request without anyone noticing. Speed changes behaviour too, when a model answers at 750 tokens a second like <a href="/blog/openai-gpt-56-sol-cerebras-750-tokens-second">GPT-5.6 on Cerebras hardware</a>, teams stop being careful with it, and volume quietly triples.</p>
+<p>Agents are the worst case of all of this. One user click becomes an agent run, the run becomes forty model calls across three providers, some cached, some retried, one escalated to the expensive model because a tool call failed. What did the click cost? If you are not attributing every call back to the root request, that number simply does not exist anywhere in your company.</p>
+
+<h2>We already solved this shape of problem once</h2>
+<p>The good news is that engineering has seen this exact shape before. A request fans out across services, and you want to know what happened to it end to end, so you propagate a context along with the request and every hop records what it did. That is distributed tracing. Cost attribution is the same trick wearing a finance hat. You propagate feature, team, customer and prompt version alongside every model call, the same way you already propagate a trace ID, and each call records the served model, the token counts by type, and the price that was in effect at that moment.</p>
+<p>That last part trips people up. Prices change, this year they have changed constantly, so you need a price table that is versioned in your own code, not a rate you look up at query time. A call made in March needs to be costed at March prices or your historical numbers drift into nonsense. It is boring work, it is maybe two hundred lines, and it is the difference between a cost dashboard people trust and one they laugh at.</p>
+<p>The standards are catching up too. The OpenTelemetry GenAI semantic conventions already define attributes for model name and token usage per call, so the same spans that power your latency dashboards can power the cost view, one layer of enrichment later. I argued in <a href="/blog/opentelemetry-table-stakes-what-comes-after">the OTel table stakes piece</a> that cost attribution is the least glamorous layer of the new observability stack and the fastest one to pay for itself. Multi-model routing did not changed that. It just raised the stakes.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1280&q=80" alt="Two people working through a plan on a whiteboard" loading="lazy" /><figcaption>The tagging taxonomy is the real design work. Feature, team, customer, prompt version. Get those four propagating on every model call and the dashboard is the easy part.</figcaption></figure>
+
+<h2>What breaks attribution, and the fix for each</h2>
+<table class="ctable">
+  <thead><tr><th>What breaks it</th><th>How it lies to you</th><th>The fix</th></tr></thead>
+  <tbody>
+    <tr><th>Model routing and fallbacks</th><td>The model you requested is not the model that answered</td><td>Record the served model on every call, never the requested one</td></tr>
+    <tr><th>Cached input</th><td>Raw token counts overstate cost, sometimes badly</td><td>Track cached and uncached input as separate counters</td></tr>
+    <tr><th>Thinking tokens</th><td>Output you never see still gets billed</td><td>Use the providers usage object, not the length of the response</td></tr>
+    <tr><th>Retries</th><td>One logical request, two or three billed calls</td><td>Attribute every attempt to the root request ID</td></tr>
+    <tr><th>Agent fan-out</th><td>One click becomes forty calls across providers</td><td>Propagate the root context through the whole run</td></tr>
+    <tr><th>Price changes</th><td>Historical spend recalculated at todays rates drifts into fiction</td><td>Versioned price table, cost each call at time of call</td></tr>
+  </tbody>
+</table>
+
+<h2>What to actually do this quarter</h2>
+<p>You do not need a platform team and a six month roadmap for this. First, make sure every model call records the served model and the full usage object the provider returns. That is the raw material and most teams already have half of it sitting in thier LLM observability tool, the four I compared in <a href="/blog/langfuse-vs-arize-phoenix-vs-langsmith-vs-agentops-llm-observability-2026">the Langfuse, Phoenix, LangSmith and AgentOps piece</a> all capture per-call token usage out of the box.</p>
+<p>Second, pick your tags and propagate them. Feature, team, customer, prompt version. Four tags, passed as metadata on every call, the same way trace context already flows. Third, build the versioned price table and cost every call at write time. Fourth, put a dashboard in front of each team showing thier own number, per feature, per week. Thats it. No chargeback, no internal invoicing, just the number where people can see it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=1280&q=80" alt="A glass jar tipped over with coins spilling out" loading="lazy" /><figcaption>Showback first. The first month a team sees its own per-feature number, one of them finds a call pattern nobody meant to ship. Every time.</figcaption></figure>
+
+<h2>Showback before chargeback</h2>
+<p>One warning from watching cloud FinOps play this exact game a decade ago. The moment cost data becomes internal billing, it becomes political, and people spend thier energy arguing about the allocation method instead of fixing the spend. So dont start there. Run showback for a quarter, just visibility, no consequences. What happens every single time is that some team sees thier number, goes looking, and finds an agent retry loop or a debug feature flag that has been burning the expensive model on requests where the flash tier would do fine.</p>
+<p>The first found-money moment buys you the credibility for everything after. Chargeback, budgets, alerts on cost anomalies per feature, all of that can come later once the data is trusted. But it starts with a per-call record that knows which model actually answered and which feature asked. If GPT-5.6 and Grok 4.5 week is what finally pushes your team to build that, lets be honest, it wont be the worst thing this news cycle produced.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>Multi-model routing broke the last thread connecting your AI bill to your product. Provider invoices answer by API key, real questions cut by feature and customer, and only your application can make that join, at call time, never after. Treat it like tracing: propagate feature, team, customer and prompt version on every call, record the served model and the true usage object, cost it against a versioned price table. Start with showback. The first team that sees its own number will find the money that pays for the whole effort.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/" target="_blank" rel="noopener">OpenTelemetry GenAI semantic conventions</a></li>
+  <li><a href="https://platform.openai.com/docs/pricing" target="_blank" rel="noopener">OpenAI API pricing</a></li>
+  <li><a href="https://docs.claude.com/en/docs/about-claude/pricing" target="_blank" rel="noopener">Anthropic API pricing</a></li>
+  <li><a href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps Foundation framework</a></li>
+</ul>
+    `
   }
 ];
