@@ -3600,5 +3600,104 @@ export const BLOG_POSTS = [
   <li><a href="https://www.finops.org/framework/" target="_blank" rel="noopener">FinOps Foundation framework</a></li>
 </ul>
     `
+  },
+  {
+    id: 'o11y-bench-grafana-ai-agent-observability-benchmark',
+    bannerImage: '/blog-banners/comparison-podium.jpg',
+    title: 'o11y-bench: Grafana Just Built the Exam Your AI SRE Agent Will Fail',
+    subtitle: "Grafana open sourced a benchmark that puts AI agents in front of a real Prometheus, Loki and Tempo stack and grades them on 63 observability tasks. The top model scores 79.4 percent. On dashboard work it drops to 57. Here is what the numbers actually tell you before you hand an agent your on-call rotation.",
+    category: 'AI Observability',
+    icon: '🎓',
+    bgGradient: 'linear-gradient(135deg, #0d0618 0%, #4a1d6e 55%, #b56ff5 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-20',
+    readTime: 10,
+    tags: ['o11y-bench', 'AI agents', 'Grafana', 'benchmark', 'AI SRE', 'observability', 'MCP', 'AIOps'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>o11y-bench is the first open benchmark that grades AI agents on <strong>real observability work</strong>. Grafana Labs released it at GrafanaCON on 21 April 2026. It spins up an actual Grafana stack in Docker with Prometheus, Loki and Tempo, hands the agent the Grafana MCP server, and scores 63 tasks.</li>
+    <li>The headline metric is <strong>Pass^3</strong>, the average score across three runs, not best-of-three. That choice matters more than any single number on the board, because it grades consistency instead of luck.</li>
+    <li>Best result so far is Claude Opus 4.7 with thinking <em>off</em> at 79.4 percent Pass^3. Turning reasoning to high made it worse on consistency, 73.0 percent, while raising best-of-three to 90.5. More thinking bought range, not reliability.</li>
+    <li>Dashboard tasks are where everything falls apart. The top model manages 57 percent there against 100 percent on plain Grafana API calls. Reading telemetry is close to solved. Changing things safely is not.</li>
+  </ul>
+</div>
+
+<h2>Somebody finally wrote the test</h2>
+<p>Every vendor with a roadmap has shipped an SRE agent in the last eighteen months. AWS has one, Azure has one, Datadog has one, and the demo is always the same: a synthetic outage, a tidy root cause, applause. What nobody could tell you was whether any of it survived contact with a real stack, because there was no shared exam. Each vendor graded its own homework.</p>
+<p>Grafana changed that on 21 April, at GrafanaCON, by open sourcing <a href="https://github.com/grafana/o11y-bench" target="_blank" rel="noopener">o11y-bench</a> under AGPL v3. It is a benchmark that stands up a genuine observability environment in Docker, synthetic metrics, logs and traces flowing through Prometheus, Loki and Tempo, then points an agent at it through the Grafana MCP server and asks it to do 63 things a working engineer does.</p>
+<p>The framing I like most is that it measures what the agent <em>does in the system</em>, not what it says about the system. A chat transcript that sounds competent scores zero if the PromQL came back wrong. It is built on Harbor, the environment-standardisation framework from the Terminal Bench people, so the plumbing is somebody else's solved problem and the tasks are the contribution.</p>
+
+<h2>What the 63 tasks look like</h2>
+<p>They break into five buckets. Prometheus and PromQL. Loki and LogQL. Tempo and TraceQL. Multi-step incident investigations, which is the closest thing here to a real page at 3am. And dashboard editing and repair.</p>
+<p>Grading is a mix of deterministic checks and rubric criteria, so a task is not graded purely on vibes, but it is not purely string matching either. You need an Anthropic key for the grading pass plus a key for whatever model you are testing. Runs can be regraded later without re-running the agents, which is a small thing that will save anyone doing serious evaluation a lot of money.</p>
+<p>The launch evaluation was not small. 29 model variants, 63 tasks, three attempts each, 5,481 trials in total. That is enough to say something.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1280&q=80" alt="Rows of labeled wooden card catalog drawers" loading="lazy" /><figcaption>Querying is the drawer-opening part of the job, and agents are genuinely good at it now. 88 percent on metrics, 80 on logs. The trouble starts when they have to put something back in a drawer.</figcaption></figure>
+
+<h2>Pass^3 is the whole story</h2>
+<p>Most agent benchmarks quote pass@k, which asks whether the model got there at least once in k attempts. That is a fine number for research and a terrible number for operations. Nobody runs an incident three times and keeps the good one.</p>
+<p>o11y-bench leads with <strong>Pass^3</strong> instead, the average score across three runs. Same task, three goes, what did you score on average. It punishes a model that solves something brilliantly on Tuesday and wanders off on Wednesday, which is precisely the failure mode that makes engineers stop trusting an agent. Pass@3 is still reported next to it, and the gap between the two columns is where the interesting reading is.</p>
+<table class="ctable">
+  <thead><tr><th>Model</th><th>Pass^3</th><th>Pass@3</th><th>Tasks solved</th></tr></thead>
+  <tbody>
+    <tr><th>Claude Opus 4.7 (thinking off)</th><td>79.4%</td><td>87.3%</td><td>50 / 63</td></tr>
+    <tr><th>Claude Opus 4.7 (thinking high)</th><td>73.0%</td><td>90.5%</td><td>46 / 63</td></tr>
+    <tr><th>Claude Sonnet 4.6 (thinking high)</th><td>68.3%</td><td>84.1%</td><td>43 / 63</td></tr>
+    <tr><th>Claude Opus 4.6 (thinking off)</th><td>66.7%</td><td>90.5%</td><td>42 / 63</td></tr>
+    <tr><th>Claude Opus 4.7 (thinking low)</th><td>63.5%</td><td>85.7%</td><td>40 / 63</td></tr>
+  </tbody>
+</table>
+<p>Look at rows one and two. Thinking high solves more distinct problems at least once, 90.5 against 87.3, and yet its average run is six points worse. Look at row four, which is a previous-generation model posting the same 90.5 percent best-of-three as the newest reasoning configuration while sitting nearly thirteen points lower on consistency.</p>
+<p>Grafana's own read on this is that high-thinking models sometimes spin their wheels gathering too much information. Which matches what anyone who has watched an agent work a live incident already suspects. Given more room to reason, it goes and reads everything, and sometimes the extra context helps and sometimes it talks itself out of the right answer. Qwen 3.6 Plus was the strongest open-source entry, worth knowing if you are running models yourself.</p>
+
+<h2>The dashboard cliff</h2>
+<p>Here is the number I would put on a slide. For the top model, broken out by category:</p>
+<ul>
+  <li>Grafana API: <strong>100%</strong></li>
+  <li>Metrics: <strong>88%</strong></li>
+  <li>Logs: <strong>80%</strong></li>
+  <li>Traces: <strong>77%</strong></li>
+  <li>Investigation: <strong>73%</strong></li>
+  <li>Dashboards: <strong>57%</strong></li>
+</ul>
+<p>That is a clean gradient from "call an API correctly" down to "change a shared artifact without breaking it", and it is not subtle. Forty-three points separate the top and bottom of that list.</p>
+<p>Why dashboards are hard is worth sitting with, because the reason generalises. A dashboard task requires holding several things true at once: the state of the object you are editing, the correctness of the query inside the panel, the variable wiring that makes the panel respond to the template selector, and the saved behaviour after you write it back. Get three right and the fourth wrong and you have shipped a dashboard that looks fine and lies to whoever opens it next.</p>
+<p>Which is the whole problem with agents doing mutation work. A wrong PromQL query announces itself, you see an empty graph or an absurd number and you fix it. A subtly wrong dashboard is silent, and it stays silent until somebody trusts it during an outage. The failure has a long fuse and lands on a different person than the one which caused it.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1280&q=80" alt="A laptop on a couch showing charts and a dashboard" loading="lazy" /><figcaption>57 percent on dashboard tasks. Roughly two in five attempts to edit or repair a dashboard came back wrong, in ways that do not necessarily announce themselves.</figcaption></figure>
+
+<h2>What I would actually do with this</h2>
+<p>Do not read 79.4 percent as "agents are 79 percent of an SRE". The benchmark is 63 tasks against a synthetic stack that Grafana built, and a synthetic stack is tidier than yours. No half-migrated legacy exporter, no metric that three teams renamed, no dashboard from 2021 that somebody still uses. A real environment is dirtier and the scores would move down, not up.</p>
+<p>What the benchmark is genuinely good for is three things. Setting a read/write boundary, comparing models on the axis that matters, and giving you a template for your own evaluation.</p>
+<p>The boundary is the easy win. The category breakdown draws a line for you: query and investigation work is in decent shape, mutation work is not. So give the agent broad read access and make every write a proposal a human approves. That is not a permanent state of the world, but at 57 percent it is where the numbers point today, and you can revisit when the leaderboard moves.</p>
+<p>On model selection, the lesson is to stop reading best-of-three numbers when you are buying reliability. If you had picked from the Pass@3 column you would have chosen the thinking-high configuration and got a measurably less consistent agent. Also worth noticing that maximum reasoning is not automatically the right setting, cranking it up cost six points of consistency here. Test the setting, do not assume it.</p>
+<p>And the third use is the one most teams will skip and shouldn't. The tasks are readable on the <a href="https://o11ybench.ai/tasks/" target="_blank" rel="noopener">tasks explorer</a>, the whole thing is AGPL, and Harbor is designed to be extended. Fork the structure, write twenty tasks against your own stack with your own metric names and your own genuinely cursed dashboard, and now you have a number for <em>your</em> environment. That number is worth ten times the public leaderboard, because it is measured on the mess your agent will actually meet.</p>
+
+<h2>The part this does not measure</h2>
+<p>A benchmark grades the agent. It does not tell you what the agent did on the way to the answer, and that gap is the thing I keep writing about. o11y-bench will tell you a model got 73 percent on investigation tasks. It will not tell you that it burned 40 tool calls doing it, or that it queried a production Loki instance eleven times when once would have done.</p>
+<p>That is your telemetry problem, not Grafana's, and it is the subject of <a href="/blog/ai-agents-breaking-traditional-monitoring-observability">Observing the Observer</a> and <a href="/blog/ai-agents-observability-blind-spot">the agent observability blind spot</a>. Benchmarks measure whether the agent can do the job. Instrumentation measures what it did to your systems while doing it, and you need both, the tooling for the second half is covered in <a href="/blog/langfuse-vs-arize-phoenix-vs-langsmith-vs-agentops-llm-observability-2026">the Langfuse, Phoenix, LangSmith and AgentOps comparison</a>.</p>
+<p>Still, an open, reproducible, vendor-neutral exam is a real gift to this space. It is going to be very hard to sell an autonomous SRE agent now without someone asking what it scored. Which is exactly the pressure the category needed.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>o11y-bench is the first honest scoreboard for AI agents doing observability work, and its most useful decision is grading consistency over best-of-three. The top score of 79.4 percent is respectable and the 57 percent on dashboards is the number to act on: let agents read broadly, make them propose every write. Do not take the leaderboard as your answer. Fork the repo, write tasks against your own stack, and find out what these things score on your mess instead of Grafana's clean one.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://grafana.com/blog/o11y-bench-open-benchmark-for-observability-agents/" target="_blank" rel="noopener">Introducing o11y-bench, Grafana Labs</a></li>
+  <li><a href="https://github.com/grafana/o11y-bench" target="_blank" rel="noopener">grafana/o11y-bench on GitHub</a></li>
+  <li><a href="https://o11ybench.ai/" target="_blank" rel="noopener">o11y-bench leaderboard</a></li>
+  <li><a href="https://grafana.com/press/2026/04/21/grafana-labs-targets-the-ai-blind-spot-with-new-observability-tools-announced-at-grafanacon-2026/" target="_blank" rel="noopener">GrafanaCON 2026 announcement</a></li>
+</ul>
+    `
   }
 ];
