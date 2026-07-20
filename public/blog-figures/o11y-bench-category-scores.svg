@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 420" font-family="ui-sans-serif,system-ui,Segoe UI,Roboto,Arial" role="img" aria-label="Bar chart of o11y-bench Pass^3 scores by task category for Claude Opus 4.7 with thinking off: Grafana API 100 percent, Metrics 88 percent, Logs 80 percent, Traces 77 percent, Investigation 73 percent, Dashboards 57 percent">
+  <defs>
+    <linearGradient id="o11ybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1120"/><stop offset="1" stop-color="#121a2e"/></linearGradient>
+  </defs>
+  <rect width="820" height="420" rx="18" fill="url(#o11ybg)"/>
+  <rect x="1" y="1" width="818" height="418" rx="17" fill="none" stroke="#ffffff" stroke-opacity="0.08"/>
+
+  <text x="410" y="40" fill="#e5e7eb" font-size="19" font-weight="700" text-anchor="middle">Where AI agents break down on observability work</text>
+  <text x="410" y="63" fill="#64748b" font-size="13" text-anchor="middle">Claude Opus 4.7 (thinking off), top scorer on o11y-bench &#183; Pass^3 across 63 tasks</text>
+
+  <!-- gridlines -->
+  <g stroke="#1e293b" stroke-width="1">
+    <line x1="210" y1="84" x2="210" y2="356"/>
+    <line x1="347.5" y1="84" x2="347.5" y2="356"/>
+    <line x1="485" y1="84" x2="485" y2="356"/>
+    <line x1="622.5" y1="84" x2="622.5" y2="356"/>
+    <line x1="760" y1="84" x2="760" y2="356"/>
+  </g>
+
+  <!-- 70% pass threshold used by the o11y-bench leaderboard -->
+  <line x1="595" y1="84" x2="595" y2="356" stroke="#eab308" stroke-opacity="0.5" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="595" y="78" fill="#eab308" font-size="11" text-anchor="middle" opacity="0.85">70% threshold</text>
+
+  <!-- bars -->
+  <g font-size="13">
+    <!-- Grafana API 100% -->
+    <text x="196" y="115" fill="#cbd5e1" text-anchor="end">Grafana API</text>
+    <rect x="210" y="97" width="550" height="26" rx="5" fill="#22c55e"/>
+    <text x="748" y="115" fill="#052e16" font-size="12" font-weight="700" text-anchor="end">100%</text>
+
+    <!-- Metrics 88% -->
+    <text x="196" y="161" fill="#cbd5e1" text-anchor="end">Metrics</text>
+    <rect x="210" y="143" width="484" height="26" rx="5" fill="#eab308"/>
+    <text x="682" y="161" fill="#422006" font-size="12" font-weight="700" text-anchor="end">88%</text>
+
+    <!-- Logs 80% -->
+    <text x="196" y="207" fill="#cbd5e1" text-anchor="end">Logs</text>
+    <rect x="210" y="189" width="440" height="26" rx="5" fill="#eab308"/>
+    <text x="638" y="207" fill="#422006" font-size="12" font-weight="700" text-anchor="end">80%</text>
+
+    <!-- Traces 77% -->
+    <text x="196" y="253" fill="#cbd5e1" text-anchor="end">Traces</text>
+    <rect x="210" y="235" width="423.5" height="26" rx="5" fill="#eab308"/>
+    <text x="621.5" y="253" fill="#422006" font-size="12" font-weight="700" text-anchor="end">77%</text>
+
+    <!-- Investigation 73% -->
+    <text x="196" y="299" fill="#cbd5e1" text-anchor="end">Investigation</text>
+    <rect x="210" y="281" width="401.5" height="26" rx="5" fill="#eab308"/>
+    <text x="599.5" y="299" fill="#422006" font-size="12" font-weight="700" text-anchor="end">73%</text>
+
+    <!-- Dashboards 57% -->
+    <text x="196" y="345" fill="#f87171" text-anchor="end" font-weight="600">Dashboards</text>
+    <rect x="210" y="327" width="313.5" height="26" rx="5" fill="#ef4444"/>
+    <text x="511.5" y="345" fill="#450a0a" font-size="12" font-weight="700" text-anchor="end">57%</text>
+  </g>
+
+  <!-- axis -->
+  <g font-size="11" fill="#475569" text-anchor="middle">
+    <text x="210" y="374">0%</text>
+    <text x="347.5" y="374">25%</text>
+    <text x="485" y="374">50%</text>
+    <text x="622.5" y="374">75%</text>
+    <text x="760" y="374">100%</text>
+  </g>
+
+  <line x1="60" y1="388" x2="760" y2="388" stroke="#1e293b" stroke-width="1"/>
+  <text x="60" y="408" fill="#94a3b8" font-size="12.5">Reading telemetry is close to solved. Changing it safely is not.</text>
+</svg>
