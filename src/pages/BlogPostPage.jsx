@@ -5,7 +5,7 @@ import { BLOG_POSTS } from '../data/allBlogs';
 import { figuresForPost, injectFiguresIntoHtml } from '../lib/blogImages';
 import { sanitizeBlogHtml } from '../lib/sanitizeHtml';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
-import { buildArticleSchema, buildBreadcrumb, useArticleSchema } from '../lib/structuredData';
+import { buildArticleSchema, buildBreadcrumb, buildFaqSchema, useArticleSchema } from '../lib/structuredData';
 import BlogBanner from '../components/BlogBanner';
 import ShareBar from '../components/ShareBar';
 import SaveButton from '../components/SaveButton';
@@ -104,6 +104,7 @@ export default function BlogPostPage() {
             { name: 'Home', path: '/' },
             { name: post.title, path },
           ]),
+          buildFaqSchema(post.faq),
         ]
       : null
   );

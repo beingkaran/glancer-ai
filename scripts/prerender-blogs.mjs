@@ -28,7 +28,7 @@ const DIST = resolve(__dirname, '../dist');
 
 const { BLOG_POSTS } = await import('../src/data/allBlogs.js');
 const { PRIMARY_AUTHOR } = await import('../src/data/authorMeta.js');
-const { buildArticleSchema, buildBreadcrumb, schemaToJson } = await import('../src/lib/structuredData.js');
+const { buildArticleSchema, buildBreadcrumb, buildFaqSchema, schemaToJson } = await import('../src/lib/structuredData.js');
 const { relatedLinksHtml } = await import('../src/lib/blogRelated.js');
 
 let shell;
@@ -67,6 +67,8 @@ for (const post of BLOG_POSTS) {
       { name: post.title, path },
     ])
   );
+  const faqObj = buildFaqSchema(post.faq);
+  const faqSchema = faqObj ? schemaToJson(faqObj) : null;
 
   let html = shell
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`)
@@ -83,7 +85,9 @@ for (const post of BLOG_POSTS) {
   html = html.replace(
     '</head>',
     `  <script type="application/ld+json">${articleSchema}</script>\n` +
-      `    <script type="application/ld+json">${crumbSchema}</script>\n  </head>`
+      `    <script type="application/ld+json">${crumbSchema}</script>\n` +
+      (faqSchema ? `    <script type="application/ld+json">${faqSchema}</script>\n` : '') +
+      `  </head>`
   );
 
   // Prerendered article markup inside #root. React replaces this on mount.

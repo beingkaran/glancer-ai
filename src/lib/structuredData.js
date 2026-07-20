@@ -129,6 +129,34 @@ export function buildNewsArticleSchema(post, { path } = {}) {
   return buildArticleSchema(post, { type: 'NewsArticle', path });
 }
 
+/**
+ * Build a FAQPage JSON-LD object from a post's `faq` array.
+ *
+ * Why this matters for SEO (2026): FAQPage markup makes a page eligible for the
+ * expandable People-Also-Ask style rich result on comparison/"X vs Y" queries,
+ * which lifts SERP real estate and CTR even when ranking position is unchanged.
+ * `faq` entries are `{ q, a }` where `a` may contain light inline HTML — we
+ * strip tags to a clean plain-text answer for the schema.
+ *
+ * @param {Array<{q: string, a: string}>} faq
+ */
+export function buildFaqSchema(faq) {
+  if (!Array.isArray(faq) || faq.length === 0) return null;
+  const entries = faq
+    .filter((f) => f && f.q && f.a)
+    .map((f) => ({
+      '@type': 'Question',
+      name: String(f.q).trim(),
+      acceptedAnswer: { '@type': 'Answer', text: plainText(f.a, 1000) },
+    }));
+  if (!entries.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: entries,
+  };
+}
+
 export function buildBreadcrumb(items) {
   return {
     '@context': 'https://schema.org',
