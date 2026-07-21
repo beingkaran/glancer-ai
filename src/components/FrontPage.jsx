@@ -11,11 +11,12 @@ import NewsCarousel from './NewsCarousel';
  * FrontPage — the above-the-fold split. Two content types, two visual
  * grammars, one glance:
  *
- *   left  (pink accent) — the analysis desk: newest Deep Dive as a lead
- *                         story plus a 3-item headline rail, editorial type.
- *   right (cyan accent)  — the Live Feed: news AND deep dives as a tailing
- *                         log stream that advances one entry every 7 seconds
- *                         (paused while hovered, so nothing moves mid-click).
+ *   left  (cyan accent) — the Live Feed: news AND deep dives as a tailing
+ *                        log stream that advances one entry every 7 seconds
+ *                        (paused while hovered, so nothing moves mid-click).
+ *                        News leads the page, so it takes the wide column.
+ *   right (pink accent) — the analysis desk: newest Deep Dive as a lead
+ *                        story plus a 3-item headline rail, editorial type.
  *
  * Everything opens in the swipe reader: news entries open the news slideshow,
  * deep dives (desk and feed alike) open the blogs slideshow — same behavior
@@ -151,47 +152,6 @@ export default function FrontPage() {
     <section className="front-page" aria-label="Today's front page">
       <div className="container">
         <div className="front-grid">
-          <div className="front-desk">
-            <header className="front-kicker front-kicker--desk">
-              <span className="front-kicker-mark" aria-hidden="true" />
-              <span className="front-kicker-label">Deep Dives</span>
-              <span className="front-kicker-sub">practitioner analysis</span>
-            </header>
-
-            <Link to={`/blog/${lead.id}`} state={{ from: 'front-page' }} className="front-lead" onClick={openDive(0)}>
-              <div className="front-lead-banner">
-                <BlogBanner post={lead} className="feed-blog-banner" />
-              </div>
-              <span className="front-lead-tag">Deep Dive · {lead.category}</span>
-              <h2 className="front-lead-title">{lead.title}</h2>
-              <p className="front-lead-sub">{lead.subtitle}</p>
-              <p className="front-lead-meta">
-                {lead.readTime ? `${lead.readTime} min read · ` : ''}{shortDate(lead.date)}
-              </p>
-            </Link>
-
-            {rail.length > 0 && (
-              <div className="front-rail">
-                {rail.map((post, i) => (
-                  <Link
-                    key={post.id}
-                    to={`/blog/${post.id}`}
-                    state={{ from: 'front-page' }}
-                    className="front-rail-item"
-                    onClick={openDive(i + 1)}
-                  >
-                    <span className="front-rail-cat">{post.category}</span>
-                    <span className="front-rail-title">{post.title}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            <button type="button" className="front-more" onClick={scrollToFeed}>
-              All deep dives ↓
-            </button>
-          </div>
-
           <aside
             className="front-wire"
             aria-label="Live feed of news and deep dives"
@@ -246,6 +206,47 @@ export default function FrontPage() {
               Full feed →
             </Link>
           </aside>
+
+          <div className="front-desk">
+            <header className="front-kicker front-kicker--desk">
+              <span className="front-kicker-mark" aria-hidden="true" />
+              <span className="front-kicker-label">Deep Dives</span>
+              <span className="front-kicker-sub">practitioner analysis</span>
+            </header>
+
+            <Link to={`/blog/${lead.id}`} state={{ from: 'front-page' }} className="front-lead" onClick={openDive(0)}>
+              <div className="front-lead-banner">
+                <BlogBanner post={lead} className="feed-blog-banner" />
+              </div>
+              <span className="front-lead-tag">Deep Dive · {lead.category}</span>
+              <h2 className="front-lead-title">{lead.title}</h2>
+              <p className="front-lead-sub">{lead.subtitle}</p>
+              <p className="front-lead-meta">
+                {lead.readTime ? `${lead.readTime} min read · ` : ''}{shortDate(lead.date)}
+              </p>
+            </Link>
+
+            {rail.length > 0 && (
+              <div className="front-rail">
+                {rail.map((post, i) => (
+                  <Link
+                    key={post.id}
+                    to={`/blog/${post.id}`}
+                    state={{ from: 'front-page' }}
+                    className="front-rail-item"
+                    onClick={openDive(i + 1)}
+                  >
+                    <span className="front-rail-cat">{post.category}</span>
+                    <span className="front-rail-title">{post.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <button type="button" className="front-more" onClick={scrollToFeed}>
+              All deep dives ↓
+            </button>
+          </div>
         </div>
       </div>
 

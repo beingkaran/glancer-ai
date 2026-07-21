@@ -49,3 +49,6 @@ android/captures
 
 # Local maintenance-guide build artifacts (large binaries)
 docs/
+
+# Accidental pip bootstrap download
+get-pip.py

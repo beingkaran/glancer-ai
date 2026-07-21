@@ -3803,5 +3803,119 @@ export const BLOG_POSTS = [
   <li><a href="https://grafana.com/press/2026/04/21/grafana-labs-targets-the-ai-blind-spot-with-new-observability-tools-announced-at-grafanacon-2026/" target="_blank" rel="noopener">GrafanaCON 2026 announcement</a></li>
 </ul>
     `
+  },
+  {
+    id: 'has-observability-actually-adopted-ai-vendor-maturity-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=80',
+    title: 'Has Observability Actually Adopted AI, or Just Rebranded Around It?',
+    subtitle: "Every major vendor now sells an AI story. Only 4 percent of organisations have operationalised any of it. Here is an honest maturity read on Dynatrace, Datadog, Grafana, New Relic, Splunk, Elastic and the rest, and where the marketing runs ahead of the product.",
+    category: 'AI Observability',
+    icon: '🧭',
+    bgGradient: 'linear-gradient(135deg, #05121c 0%, #0f4c5c 50%, #34d0c4 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-22',
+    readTime: 11,
+    tags: ['AI observability', 'AIOps', 'Dynatrace', 'Datadog', 'Grafana', 'New Relic', 'MCP', 'vendor maturity'],
+    featured: true,
+    faq: [
+      { q: 'Have observability vendors really adopted AI, or is it just marketing?', a: 'Both, depending on the layer. Anomaly detection and forecasting are genuinely mature and have shipped in production for years, with Dynatrace Davis running since 2017. Natural language querying is real and useful but shallow. Agentic investigation, where a system reads telemetry and proposes a root cause on its own, went generally available across most major platforms during 2026 and is still early. Autonomous remediation is almost entirely demoware outside a few narrow, well-guarded runbooks.' },
+      { q: 'Which observability vendor is the most mature on AI in 2026?', a: 'Dynatrace has the longest production track record because Davis has been doing causal analysis on a live dependency map since 2017, and it is deterministic rather than purely statistical, so it can show its reasoning chain. Datadog has moved fastest on agentic investigation with Bits AI SRE and shipped a remote MCP server in March 2026. Grafana is the most transparent, having open sourced o11y-bench to grade agents publicly. Maturity depends on which capability you are buying.' },
+      { q: 'Why is AI adoption in IT operations still so low?', a: 'Survey data puts roughly 4 percent of organisations at full operationalisation, with about 49 percent still running limited pilots and 22 percent not started. The blockers are rarely model quality. They are fragmented telemetry across disconnected tools, missing or inconsistent metadata that leaves a correlator guessing, and the absence of explainability and approval workflows that operations leaders need before letting software act on production.' },
+    ],
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>The vendors have shipped. The customers have not adopted. Around <strong>4 percent</strong> of organisations have operationalised AI across IT operations, while 49 percent are still running limited pilots and 22 percent have not begun.</li>
+    <li>Maturity is not one thing. Anomaly detection is a solved, boring, production-grade feature. Agentic investigation went GA across the field during 2026 and is genuinely new. Autonomous remediation is mostly a demo.</li>
+    <li><strong>MCP was the real 2026 story</strong>, not any single assistant. By Q1 most major platforms exposed their telemetry as tool calls, which quietly turned every observability vendor into a data source for somebody else's agent.</li>
+    <li>Grafana's o11y-bench gave us the first neutral scoreboard, and it is humbling. Best model sits at 79.4 percent on repeated runs, and drops to 57 percent the moment a task involves changing a dashboard rather than reading data.</li>
+  </ul>
+</div>
+
+<h2>Everybody shipped something</h2>
+<p>Walk any vendor booth in 2026 and you will not find a single observability platform without an AI story. Dynatrace has Davis and Davis CoPilot. Datadog has Watchdog, Bits AI and an SRE agent priced per investigation. New Relic has NRAI and an SRE Agent that lives in Slack. Grafana has Assistant. Splunk, Elastic, Honeycomb, Chronosphere, IBM Instana, LogicMonitor, all of them have something with a name and a launch blog.</p>
+<p>So on the narrow question of whether the industry has incorporated AI into its toolset, the answer is obviously yes, and it stopped being interesting about two years ago. The better question is the one buyers actually mean when they ask it. Is any of this load bearing? Would an on call engineer at 3am notice if it vanished?</p>
+<p>That answer is a lot messier.</p>
+
+<h2>The adoption gap nobody puts on a slide</h2>
+<p>Here is the number that should frame everything else. Roughly <strong>4 percent</strong> of organisations have genuinely operationalised AI across their IT operations. About 12 percent use it for automated root cause analysis and remediation, 13 percent for anomaly detection and incident response. Around 49 percent are stuck in pilots inside limited environments and 22 percent have not started at all. A separate cut of the same research says 62 percent have implemented AI in some form without scaling it anywhere.</p>
+<p>Those numbers describe a market where the supply side is years ahead of the demand side. Which is unusual. Normally in enterprise software the customers are screaming for a capability the vendors cannot build fast enough. Here the capability shipped and the customers cannot get it into production.</p>
+<p>The reasons are dull and structural. Telemetry lives in four tools that do not share identity. Half the services have no owner tag, so a correlator that groups by ownership groups by nothing. And nobody in operations will let software touch production without an approval workflow and an audit trail, which most of these features shipped without. Black box output does not get adopted, it gets ignored politely.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" alt="A monitoring dashboard showing charts and metrics on a laptop screen" loading="lazy" /><figcaption>The dashboards got smarter. The organisations around them mostly did not, which is why 49 percent of AI in operations is still a pilot.</figcaption></figure>
+
+<h2>Five levels, and where the industry actually sits</h2>
+<p>Vendor comparisons collapse when "has AI" is one column. It isn't one capability, it's five, and every platform is at a different level on each. I use this ladder when I'm reviewing a platform, and it cuts through a surprising amount of marketing.</p>
+
+<table class="ctable">
+  <thead><tr><th>Level</th><th>Capability</th><th>Industry state</th><th>Honest read</th></tr></thead>
+  <tbody>
+    <tr><th>1</th><td>Statistical anomaly detection and forecasting</td><td>Mature, universal</td><td>Genuinely solved. Table stakes since about 2020.</td></tr>
+    <tr><th>2</th><td>Alert correlation and noise reduction</td><td>Mature, quality varies wildly</td><td>Works when your metadata is clean. Confident nonsense when it isn't.</td></tr>
+    <tr><th>3</th><td>Natural language query and summarisation</td><td>Shipped everywhere, shallow</td><td>Saves you learning PromQL. Rarely changes an outcome.</td></tr>
+    <tr><th>4</th><td>Agentic investigation and root cause</td><td>GA during 2026, early</td><td>The real frontier. Impressive and inconsistent in equal measure.</td></tr>
+    <tr><th>5</th><td>Autonomous remediation</td><td>Demo, plus a few narrow runbooks</td><td>Almost nobody is doing this unsupervised on production.</td></tr>
+  </tbody>
+</table>
+
+<p>Notice that levels 1 through 3 cover almost everything on a vendor's AI feature page, and none of it is a differentiator anymore. The whole competitive fight is happening at level 4.</p>
+
+<h2>Vendor by vendor, without the press release voice</h2>
+
+<h3>Dynatrace</h3>
+<p>The most mature, and it is not especially close on pedigree. Davis has been running causal analysis in production since 2017, which means Dynatrace was doing this while competitors were still calling it machine learning in a footnote. The architecture matters more than the age: Davis works off Smartscape, a live dependency map, and does causation rather than correlation, so it hands you one probable root cause with a visible evidence chain instead of a ranked list of things that looked weird at the same moment.</p>
+<p>They now describe it as hypermodal, which is marketing language for stacking predictive, causal and generative AI together, with Davis CoPilot as the conversational layer on top. Skepticism is warranted about the label. The underlying causal engine is the real asset and it is the one thing in this whole space I have consistently seen engineers trust, because it can show its work.</p>
+
+<h3>Datadog</h3>
+<p>The fastest mover, and the most aggressive on the agentic frontier. Watchdog has done broad always-on anomaly surfacing for years and it is good at breadth, weaker at causation, since it leans statistical where Davis leans deterministic. The interesting thing is Bits AI SRE, which is currently the strongest agentic investigator among the general purpose platforms and, notably, is priced per investigation.</p>
+<p>That pricing model tells you something. Per investigation billing means Datadog knows you will not point this at every alert, so they built the commercial model around aiming it at your noisiest critical alerts first. It's an unusually honest piece of packaging for an AI feature. Datadog also shipped a remote MCP server that went GA on 10 March 2026, which turned out to matter more than the assistant itself.</p>
+
+<h3>Grafana</h3>
+<p>The most transparent, by a distance. Grafana Assistant does natural language querying and ML anomaly detection like everyone else, and at GrafanaCON on 21 April 2026 they went after what they called the AI blind spot with new tooling for agent telemetry. But the thing that earned them credibility was open sourcing <a href="/blog/o11y-bench-grafana-ai-agent-observability-benchmark">o11y-bench</a>, a benchmark that grades AI agents on 63 real observability tasks against a live Prometheus, Loki and Tempo stack.</p>
+<p>Publishing a public exam that your own product can fail is not normal vendor behaviour. It is also the single most useful thing anyone in this market did in 2026.</p>
+
+<h3>New Relic</h3>
+<p>Solid, unshowy, well placed for mid-size teams. NRAI handles conversational querying and anomaly detection, and their SRE Agent is built around where triage actually happens, which is Slack and Zoom rather than a vendor console nobody has open at 2am. That's a smaller ambition than Datadog's and probably a more realistic one. Price to performance remains their strongest argument and the AI features are priced to not be a separate negotiation.</p>
+
+<h3>The rest of the field</h3>
+<p>Splunk has enormous data platform power and an AI layer that has never quite matched the platform underneath it. Elastic's AI Assistant is competent and benefits from the search heritage. Honeycomb's Query Assistant was arguably first to natural language querying and remains tightly scoped, which is a compliment. Chronosphere leans on differential diagnosis, which is a genuinely good technique and undersold. IBM Instana and LogicMonitor both have credible correlation and both suffer from being evaluated against Dynatrace on causation, where the gap shows.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1280&q=80" alt="A close-up of a circuit board with dense components" loading="lazy" /><figcaption>MCP turned every observability platform into a set of tool calls. That reframing did more for AI in operations than any assistant shipped in the same window.</figcaption></figure>
+
+<h2>MCP changed the shape of the question</h2>
+<p>The most consequential thing that happened in 2026 was not an assistant. By the first quarter, most major observability vendors had shipped MCP servers exposing logs, metrics, traces, incidents and deployments as tool calls that any agent could invoke. Datadog's went GA on 10 March. Grafana's covers Prometheus, Loki and Tempo and landed early in the year. OpenObserve, IBM Instana and OneUptime followed.</p>
+<p>Think about what that does to the competitive story. For a decade every vendor sold a destination, a place where you go to look at things. MCP turns them into a source that something else queries. The Azure SRE Agent went GA in April 2026 with over 1,300 agents deployed inside Microsoft and more than 35,000 incidents mitigated, and the AWS DevOps Agent went GA the same month. Both of them reach observability platforms through MCP.</p>
+<p>So the platform's own assistant now competes with a cloud provider's agent using the platform's own data. If your vendor's AI story is entirely about their chat window, that is a strategically weak position and I would push them on it during renewal.</p>
+
+<h2>The benchmark that spoiled the party</h2>
+<p>Every vendor demo of agentic investigation looks the same. Synthetic outage, clean root cause, applause. o11y-bench was the first attempt to grade this neutrally, and the results reset expectations fast.</p>
+<p>The headline metric is Pass^3, the average across three runs rather than best of three, which grades consistency instead of luck. Best result so far is 79.4 percent. On plain Grafana API calls, agents hit 100 percent. On dashboard tasks, where the agent has to change something rather than read something, the top score falls to 57 percent.</p>
+<p>That split is the whole story of AI maturity in observability in one pair of numbers. Reading telemetry is close to solved. Acting on it safely is not. Which is exactly why level 5 on the ladder above is still demoware, and why every sensible deployment I've seen keeps a human on the approval step.</p>
+
+<h2>So, has it actually adopted AI?</h2>
+<p>Yes at the product layer, no at the practice layer, and the gap between those two is where most of the disappointment lives. The tooling genuinely incorporates AI. Anomaly detection and correlation are mature and dull. Natural language querying is everywhere and mostly convenient rather than transformative. Agentic investigation is real, new, and about 79 percent reliable on a good day.</p>
+<p>If you're evaluating platforms, stop asking whether they have AI. Ask which of the five levels they are actually strong at, ask them to show you the reasoning chain rather than the conclusion, ask whether their MCP server exists so your own agents are not locked out, and ask what happens when the metadata is imperfect. Because it will be.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>Observability vendors have adopted AI properly at levels 1 to 3 and are actively building level 4. Customers have not: roughly 4 percent operationalised, half still piloting. The bottleneck is not model quality, it is fragmented telemetry, missing ownership metadata and absent approval workflows, and no vendor can fix those for you. Buy for the causal engine and the MCP surface, not the chat window. Then go clean up your tags, because that is the actual prerequisite everyone keeps skipping.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.logicmonitor.com/resources/2026-observability-ai-trends-outlook" target="_blank" rel="noopener">2026 Observability &amp; AI Outlook, LogicMonitor</a></li>
+  <li><a href="https://www.logicmonitor.com/blog/observability-ai-trends-2026" target="_blank" rel="noopener">5 Observability &amp; AI Trends for 2026, LogicMonitor</a></li>
+  <li><a href="https://www.datadoghq.com/product/ai/mcp-server/" target="_blank" rel="noopener">Datadog MCP Server</a></li>
+  <li><a href="https://grafana.com/press/2026/04/21/grafana-labs-targets-the-ai-blind-spot-with-new-observability-tools-announced-at-grafanacon-2026/" target="_blank" rel="noopener">GrafanaCON 2026 announcement, Grafana Labs</a></li>
+  <li><a href="https://github.com/grafana/o11y-bench" target="_blank" rel="noopener">grafana/o11y-bench on GitHub</a></li>
+  <li><a href="https://logz.io/blog/observability-predictions-2026/" target="_blank" rel="noopener">2026 Observability Predictions, Logz.io</a></li>
+</ul>
+    `
   }
 ];

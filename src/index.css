@@ -3428,13 +3428,16 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .front-page { padding: 26px 0 8px; }
 .front-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   border: 1px solid var(--glass-border);
   border-radius: 6px;
   overflow: hidden;
 }
-.front-desk { padding: 22px 26px 20px; border-right: 1px solid var(--glass-border); min-width: 0; }
-.front-wire { background: var(--glass-bg); padding: 20px 22px 18px; min-width: 0; display: flex; flex-direction: column; }
+.front-desk { padding: 22px 26px 20px; min-width: 0; }
+.front-wire {
+  background: var(--glass-bg); padding: 20px 22px 18px; min-width: 0;
+  display: flex; flex-direction: column; border-right: 1px solid var(--glass-border);
+}
 
 .front-kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
 .front-kicker-label { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
@@ -3451,7 +3454,7 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 }
 @media (prefers-reduced-motion: reduce) { .front-wire-dot.is-live { animation: none; } }
 
-/* --- the analysis desk (left) --- */
+/* --- the analysis desk (right) --- */
 .front-lead { display: block; text-decoration: none; color: inherit; }
 .front-lead-banner { position: relative; border-radius: 4px; overflow: hidden; aspect-ratio: 21 / 9; margin-bottom: 14px; border: 1px solid var(--glass-border); }
 .front-lead-banner .feed-blog-banner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -3487,7 +3490,7 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 .front-more:hover { text-decoration: underline; text-underline-offset: 3px; }
 .front-more--wire { color: var(--cyan); }
 
-/* --- the wire (right) --- */
+/* --- the wire (left) --- */
 .front-wire-list { list-style: none; margin: 0; padding: 0; flex: 1; }
 .front-wire-item { display: block; padding: 9px 0; border-bottom: 1px solid var(--glass-border); text-decoration: none; color: inherit; }
 .front-wire-list li:last-child .front-wire-item { border-bottom: 0; }
@@ -3500,8 +3503,8 @@ html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 /* --- responsive: wire-first on phones, desk below --- */
 @media (max-width: 900px) {
   .front-grid { grid-template-columns: 1fr; }
-  .front-desk { border-right: 0; padding: 20px 18px 18px; }
-  .front-wire { order: -1; border-bottom: 1px solid var(--glass-border); padding: 16px 18px 14px; }
+  .front-desk { padding: 20px 18px 18px; }
+  .front-wire { border-right: 0; border-bottom: 1px solid var(--glass-border); padding: 16px 18px 14px; }
   .front-wire-list li:nth-child(n + 6) { display: none; }
   .front-rail-cat { min-width: 78px; }
   .masthead-band { padding: 18px 0 16px; }

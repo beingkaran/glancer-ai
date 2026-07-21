@@ -29,8 +29,8 @@ import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
 
 export default function App() {
-  // Dark is the default; light remains available via the toggle.
-  const [theme, setTheme] = useState('dark');
+  // Light is the default; dark remains available via the toggle.
+  const [theme, setTheme] = useState('light');
   const { pathname, state } = useLocation();
 
   useEffect(() => {
