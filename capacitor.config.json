@@ -2,25 +2,25 @@
   "appId": "com.glancerai.app",
   "appName": "Glancer AI",
   "webDir": "dist",
-  "backgroundColor": "#000814",
+  "backgroundColor": "#F6F6F6",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 1200,
-      "backgroundColor": "#000814",
+      "backgroundColor": "#F6F6F6",
       "showSpinner": false,
       "androidScaleType": "CENTER_CROP"
     },
     "StatusBar": {
-      "style": "DARK",
-      "backgroundColor": "#000814",
+      "style": "LIGHT",
+      "backgroundColor": "#F6F6F6",
       "overlaysWebView": false
     }
   },
   "ios": {
     "contentInset": "always",
-    "backgroundColor": "#000814"
+    "backgroundColor": "#F6F6F6"
   },
   "android": {
-    "backgroundColor": "#000814"
+    "backgroundColor": "#F6F6F6"
   }
 }

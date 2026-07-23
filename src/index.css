@@ -2063,6 +2063,49 @@ html[data-platform="android"] .greeting-cta:active { transform: scale(0.97); fil
 /* Android's font renders a touch heavier — nudge body weight down for parity. */
 html[data-platform="android"] body { -webkit-font-smoothing: auto; }
 
+/* ---- Bottom tab bar (native shells only) ------------------------------- */
+/* Rendered by components/NativeTabBar.jsx, which returns null on the web, so
+   none of this applies to the website. Primary navigation lives here; the
+   masthead's hamburger stays as the overflow menu for Events, Glossary,
+   AI Tools and the legal pages. */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 900;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--glass-bg);
+  border-top: 1px solid var(--glass-border);
+  padding-bottom: env(safe-area-inset-bottom);
+  backdrop-filter: blur(18px) saturate(120%); -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+.tabbar-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  /* 56px is the Material minimum for a bottom-nav target; thumbs are imprecise. */
+  min-height: 56px; padding: 7px 2px 6px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--text-muted); text-decoration: none;
+  font-family: var(--font-body);
+  transition: color 0.14s ease;
+}
+.tabbar-item.is-active { color: var(--accent); }
+.tabbar-item:active { background: var(--surface-hover); }
+.tabbar-icon { position: relative; display: block; width: 22px; height: 22px; }
+.tabbar-icon svg { width: 100%; height: 100%; display: block; }
+.tabbar-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.02em; line-height: 1; }
+.tabbar-badge {
+  position: absolute; top: -5px; right: -7px; min-width: 15px; height: 15px;
+  display: flex; align-items: center; justify-content: center; padding: 0 4px;
+  background: var(--accent); color: #fff;
+  font-family: var(--font-mono); font-size: 0.56rem; font-weight: 700;
+  border-radius: var(--border-radius-pill);
+}
+
+/* Content has to clear the bar, or the last card sits under it forever. */
+html.is-native body { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+html.is-native .footer { padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
+
+/* The horizontal pillar row duplicates the tabs inside the app — drop it and
+   give the masthead back the vertical space. */
+html.is-native .masthead-pillars { display: none; }
+
 /* ─────────────────────────────────────────────────────────────────────────
    Full-screen news carousel — opens when a news card is tapped (desktop +
    mobile). One story per slide, swiped horizontally; arrows + dots aid nav.

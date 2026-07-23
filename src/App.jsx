@@ -25,8 +25,10 @@ import TermsPage from './pages/TermsPage';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import NativeTabBar from './components/NativeTabBar';
 import CookieConsent, { getCookieConsent } from './components/CookieConsent';
 import { recordHit } from './lib/analytics';
+import { syncNativeTheme } from './lib/nativeApp';
 
 export default function App() {
   // Light is the default; dark remains available via the toggle.
@@ -35,6 +37,8 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    // Repaint the native status bar to match (no-op on the web build).
+    syncNativeTheme(theme);
   }, [theme]);
 
   // Scroll to top on route change — except in-feed page switches (/ ↔ /news ↔
@@ -98,6 +102,9 @@ export default function App() {
       </main>
 
       {!isAdmin && <Footer />}
+
+      {/* Bottom tab bar — renders only inside the Capacitor shells. */}
+      {!isAdmin && <NativeTabBar />}
 
       {/* One-time newsletter invite for unsigned visitors (fires after ~1 min). */}
       <NewsletterPopup />

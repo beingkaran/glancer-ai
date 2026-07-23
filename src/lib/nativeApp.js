@@ -3,9 +3,10 @@
  *
  *  - Tags <html data-platform="ios|android|web"> so CSS can opt into
  *    platform-specific styling (safe-area insets, native fonts, ripples).
- *  - Inside the Capacitor shells it themes the native status bar to match the
- *    space-black UI, hides the splash once React has painted, and makes the
- *    Android hardware back button behave (go back, or minimise at the root).
+ *  - Inside the Capacitor shells it hides the splash once React has painted and
+ *    makes the Android hardware back button behave (go back, or minimise at the
+ *    root). Status-bar theming lives in syncNativeTheme below, because it has to
+ *    re-run whenever the user toggles light/dark rather than once at startup.
  *
  * Everything is guarded so the same call is a near no-op on the plain web build
  * (Capacitor.getPlatform() === 'web'), keeping the website dependency-light.
@@ -21,16 +22,9 @@ export function initNativeApp() {
 
   root.classList.add('is-native');
 
-  // Theme the native status bar + dismiss the splash once we're interactive.
+  // Dismiss the splash once we're interactive. The status bar is themed
+  // separately by syncNativeTheme, which App calls whenever the theme changes.
   (async () => {
-    try {
-      const { StatusBar, Style } = await import('@capacitor/status-bar');
-      await StatusBar.setStyle({ style: Style.Dark });
-      if (platform === 'android') {
-        await StatusBar.setBackgroundColor({ color: '#000814' });
-      }
-    } catch { /* plugin unavailable — ignore */ }
-
     try {
       const { SplashScreen } = await import('@capacitor/splash-screen');
       await SplashScreen.hide();
@@ -48,4 +42,26 @@ export function initNativeApp() {
       });
     } catch { /* ignore */ }
   })();
+}
+
+/*
+ * Keep the native status bar in step with the in-app theme. Called by App on
+ * every theme change, so toggling to dark inside the app repaints the system
+ * bar too instead of leaving a light strip above a dark page.
+ *
+ * Capacitor's Style is named for the CONTENT, not the background:
+ *   Style.Light = dark text, for a light background
+ *   Style.Dark  = light text, for a dark background
+ * which reads backwards the first time and is worth the comment.
+ */
+export async function syncNativeTheme(theme) {
+  if (!Capacitor.isNativePlatform()) return;
+  const dark = theme === 'dark';
+  try {
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    await StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light });
+    if (Capacitor.getPlatform() === 'android') {
+      await StatusBar.setBackgroundColor({ color: dark ? '#000814' : '#F6F6F6' });
+    }
+  } catch { /* plugin unavailable — ignore */ }
 }

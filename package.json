@@ -11,7 +11,11 @@
     "build:vite": "vite build",
     "build:infographic": "python3 scripts/generate-glossary-infographic.py",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android:add": "cap add android",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:run": "npm run android:sync && cap run android"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
