@@ -3917,5 +3917,102 @@ export const BLOG_POSTS = [
   <li><a href="https://logz.io/blog/observability-predictions-2026/" target="_blank" rel="noopener">2026 Observability Predictions, Logz.io</a></li>
 </ul>
     `
+  },
+  {
+    id: 'telemetry-pipeline-control-plane-land-grab-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1538474705339-e87de81450e8?auto=format&fit=crop&w=1600&q=80',
+    title: 'The Telemetry Pipeline Went Free in April. Nobody Gives Away Something That Valuable',
+    subtitle: 'Edge Delta made pipelines free at any throughput on 8 April. Dynatrace agreed to buy Bindplane the next day. Those look like opposite bets and they are exactly the same bet, which is that whoever controls the pipe controls whether you can ever leave.',
+    category: 'Observability',
+    icon: '🚰',
+    bgGradient: 'linear-gradient(135deg, #0a1410 0%, #1d5648 55%, #4ad6a8 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-23',
+    readTime: 10,
+    tags: ['telemetry pipelines', 'Cribl', 'Edge Delta', 'Dynatrace', 'Bindplane', 'OpenTelemetry', 'cost', 'vendor lock-in'],
+    featured: true,
+    faq: [
+      { q: 'What is a telemetry pipeline?', a: 'A telemetry pipeline sits between your agents and your observability backend. It intercepts logs, metrics and traces at the edge, then filters out noise, normalises formats across environments, enriches events with context like team ownership, masks sensitive fields for compliance, and routes each stream to whichever destination you choose. Because it decides what actually reaches a per-GB backend, it is the main lever teams have on observability spend.' },
+      { q: 'Why did Edge Delta make its telemetry pipelines free?', a: 'Edge Delta announced on 8 April 2026 that Telemetry Pipelines carries no throughput charge at any volume, including petabyte scale, with no seat fees or pipeline usage charges. It still bills for data stored in its platform and for AI tokens consumed. The pipeline is the funnel into the products that do carry a price, so giving away the funnel is a distribution strategy rather than a discount.' },
+      { q: 'Does OpenTelemetry protect you from vendor lock-in?', a: 'Only partly. OTel makes your instrumentation portable, so you will not re-instrument services to switch backends. But your routing rules, sampling policy, enrichment logic and redaction config live in the pipeline layer, and those are not covered by the OTel spec in any portable way. If a backend vendor owns your pipeline, the switching cost moved rather than disappeared.' },
+    ],
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Two moves, one week, April 2026. Edge Delta made its Telemetry Pipelines free at any throughput on the 8th. Dynatrace signed to acquire <strong>Bindplane</strong>, an OpenTelemetry-based pipeline company, a day later.</li>
+    <li>Both are the same play. The pipeline is not where the revenue is, it is where the <strong>control</strong> is, and control of the pipe decides what your backend ever sees.</li>
+    <li>Cribl proved the thesis first and got to a $3.5B valuation doing it, reaching $100M ARR in under four years by cutting Splunk bills 30 to 90 percent.</li>
+    <li>OTel gave you portable instrumentation, not portable operations. Your sampling rules, enrichment and redaction config are the real switching cost now, and almost nobody has them in version control.</li>
+  </ul>
+</div>
+
+<h2>Two announcements, nine days apart</h2>
+<p>On 8 April 2026, Edge Delta said its Telemetry Pipelines product was free. Not free up to a tier, not free for a trial. Free at petabyte throughput, no per-GB licence, no seat fees, no pipeline usage charge. CEO Ozan Unlu framed it as removing "the last barrier" to their agentic product.</p>
+<p>The next day Forbes ran a piece on Dynatrace signing a definitive agreement to buy Bindplane, a telemetry pipeline company built on OpenTelemetry, with the deal expected to close that same month.</p>
+<p>One vendor gave the pipeline away. The other paid money to own one. Those read as opposite bets and they are not, they are the same bet placed from two directions.</p>
+
+<h2>What the pipe does, quickly</h2>
+<p>If you have not touched this layer, it sits between your agents and your backend. It intercepts telemetry at the edge before anything reaches a platform that charges by the gigabyte, and then it does five unglamorous jobs: drops the noise, normalises formats across environments that never agreed on anything, enriches events with context like which team owns the service, masks the fields your compliance people care about, and routes whatever survives to one or more destinations.</p>
+<p>That last word is the one to sit with. Routes. To destinations, plural.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1773517459098-5211082374a4?auto=format&fit=crop&w=1280&q=80" alt="An old telephone switchboard covered in patch wires" loading="lazy" /><figcaption>A pipeline is a switchboard. Whoever holds the patch cables decides which calls connect, and more to the point, which ones never do.</figcaption></figure>
+
+<h2>Free is a position, not a gift</h2>
+<p>Read the Edge Delta pricing change carefully and the shape of it is obvious. Throughput is free. Storage inside their platform is not, and AI tokens are not. So the thing they stopped charging for is the thing that decides how much of the thing they do charge for ends up flowing to them.</p>
+<p>I don't say that cynically, it is a perfectly rational move and arguably a good deal if you were already paying per GB to push data around. But calling it generosity misreads it. A pipeline you did not pay for is a pipeline you have less reason to rip out, and every day it runs it is quietly making routing decisions on your behalf.</p>
+<p>The tell is always the same. When a company gives away the layer that everything else has to pass through, they have worked out that the layer is worth more as a position than as a product.</p>
+
+<h2>Dynatrace buying its way upstream</h2>
+<p>The Bindplane deal is the more interesting of the two, because Dynatrace is a backend. They sell the destination. Buying the pipe that feeds destinations puts them in a slightly awkward spot and they clearly decided it was worth it.</p>
+<p>Their stated logic is hard to argue with: a platform is only as good as the data it receives, and AI features are especially unforgiving about input quality. A correlator fed half-labelled telemetry produces confident nonsense, which I've written about before. If your analysis layer keeps getting garbage, fixing it at the analysis layer is the wrong end of the problem.</p>
+<p>Here's the part I'd watch. Bindplane's value to customers was partly that it routed anywhere, including to Dynatrace's competitors. If that stays genuinely open after the acquisition, fine, the strategy is about data quality. If routing to a rival quietly gets worse, less documented, slower to support, then the acquisition was about closing a door, and everyone who standardised on Bindplane finds out the hard way. I'd give it four quarters before you can tell which.</p>
+
+<h2>Cribl got there first</h2>
+<p>None of this is new. It's just newly urgent. Cribl built an entire company on being the neutral party in the middle, and the numbers are not small: a $3.5B valuation, roughly a quarter of the Fortune 500 as customers, $100M ARR inside four years. The original pitch was almost rude in its simplicity, which was that they'd cut your Splunk bill by 30 to 90 percent by throwing away metadata nobody reads.</p>
+<p>That worked because Cribl had no dog in the fight about where your data landed. They made money whichever backend you kept.</p>
+<p>Although, worth noting, they went backwards into storage themselves with Cribl Lake in 2024. Once your pipeline vendor also sells you a place to keep the data, the neutrality argument gets a little softer. Not gone. Softer.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1763315156830-07870b159121?auto=format&fit=crop&w=1280&q=80" alt="A worker feeding blue material onto an industrial conveyor belt" loading="lazy" /><figcaption>Sorting happens before the expensive part. Every gigabyte you drop at the edge is one you never pay a backend to index, store and forget about.</figcaption></figure>
+
+<h2>The lock-in moved and most teams missed it</h2>
+<p>Here is the thing that actually bothers me about all this. For years the answer to vendor lock-in was OpenTelemetry, and that answer was correct as far as it went. Instrument once against an open standard, and switching backends no longer means re-instrumenting three hundred services. Real progress. I've argued before that <a href="/blog/opentelemetry-table-stakes-what-comes-after">OTel became table stakes</a> and the interesting fight moved a layer up.</p>
+<p>What I underrated is that it also moved a layer <em>down</em>.</p>
+<p>Your instrumentation is portable now. Your operational config is not. The sampling policy that decides which traces survive, the enrichment rules that attach team and cost-centre labels, the redaction patterns that keep card numbers out of logs, the routing tree that sends security events one way and debug noise to cold storage. None of that is covered by the OTel spec in any portable form. It lives in your pipeline vendor's config language, and rebuilding it is weeks of careful work that nobody budgets for because nobody thinks of it as an asset.</p>
+
+<table class="ctable">
+  <thead><tr><th>Who owns your pipeline</th><th>What you get</th><th>What it costs you</th></tr></thead>
+  <tbody>
+    <tr><th>Your backend vendor</th><td>One throat to choke, tight integration, usually bundled</td><td>The routing decisions of the company that bills you per GB</td></tr>
+    <tr><th>An independent (Cribl, Edge Delta)</th><td>Genuine multi-destination routing, real negotiating leverage</td><td>Another vendor, another contract, config in their dialect</td></tr>
+    <tr><th>You, on OTel Collector or Grafana Alloy</th><td>Config you own outright, no licence, full portability</td><td>You are now operating a distributed system that can drop data</td></tr>
+  </tbody>
+</table>
+
+<h2>What I would actually do about it</h2>
+<p>Not "rip out your pipeline". That's the sort of advice that sounds decisive and gets ignored, correctly.</p>
+<p>Start smaller. Go find where your pipeline configuration currently lives and check whether it is in version control. In a lot of shops it is a set of rules somebody built in a web UI two years ago and the person who built it has since left. If that describes you, the vendor question is academic, because you couldn't migrate anywhere regardless of who owns the tool.</p>
+<p>Then write down what your pipeline is doing in plain language, one page. What gets dropped, what gets sampled and at what rate, what gets masked, where each stream lands. The number of teams who can produce that page on request are smaller than you'd guess, and the exercise of trying is usually where somebody finds a rule from 2023 which is silently discarding a log stream that a compliance audit assumes exists.</p>
+<p>After that, the vendor choice is a normal commercial decision instead of a hostage situation. If your backend vendor's pipeline is free and your config is portable, take the free thing, you can leave. If your config only exists inside their UI, the free thing isn't free, you just haven't been invoiced yet.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>April 2026 was the month the telemetry pipeline stopped being a cost-cutting utility and became the thing vendors buy and give away to hold a position. Edge Delta went free on throughput and kept charging for storage and tokens. Dynatrace bought Bindplane to control what reaches its own AI. Cribl showed everyone the layer was worth $3.5B. Your defence is not picking the right vendor, it's owning your pipeline config in git and being able to say on one page what it does. Teams that can do that get to treat this as shopping. Teams that can't are just finding out who their landlord is.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://www.forbes.com/sites/stevemcdowell/2026/04/09/dynatrace-moves-upstream-bindplane-acquisition-targets-data-control/" target="_blank" rel="noopener">Dynatrace Moves Upstream: Bindplane Acquisition Targets Data Control, Forbes</a></li>
+  <li><a href="https://www.prnewswire.com/news-releases/edge-delta-makes-all-telemetry-pipelines-data-throughput-limitless-and-free-for-all-customers-302736808.html" target="_blank" rel="noopener">Edge Delta makes Telemetry Pipelines throughput free, PR Newswire</a></li>
+  <li><a href="https://sacra.com/c/cribl/" target="_blank" rel="noopener">Cribl revenue, valuation and funding, Sacra</a></li>
+  <li><a href="https://cribl.io/blog/the-observability-pipeline/" target="_blank" rel="noopener">What is an observability pipeline, Cribl</a></li>
+  <li><a href="https://opentelemetry.io/docs/collector/" target="_blank" rel="noopener">OpenTelemetry Collector documentation</a></li>
+</ul>
+    `
   }
 ];
