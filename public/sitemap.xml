@@ -3,148 +3,155 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://glancerai.com/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://glancerai.com/ai-tools</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://glancerai.com/metrics</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/events</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/glossary</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image><image:loc>https://glancerai.com/glossary-infographic.jpg</image:loc><image:title>AI, AIOps &amp; Observability Glossary Map — 2,200+ Terms</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/faq</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://glancerai.com/about</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://glancerai.com/privacy</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://glancerai.com/terms</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topics</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/openai</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/anthropic</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/google-gemini</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/meta-ai</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/microsoft-ai</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/nvidia</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/mistral</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/ai-agents</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/image-generation</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/coding-assistants</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/rag</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/aiops</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/observability</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://glancerai.com/topic/apm</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/grafana-cloud-vs-datadog-open-source-tco-2026</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>Grafana Cloud vs Datadog (2026): When Open-Source-First Actually Wins</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/opentelemetry-table-stakes-what-comes-after</loc>
@@ -385,6 +392,13 @@
     <image:image><image:loc>https://glancerai.com/blog-banners/comparison-bars.jpg</image:loc><image:title>Datadog vs New Relic (2026): The Definitive Head-to-Head</image:title></image:image>
   </url>
   <url>
+    <loc>https://glancerai.com/blog/datadog-vs-dynatrace-deep-comparison-2026</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison.jpg</image:loc><image:title>Datadog vs Dynatrace (2026): The Head-to-Head Every Platform Team Is Actually Googling</image:title></image:image>
+  </url>
+  <url>
     <loc>https://glancerai.com/blog/datadog-vs-appdynamics-cloudnative-vs-enterprise</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -407,10 +421,10 @@
   </url>
   <url>
     <loc>https://glancerai.com/blog/ultimate-apm-comparison-datadog-newrelic-splunk-appdynamics-broadcom-2026</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-podium.jpg</image:loc><image:title>The Ultimate APM Comparison 2026: Datadog, New Relic, Splunk, AppDynamics &amp; Broadcom DX APM</image:title></image:image>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-podium.jpg</image:loc><image:title>The Ultimate APM Comparison 2026: Datadog, Dynatrace, New Relic, Splunk, AppDynamics &amp; Broadcom DX APM</image:title></image:image>
   </url>
   <url>
     <loc>https://glancerai.com/blog/ai-observability-beginner-intro</loc>
@@ -460,5 +474,26 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&amp;fit=crop&amp;w=1200&amp;h=675&amp;q=80</image:loc><image:title>One App, Four Models, No Idea What Anything Costs: Multi-Model Cost Attribution Is the Ugly Problem of 2026</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/o11y-bench-grafana-ai-agent-observability-benchmark</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://glancerai.com/blog-banners/comparison-podium.jpg</image:loc><image:title>o11y-bench: Grafana Just Built the Exam Your AI SRE Agent Will Fail</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/has-observability-actually-adopted-ai-vendor-maturity-2026</loc>
+    <lastmod>2026-07-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>Has Observability Actually Adopted AI, or Just Rebranded Around It?</image:title></image:image>
+  </url>
+  <url>
+    <loc>https://glancerai.com/blog/telemetry-pipeline-control-plane-land-grab-2026</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image><image:loc>https://images.unsplash.com/photo-1538474705339-e87de81450e8?auto=format&amp;fit=crop&amp;w=1600&amp;q=80</image:loc><image:title>The Telemetry Pipeline Went Free in April. Nobody Gives Away Something That Valuable</image:title></image:image>
   </url>
 </urlset>

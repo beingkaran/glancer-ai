@@ -1,6 +1,92 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'grafana-cloud-vs-datadog-open-source-tco-2026',
+    bannerImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=675&q=80',
+    title: 'Grafana Cloud vs Datadog (2026): When Open-Source-First Actually Wins',
+    subtitle: "Everyone quotes the sticker price. Nobody quotes the engineer-hours. This is a practitioner read on Grafana Cloud and the LGTM stack against Datadog's turnkey platform, modeled on a real 200-host estate, including the headcount cost that the free-tier crowd keeps leaving off the spreadsheet.",
+    category: 'Comparison',
+    icon: '📉',
+    bgGradient: 'linear-gradient(135deg, #1a1206 0%, #6b3a12 55%, #f97316 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-24',
+    readTime: 11,
+    tags: ['Grafana', 'Datadog', 'observability', 'cost', 'TCO', 'open source', 'Loki', 'Prometheus'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>Grafana Cloud looks free and Datadog looks expensive, and both impressions are traps. The real comparison is total cost of ownership, and TCO includes the engineers you pay to run the thing.</li>
+    <li>The LGTM stack (Loki for logs, Grafana for dashboards, Tempo for traces, Mimir for metrics) is genuinely cheaper on the invoice. Where it gets you back is headcount, on-call load, and the weeks nobody budgets for.</li>
+    <li>Datadog's price buys you time. You trade a bigger bill for fewer engineers babysitting the platform, and for a team without spare SRE capacity that trade is often the right one.</li>
+    <li>Pick Grafana Cloud when you have the platform muscle and cardinality discipline to use it. Pick Datadog when your scarce resource is people, not money. The mistake is choosing on the sticker.</li>
+  </ul>
+</div>
+
+<p>This is the piece our <a href="/blog/ultimate-apm-comparison-datadog-newrelic-splunk-appdynamics-broadcom-2026">Ultimate APM Comparison</a> kept dancing around, because "open source is cheaper" is true on the invoice and misleading everywhere else. If you're deep in the Datadog decision already, read this next to our <a href="/blog/datadog-vs-newrelic-deep-comparison-2026">Datadog vs New Relic head-to-head</a> and the <a href="/blog/datadog-vs-dynatrace-deep-comparison-2026">Datadog vs Dynatrace</a> breakdown. Here I only want to answer one question honestly. When does going open-source-first actually save you money, and when does it just move the cost somewhere your finance team can't see it?</p>
+
+<h2>Two different bets, not two versions of the same thing</h2>
+<p>Datadog sells you the whole factory, assembled. One vendor, 800-plus integrations, metrics and logs and traces and RUM and security all sharing a UI, and a bill that shows up every month whether or not anyone touched it. Grafana Cloud sells you a hosted version of an open-source kit you could also run yourself: Mimir holds the metrics, Loki holds the logs, Tempo holds the traces, and Grafana draws it. Same telemetry, very different relationship. With Datadog you're renting an outcome. With Grafana you're renting the parts and supplying some of the labor.</p>
+<p>That labor is the whole argument. Ignore it and the comparison is a rout, Grafana wins on price by a mile. Count it properly and the answer starts depending on who you are.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1280&q=80" alt="A monitoring dashboard showing metrics, charts and trend lines" loading="lazy" /><figcaption>Both platforms end up drawing charts that look about the same. The difference is who keeps the pipeline behind them alive at 3am.</figcaption></figure>
+
+<h2>The bill everyone quotes</h2>
+<p>Start with the numbers people actually paste into Slack. Datadog's list price is roughly $15 per host per month for Infrastructure Pro on an annual commit, and APM is another $31 per host per month, before you add logs at around $0.10 per ingested GB, custom metrics, session replay, and the rest of the SKU sprawl. It adds up fast and it adds up in ways that are hard to predict, because the line item that triples your bill is usually a high-cardinality metric or a chatty debug log nobody remembered shipping.</p>
+<p>Grafana Cloud's free tier is real and it's generous: 10,000 active metric series, 50 GB of logs, 50 GB of traces, 14-day retention, three users. Plenty of small teams live there for a year. The Pro plan is usage-based on top of that, and the per-unit rates undercut Datadog by a wide margin, especially on log volume where Loki's index-light design is structurally cheaper. On the invoice, this is not close.</p>
+<p>But an invoice is not a cost. It's one column of a cost.</p>
+
+<h2>The bill you actually pay</h2>
+<p>Here's the line nobody puts on the comparison slide: the loaded cost of an engineer who understands the stack. Call it $180k to $220k all-in for a mid-senior platform engineer in a US market. If running your own LGTM-flavored setup, even the hosted Grafana Cloud version, quietly consumes a third of one such person, that's $60k to $70k a year that never shows up next to the Grafana invoice. Two of them and you've erased the savings on a mid-size estate before lunch.</p>
+<p>Where does that time go? Cardinality management, mostly. Loki and Mimir are cheap because they push discipline back onto you, and a team that labels everything with a pod ID and a request ID will melt their own ingest and then spend a sprint learning why. Then there's retention tuning, recording rules, alert plumbing that Datadog ships as a checkbox, and the upgrade treadmill. It's hosted so you skip the worst of the ops, the config burden is still yours.</p>
+<p>Datadog's pitch, stripped of marketing, is that you're buying that time back. You pay more and you point fewer people at the platform. For a shop with three SREs and no slack in the rotation, that can be the cheapest decision on the table even though it's the biggest number.</p>
+
+<figure class="blog-figure blog-figure-photo"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1280&q=80" alt="Rows of servers in a data center" loading="lazy" /><figcaption>Loki and Mimir are cheap at the storage layer on purpose. The savings are real, and so is the cardinality discipline they demand in return.</figcaption></figure>
+
+<h2>A 200-host estate, modeled honestly</h2>
+<p>Take a concrete shape: 200 hosts, 50 services, moderate log volume, a team that wants APM and dashboards but isn't doing session replay. Rough, list-price, order-of-magnitude, your mileage will vary.</p>
+<table class="ctable">
+  <thead><tr><th>Cost element</th><th>Datadog</th><th>Grafana Cloud (Pro)</th></tr></thead>
+  <tbody>
+    <tr><th>Infra + APM (200 hosts)</th><td>~$110k / yr list</td><td>usage-based, materially lower</td></tr>
+    <tr><th>Log ingest</th><td>$0.10/GB, climbs fast</td><td>Loki index-light, cheaper per GB</td></tr>
+    <tr><th>Platform engineer time</th><td>~0.1 FTE</td><td>~0.4-0.6 FTE</td></tr>
+    <tr><th>Time to first value</th><td>days</td><td>weeks</td></tr>
+    <tr><th>Bill predictability</th><td>volatile (SKU sprawl)</td><td>volatile (cardinality)</td></tr>
+    <tr><th>Who owns an outage in the tool</th><td>Datadog support</td><td>you, then Grafana support</td></tr>
+  </tbody>
+</table>
+<p>The pattern that falls out: Grafana Cloud wins the licensing column by a lot and gives some of it back in the headcount column, while Datadog inverts that exactly. Neither is a free lunch. The question is which currency you're shorter on, dollars or engineer-hours.</p>
+
+<h2>Where open-source-first genuinely wins</h2>
+<p>Grafana Cloud is the right call more often than Datadog's sales team would like, and it's worth being specific about when. You already run Prometheus and Grafana, so the mental model and the dashboards port over instead of getting rebuilt. You have real platform-engineering muscle and cardinality discipline baked into how teams instrument. You're log-heavy, which is where Loki's cost advantage compounds month over month. Or you have a hard requirement to avoid lock-in, and standardizing on OpenTelemetry plus an OSS backend means you can walk without re-instrumenting a thing, an argument we made in <a href="/blog/opentelemetry-table-stakes-what-comes-after">OpenTelemetry Is Now Table Stakes</a>.</p>
+<p>In all of those, the labor cost is either already sunk or genuinely low, and the invoice savings drop straight to the bottom line. That's the sweet spot, and it's a big one.</p>
+
+<h2>Who should never run the LGTM stack</h2>
+<p>And here's the honest other half. If your SRE headcount is maxed, if nobody on the team wants to own a telemetry pipeline, if you need to be observable by Friday and not by Q4, the open-source savings are a mirage. You'll spend the license difference on burnout and half-finished dashboards. A five-person startup shipping product does not want one of those five people becoming the accidental observability team. Buy Datadog, or buy Grafana's fully-managed hand-holding tier, and put your people on the thing customers pay for.</p>
+<p>The failure mode I've watched most often isn't picking wrong on price. It's a team choosing Grafana for the free tier, then discovering six months in that the free tier cost them a quarter of an engineer they didn't have to spare.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>Grafana Cloud versus Datadog is not cheap versus expensive. It's <strong>where do you want to spend the cost</strong>, on a vendor invoice or on your own payroll. Grafana wins decisively when you already have the platform skills, the cardinality discipline, and a log-heavy workload, because then the labor is nearly free and the savings are real. Datadog wins when your scarce resource is people, and it usually is. Model both columns, license and headcount, on your actual estate before you sign. The teams that regret this decision are the ones who only read the first column.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://grafana.com/pricing/" target="_blank" rel="noopener">Grafana Cloud pricing and free tier</a></li>
+  <li><a href="https://www.datadoghq.com/pricing/" target="_blank" rel="noopener">Datadog pricing</a></li>
+  <li><a href="https://grafana.com/oss/" target="_blank" rel="noopener">Grafana OSS stack: Loki, Mimir, Tempo</a></li>
+  <li><a href="https://opentelemetry.io/docs/" target="_blank" rel="noopener">OpenTelemetry documentation</a></li>
+</ul>
+    `,
+  },
+  {
     id: 'opentelemetry-table-stakes-what-comes-after',
     bannerImage: 'https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'OpenTelemetry Is Now Table Stakes. Here Is What Comes After',
