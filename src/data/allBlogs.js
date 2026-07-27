@@ -1,6 +1,150 @@
 /* Glancer AI  -  Curated Blog Posts */
 export const BLOG_POSTS = [
   {
+    id: 'otel-collector-sending-queue-is-full-fix',
+    bannerImage: '/blog-banners/otel-sending-queue-full.svg',
+    title: "OTel Collector \"sending queue is full\": Finding the Real Bottleneck",
+    subtitle: "The Collector took your telemetry, found no room in the exporter buffer, and dropped it. Everyone bumps queue_size first and everyone watches it fill again. Here is what the four internal metrics tell you, why queue_size stopped counting what you think it counts, and the one retry setting that does more work than the buffer size ever will.",
+    category: 'OpenTelemetry',
+    icon: '🚧',
+    bgGradient: 'linear-gradient(135deg, #10151c 0%, #7c2d12 55%, #f0883e 100%)',
+    author: 'Karan Shah',
+    authorRole: 'Service Delivery Director AIOPS/DATA/AI',
+    authorBio: 'Karan Shah is an engineer and the founder of Glancer AI. He got tired of vendor blogs explaining observability badly and built this site as a free, independent resource for engineers, SREs, and learners who want current, plainly written information without the noise.',
+    authorImage: 'https://glancerai.com/karan.webp',
+    authorLinkedIn: 'https://www.linkedin.com/in/beingkaran/',
+    avatar: 'KS',
+    date: '2026-07-27',
+    readTime: 9,
+    tags: ['OpenTelemetry', 'OTel Collector', 'observability', 'troubleshooting', 'SRE', 'telemetry pipeline', 'exporterhelper'],
+    featured: true,
+    body: `
+<div class="key-takeaways">
+  <h3>What to remember</h3>
+  <ul>
+    <li>The queue is the symptom. It fills because something downstream of it runs slower than your ingest rate, and raising queue_size treats the alarm instead of the fire.</li>
+    <li>Four Collector metrics separate "exporter is slow" from "backend is erroring". Those two need opposite fixes, and the log line looks identical either way.</li>
+    <li>queue_size counts whatever sizer is set to, and sizer defaults to requests. One request can hold five thousand spans or three. Advice written before that field existed will size your queue wrong.</li>
+    <li>retry_on_failure.max_elapsed_time matters more than the buffer. At the 300s default, a backend returning 503s holds every consumer hostage for five minutes while the queue behind them fills.</li>
+  </ul>
+</div>
+
+<p>Your Collector logs <code>sending queue is full</code>. What that means: it accepted your telemetry, tried to hand it to an exporter, found no room in the buffer sitting in front of that exporter, and dropped the data on the floor.</p>
+
+<p>The queue is the symptom. It filled because something downstream of it runs slower than your ingest rate. Raising <code>queue_size</code> is what most people reach for first, and it rarely fixes anything. I have watched a team triple theirs three times in one week and lose the same volume of spans each time.</p>
+
+<h2>What the log line is telling you</h2>
+
+<pre><code>2026-07-27T09:14:22.881Z  error
+Exporting failed. Rejecting data.
+{"kind": "exporter", "data_type": "traces", "name": "otlp/backend",
+ "error": "sending queue is full", "rejected_items": 4096}</code></pre>
+
+<p>Two fields matter.</p>
+
+<p><code>name</code> points at the exporter that is backed up. If you run three exporters and only one of them is logging this, the trouble sits downstream of that one exporter. Nothing about the Collector itself is broken, which is worth knowing before you start editing pipeline config at 2am.</p>
+
+<p><code>rejected_items</code> is real data loss. Those spans were not buffered and they were not delayed. They are gone. No retry brings them back.</p>
+
+<h2>Look at four metrics before you change any config</h2>
+
+<p>The Collector publishes its own metrics on <code>:8888/metrics</code>. Four of them tell you which problem you actually have, and it takes about ninety seconds.</p>
+
+<pre><code># Is the queue pinned at the ceiling, or just spiky?
+otelcol_exporter_queue_size / otelcol_exporter_queue_capacity
+
+# Data rejected at the door, never made it into the queue
+rate(otelcol_exporter_enqueue_failed_spans[5m])
+
+# Data that got in, went out, and failed downstream
+rate(otelcol_exporter_send_failed_spans[5m])
+
+# Receiver-side refusals, a different problem entirely
+rate(otelcol_receiver_refused_spans[5m])</code></pre>
+
+<p>If <code>enqueue_failed</code> climbs while <code>send_failed</code> stays flat, your exporter is working. It is just too slow. If both climb together, the backend is throwing errors and retries are chewing through every consumer slot you have.</p>
+
+<p>Those two situations need opposite fixes. Ninety seconds is cheap.</p>
+
+<p>One thing to rule out first. If <code>otelcol_receiver_refused_spans</code> is the metric moving and your logs say <code>data refused due to high memory usage</code>, you are looking at the <code>memory_limiter</code> processor, not the queue at all. Go check your memory limits and come back.</p>
+
+<h2>queue_size does not count what you think it counts</h2>
+
+<p>This is the part that trips up almost everyone, including me the first time.</p>
+
+<p><code>sending_queue.queue_size</code> is measured in whatever unit <code>sending_queue.sizer</code> is set to, and <code>sizer</code> defaults to <code>requests</code>. The default of 1000 means a thousand incoming requests. Not a thousand spans. Not a thousand fixed-size batches.</p>
+
+<p>One OTLP request from a busy Java service might carry five thousand spans. One request from a sidecar scraping a single quiet pod carries three. Both occupy exactly one slot.</p>
+
+<p>Any post written before that field existed describes the queue as holding "1000 batches", which no longer matches what the config does. Size your queue against average span volume using that old mental model and you will be off by two orders of magnitude in one direction or the other.</p>
+
+<p>Set <code>sizer: items</code> if you want the number to mean spans, data points, and log records.</p>
+
+<h2>A config that fixes the common case</h2>
+
+<pre><code>exporters:
+  otlp/backend:
+    endpoint: collector.example.com:4317
+    timeout: 10s              # per attempt; the 5s default is tight cross-region
+    sending_queue:
+      enabled: true
+      sizer: items            # count spans and data points, not requests
+      queue_size: 200000      # roughly 2 min of buffer at 1600 items/sec, measure your own
+      num_consumers: 20       # parallel senders, useful only if the backend absorbs them
+      batch:
+        flush_timeout: 1s
+        min_size: 8192        # items, inherited from the sizer above
+        max_size: 16384       # splits oversized batches instead of rejecting them
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 120s  # lower than the 300s default, frees consumers faster</code></pre>
+
+<p>That last line does more useful work than the queue size does.</p>
+
+<p>With the default <code>max_elapsed_time</code> of 300 seconds, a backend returning 503s keeps all twenty of your consumers busy retrying the same doomed requests for five straight minutes while the queue behind them fills to the brim. Cutting the retry window frees consumers to drain newer data. You lose the oldest requests rather than losing everything, which is a trade most teams would take if anyone had offered it to them.</p>
+
+<p>Roll the config, then watch <code>otelcol_exporter_queue_size</code> for ten minutes. If it climbs straight back to capacity at the same rate as before, buffer size was never your problem.</p>
+
+<h2>Changing the failure mode instead of the failure rate</h2>
+
+<p>Two settings change what happens when the queue fills, rather than how often it fills.</p>
+
+<p><code>block_on_overflow: true</code> stops the Collector from discarding data and makes the caller wait for space instead. Backpressure travels back up to whatever is sending you telemetry. For logs, where loss is unacceptable, this is usually what you want. For a gateway Collector fronting a few hundred application pods, it usually is not, because you have just converted "the Collector drops spans" into "every application's OTLP client blocks". Ask the app teams before you flip it.</p>
+
+<p><code>storage: file_storage/otc</code> moves the queue onto disk so a Collector restart does not vaporize everything sitting in the buffer. You need the <code>file_storage</code> extension from collector-contrib and a real volume behind it. An <code>emptyDir</code> buys you nothing once the pod gets rescheduled. Two things worth knowing before you turn it on: with persistence enabled there is no in-memory queue at all, and auth extension context is not carried through the queue.</p>
+
+<h2>When none of this helps</h2>
+
+<p>Scaling Collector replicas is the reflex fix and it frequently does nothing at all. The queue is per exporter, per instance. If your bottleneck is a backend ingest quota or a single rate-limited gRPC endpoint, ten replicas each get a smaller slice of the same ceiling, and all ten log the same error. You have spread the pain, not reduced it.</p>
+
+<p>Raising <code>num_consumers</code> against a saturated backend is worse than doing nothing. More concurrent connections mean a larger share of the backend's own queue belongs to you, and vendors that rate limit per connection will start handing back 429s that you then dutifully retry.</p>
+
+<p>A bigger queue is also memory you are holding onto. On a 2 GiB Collector pod with <code>memory_limiter</code> set at 80 percent, a 200,000 item queue full of fat spans can walk you straight into the limiter, which then starts refusing data at the receiver. You have traded one kind of drop for another and made the diagnosis harder, because now both metrics move at once. This is the failure mode I see most often in teams who read half a troubleshooting guide.</p>
+
+<p>Here is the version you learn at 2am, and it is not sophisticated. If the queue only fills between 09:00 and 09:15 on weekdays, nothing about your Collector is broken. Go find whoever deploys at 9am and look at their startup trace volume.</p>
+
+<h2>Where this sits in the bigger picture</h2>
+
+<p>Queue tuning is downstream of a decision most teams never made deliberately, which is how much of their pipeline config lives somewhere they control. If your exporter settings are checked into git next to everything else, this is a ten minute fix and a dashboard. If they exist only inside a vendor UI, you are negotiating rather than engineering. Our piece on the <a href="/blog/telemetry-pipeline-control-plane-land-grab-2026">telemetry pipeline control plane land grab</a> covers why vendors care so much about owning that layer. For the wider argument about what OTel adoption does and does not buy you, <a href="/blog/opentelemetry-default-half-your-stack-still-dark">half your stack is still dark</a> is the honest version.</p>
+
+<div class="verdict">
+  <h3>The bottom line</h3>
+  <p>Put <code>otelcol_exporter_queue_size / otelcol_exporter_queue_capacity</code> on a dashboard and alert when it holds above 0.8 for five minutes. A filling queue is the early warning. The log line is what you get once the data is already gone, and by then the only question left is how much.</p>
+</div>
+
+<h3>Sources</h3>
+<ul>
+  <li><a href="https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md" target="_blank" rel="noopener">OpenTelemetry Collector exporterhelper README</a></li>
+  <li><a href="https://opentelemetry.io/docs/collector/internal-telemetry/" target="_blank" rel="noopener">Collector internal telemetry, OpenTelemetry docs</a></li>
+  <li><a href="https://opentelemetry.io/docs/collector/resiliency/" target="_blank" rel="noopener">Collector resiliency guidance, OpenTelemetry docs</a></li>
+</ul>
+
+<p><em>Config field names reflect the exporterhelper docs as of July 2026. These fields have moved between releases, so check them against the Collector version you have pinned before rolling anything out.</em></p>
+    `
+  },
+  {
     id: 'grafana-cloud-vs-datadog-open-source-tco-2026',
     bannerImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&h=675&q=80',
     title: 'Grafana Cloud vs Datadog (2026): When Open-Source-First Actually Wins',
