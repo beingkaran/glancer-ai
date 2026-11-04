@@ -3448,6 +3448,18 @@ html.is-native .masthead-pillars { display: none; }
 .masthead-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
 .masthead-byline { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin: 0 0 4px; letter-spacing: 0.02em; }
 
+/* Visually hidden, but readable by screen readers and crawlers (SEO H1). */
+.u-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .front-page { padding: 26px 0 8px; }
 .front-grid {
   display: grid;
@@ -3530,8 +3542,11 @@ html.is-native .masthead-pillars { display: none; }
   .front-wire { border-right: 0; border-bottom: 1px solid var(--glass-border); padding: 16px 18px 14px; }
   .front-wire-list li:nth-child(n + 6) { display: none; }
   .front-rail-cat { min-width: 78px; }
-  .masthead-band { padding: 18px 0 16px; }
   .masthead-byline { display: none; }
+  /* Byline is hidden here and the only visible child is the clipped SEO H1,
+     so collapse the band to zero visible height (no padding/border/min-height)
+     instead of display:none, which would drop the H1 from the DOM. */
+  .masthead-band { padding: 0; border-bottom: 0; min-height: 0; }
 }
 
 /* --- live feed rotation + deep-dive entries --- */
