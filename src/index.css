@@ -176,7 +176,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
 .signal-ticker-pulse { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: signalPulse 1.6s infinite; }
 @keyframes signalPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
 .signal-ticker-track { white-space: nowrap; overflow: hidden; flex: 1; position: relative; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
-.signal-ticker-run { display: inline-block; padding-left: 100%; animation: signalTicker 40s linear infinite; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.signal-ticker-run { display: inline-block; padding-left: 100%; animation: signalTicker 80s linear infinite; font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
 .signal-ticker-run .signal-ticker-item {
   margin: 0 26px; display: inline; color: inherit; text-decoration: none;
   cursor: pointer; transition: color 0.16s ease;
@@ -328,21 +328,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   background: linear-gradient(90deg, transparent, var(--glass-border-strong));
   max-width: 48px; flex: 0 1 48px;
 }
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0;
-  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
-}
-.hero-eyebrow-dot {
-  width: 7px; height: 7px; border-radius: 1px; background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.18);
-  animation: heroPulse 2.4s ease-in-out infinite;
-}
-@keyframes heroPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.55; transform: scale(0.88); }
-}
-
 /* Two-column desk layout */
 .hero-grid {
   display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.7fr);
@@ -516,7 +501,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   .hero { padding-top: 18px; padding-bottom: 20px; }
   .hero-masthead { margin-bottom: 22px; }
   .hero-masthead-rule:not(:first-child) { display: none; }
-  .hero-eyebrow { font-size: 0.66rem; letter-spacing: 0.1em; }
   .hero-title-line { font-size: clamp(2rem, 9vw, 2.65rem); }
   .hero-title-accent { font-size: clamp(1.35rem, 6.5vw, 1.85rem); }
   .hero-lead { font-size: 1rem; line-height: 1.62; max-width: none; }
@@ -561,7 +545,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; letter-spac
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-eyebrow-dot { animation: none; }
   .hero-quicklinks--enter { animation: none; }
   .hero-quicklink:hover { transform: none; }
 }
@@ -3463,9 +3446,6 @@ html.is-native .masthead-pillars { display: none; }
 
 .masthead-band { padding: 24px 0 20px; border-bottom: 1px solid var(--glass-border); }
 .masthead-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
-.masthead-copy .hero-eyebrow { margin-bottom: 8px; }
-.masthead-title { font-size: clamp(1.5rem, 3.4vw, 2rem); line-height: 1.18; letter-spacing: -0.01em; }
-.masthead-title-accent { color: var(--accent); font-style: italic; }
 .masthead-byline { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin: 0 0 4px; letter-spacing: 0.02em; }
 
 .front-page { padding: 26px 0 8px; }

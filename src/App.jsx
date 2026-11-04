@@ -31,8 +31,8 @@ import { recordHit } from './lib/analytics';
 import { syncNativeTheme } from './lib/nativeApp';
 
 export default function App() {
-  // Light is the default; dark remains available via the toggle.
-  const [theme, setTheme] = useState('light');
+  // Dark is the default; light remains available via the toggle.
+  const [theme, setTheme] = useState('dark');
   const { pathname, state } = useLocation();
 
   useEffect(() => {
