@@ -99,6 +99,17 @@ export const NEWS_FEEDS = [
   // ── Analyst commentary (Gartner blog network — free; the research reports
   //    themselves are gated, but the public blogs carry APM/observability takes)
   { url: 'https://blogs.gartner.com/feed/', source: 'Gartner Blog Network', category: 'AIOps', frameable: false },
+  // ── AI+observability / APM search + vendor additions (added WITHOUT live
+  //    validation — sandbox network blocks these hosts; limited to stable,
+  //    well-known endpoints. Google News RSS search queries + standard vendor
+  //    feeds. frameable:false is conservative; /api/framecheck decides at read. ──
+  { url: 'https://news.google.com/rss/search?q=AI%20observability&hl=en-US&gl=US&ceid=US:en', source: 'Google News · AI Observability', category: 'AIOps', frameable: false },
+  { url: 'https://news.google.com/rss/search?q=AIOps&hl=en-US&gl=US&ceid=US:en', source: 'Google News · AIOps', category: 'AIOps', frameable: false },
+  { url: 'https://news.google.com/rss/search?q=%22application%20performance%20monitoring%22&hl=en-US&gl=US&ceid=US:en', source: 'Google News · APM', category: 'AIOps', frameable: false },
+  { url: 'https://news.google.com/rss/search?q=(Datadog%20OR%20Dynatrace%20OR%20%22New%20Relic%22%20OR%20Grafana%20OR%20Splunk)%20observability&hl=en-US&gl=US&ceid=US:en', source: 'Google News · Observability Vendors', category: 'AIOps', frameable: false },
+  { url: 'https://www.cncf.io/feed/', source: 'CNCF', category: 'AIOps', frameable: false },
+  { url: 'https://prometheus.io/blog/feed.xml', source: 'Prometheus', category: 'AIOps', frameable: false },
+  { url: 'https://aws.amazon.com/blogs/mt/feed/', source: 'AWS Cloud Operations', category: 'AIOps', frameable: false },
 
   // ── Policy, safety & society (Policy) ────────────────────────────────────
   { url: 'https://www.brookings.edu/topic/artificial-intelligence/feed/', source: 'Brookings', category: 'Policy', frameable: true },

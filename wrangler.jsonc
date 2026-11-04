@@ -12,10 +12,13 @@
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
-  // Daily Cron Trigger (06:00 UTC) → rebuilds the global tech-events feed and
-  // writes it to KV. See worker/index.js `scheduled()` and worker/eventsCore.js.
+  // Cron Triggers → see worker/index.js `scheduled()`:
+  //   "0 6 * * *" (daily 06:00 UTC) rebuilds the global tech-events feed into KV
+  //               (worker/eventsCore.js).
+  //   "0 * * * *" (hourly) rebuilds the news feed into KV (worker/newsCore.js)
+  //               so /api/news serves one deterministic, globally-fresh list.
   "triggers": {
-    "crons": ["0 6 * * *"]
+    "crons": ["0 6 * * *", "0 * * * *"]
   },
   // KV namespace backing the events feed (created via
   // `npx wrangler kv namespace create EVENTS_KV`).

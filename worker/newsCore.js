@@ -143,7 +143,17 @@ function shuffled(arr) {
  * across the hourly rebuilds every source still gets its turn.
  */
 export async function buildRawNews({ perFeedTimeout = 6000, maxFeeds = 45 } = {}) {
-  const feeds = shuffled(NEWS_FEEDS).slice(0, maxFeeds);
+  // Guarantee the observability/APM beat is always fetched. The feed list is now
+  // larger than maxFeeds, so a plain shuffled().slice() could randomly drop every
+  // AIOps feed in a given build. Pin the AIOps feeds (category === 'AIOps',
+  // including the Google-News search + vendor feeds) FIRST, then fill the
+  // remaining slots up to maxFeeds with a shuffle of the rest — staying within
+  // the same subrequest cap. Both halves are shuffled so no single source is
+  // always first/last across hourly rebuilds. Downstream selectDiverse still
+  // category-balances the display; this only guarantees the beat is fetched.
+  const aiops = shuffled(NEWS_FEEDS.filter((f) => f.category === 'AIOps'));
+  const rest = shuffled(NEWS_FEEDS.filter((f) => f.category !== 'AIOps'));
+  const feeds = [...aiops, ...rest].slice(0, maxFeeds);
   const settled = await Promise.allSettled(
     feeds.map((f) => fetchOneFeed(f, perFeedTimeout)),
   );

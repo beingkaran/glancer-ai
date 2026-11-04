@@ -26,6 +26,17 @@ import { calendarText } from '../src/lib/calendarLinks.js';
 const EVENTS_CACHE_CONTROL = 'public, max-age=300, s-maxage=86400';
 const EVENTS_KV_KEY = 'events:v1';
 
+// News is rebuilt hourly into KV by the cron below, then read KV-first by
+// /api/news. Browser may reuse for 5 min; the shared edge cache holds 1 hour
+// (identical to the existing on-demand response's cache-control).
+const NEWS_CACHE_CONTROL = 'public, max-age=300, s-maxage=3600';
+const NEWS_KV_KEY = 'news:raw:v1';
+const NEWS_CRON = '0 * * * *';
+// Serve the KV snapshot only while it's reasonably fresh (~90 min covers a
+// missed hourly run); past that, fall back to the live build so a stuck cron
+// can never pin a stale list.
+const NEWS_FRESH_MS = 90 * 60 * 1000;
+
 function jsonResponse(bodyStr, { status = 200, cacheControl } = {}) {
   const headers = { ...CORS, 'content-type': 'application/json; charset=utf-8' };
   if (cacheControl) headers['cache-control'] = cacheControl;
@@ -119,6 +130,27 @@ export default {
     // Cloudflare's cache. s-maxage governs that shared cache TTL.
     if (url.pathname === '/api/news') {
       if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
+
+      // KV-first: serve the hourly-cron-built snapshot when it's present and
+      // fresh, so every visitor gets the same deterministic list. If KV is
+      // missing/empty/stale (or the cron has never run), fall through to the
+      // EXACT original behavior below (edge cache + on-demand buildRawNews) —
+      // strict no-regression. The stored value is { items, builtAt }; we re-wrap
+      // it in the same { ts, count, items } shape + cache-control as the live path.
+      try {
+        if (env.EVENTS_KV) {
+          const cached = await env.EVENTS_KV.get(NEWS_KV_KEY);
+          if (cached) {
+            const { items, builtAt } = JSON.parse(cached);
+            if (Array.isArray(items) && items.length && builtAt && (Date.now() - builtAt) <= NEWS_FRESH_MS) {
+              return jsonResponse(JSON.stringify({ ts: builtAt, count: items.length, items }), {
+                cacheControl: NEWS_CACHE_CONTROL,
+              });
+            }
+          }
+        }
+      } catch { /* KV miss/unavailable/parse error → fall through to live build */ }
+
       const cache = caches.default;
       const cacheKey = new Request(new URL('/api/news', url.origin).toString());
       const hit = await cache.match(cacheKey);
@@ -197,16 +229,28 @@ export default {
     return withSecurityHeaders(await env.ASSETS.fetch(request));
   },
 
-  // Cron Trigger (see wrangler.jsonc `triggers.crons`): rebuild the events feed
-  // once a day and store it in KV so the next request serves it instantly. The
-  // request path reads KV first, so no cache purge is needed.
-  async scheduled(event, env, ctx) {
+  // Cron Triggers (see wrangler.jsonc `triggers.crons`). Branch on the firing
+  // schedule (controller.cron) so each cron rebuilds the right feed into KV; the
+  // request paths read KV first, so no cache purge is needed. Guarded on
+  // env.EVENTS_KV so every branch is a no-op where the binding is absent.
+  async scheduled(controller, env, ctx) {
     ctx.waitUntil((async () => {
       try {
+        if (controller.cron === NEWS_CRON) {
+          // Hourly: rebuild the news feed into KV for global freshness. Stored as
+          // { items, builtAt }; /api/news reads this key first (see above).
+          if (env.EVENTS_KV) {
+            const items = await buildRawNews();
+            const bodyStr = JSON.stringify({ items, builtAt: Date.now() });
+            await env.EVENTS_KV.put(NEWS_KV_KEY, bodyStr, { expirationTtl: 172800 });
+          }
+          return;
+        }
+        // Daily ("0 6 * * *"): rebuild the events feed into KV (unchanged).
         const bodyStr = await buildEventsPayload();
         if (env.EVENTS_KV) await env.EVENTS_KV.put(EVENTS_KV_KEY, bodyStr, { expirationTtl: 172800 });
       } catch (e) {
-        console.error('events cron failed:', e?.message || e);
+        console.error('cron failed:', e?.message || e);
       }
     })());
   },
