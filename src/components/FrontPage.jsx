@@ -11,16 +11,16 @@ import NewsCarousel from './NewsCarousel';
  * FrontPage — the above-the-fold split. Two content types, two visual
  * grammars, one glance:
  *
- *   left  (cyan accent) — the Live Feed: news AND deep dives as a tailing
- *                        log stream that advances one entry every 7 seconds
- *                        (paused while hovered, so nothing moves mid-click).
- *                        News leads the page, so it takes the wide column.
+ *   left  (cyan accent) — the Live Feed: news as a tailing log stream that
+ *                        advances one entry every 7 seconds (paused while
+ *                        hovered, so nothing moves mid-click). News leads the
+ *                        page, so it takes the wide column.
  *   right (pink accent) — the analysis desk: newest Deep Dive as a lead
  *                        story plus a 3-item headline rail, editorial type.
  *
  * Everything opens in the swipe reader: news entries open the news slideshow,
- * deep dives (desk and feed alike) open the blogs slideshow — same behavior
- * as the cards in the main feed below.
+ * deep dives open the blogs slideshow — same behavior as the cards in the
+ * main feed below.
  *
  * The desk shows the newest FRONT_DESK_COUNT analysis pieces; the feed below
  * skips those so the lead never repeats directly underneath. The live feed is
@@ -30,10 +30,9 @@ import NewsCarousel from './NewsCarousel';
 
 export const FRONT_DESK_COUNT = 4;
 const FEED_VISIBLE = 8;
-// One new entry surfaces every 7s. Every 4th slot is a Deep Dive so analysis
-// keeps flowing through the ticker between headlines.
+// One new entry surfaces every 7s. The ticker is news only — deep dives live
+// in their own desk on the right.
 const ROTATE_MS = 7000;
-const DIVE_EVERY = 4;
 
 const submittedTime = (p) => new Date(p.submittedAt || p.date).getTime();
 const byNewest = (list) => [...list].sort((a, b) => submittedTime(b) - submittedTime(a));
@@ -86,27 +85,11 @@ export default function FrontPage() {
     };
   }, []);
 
-  // The ticker pool: chronological news with a Deep Dive woven in every
-  // DIVE_EVERY-th slot, so both content types keep cycling through.
-  const pool = useMemo(() => {
-    const mixed = [];
-    let n = 0;
-    let a = 0;
-    while (n < news.length || a < analysis.length) {
-      const wantDive = (mixed.length + 1) % DIVE_EVERY === 0;
-      if (wantDive && a < analysis.length) {
-        mixed.push({ kind: 'dive', post: analysis[a], blogAt: a });
-        a += 1;
-      } else if (n < news.length) {
-        mixed.push({ kind: 'news', item: news[n], newsAt: n });
-        n += 1;
-      } else if (a < analysis.length) {
-        mixed.push({ kind: 'dive', post: analysis[a], blogAt: a });
-        a += 1;
-      }
-    }
-    return mixed;
-  }, [news, analysis]);
+  // The ticker pool: chronological news only. Deep dives live in the desk.
+  const pool = useMemo(
+    () => news.map((item, n) => ({ kind: 'news', item, newsAt: n })),
+    [news],
+  );
 
   // Advance one entry every 7s; hold still while the pointer is over the list
   // so a link can't move out from under a click.
@@ -154,51 +137,33 @@ export default function FrontPage() {
         <div className="front-grid">
           <aside
             className="front-wire"
-            aria-label="Live feed of news and deep dives"
+            aria-label="Live feed of news"
             onMouseEnter={() => { pausedRef.current = true; }}
             onMouseLeave={() => { pausedRef.current = false; }}
           >
             <header className="front-kicker front-kicker--wire">
               <span className={`front-wire-dot${live ? ' is-live' : ''}`} aria-hidden="true" />
               <span className="front-kicker-label">Live Feed</span>
-              <span className="front-kicker-sub">{live ? 'news + deep dives · live' : 'news + deep dives'}</span>
+              <span className="front-kicker-sub">{live ? 'news · live' : 'news'}</span>
             </header>
 
             <ol key={offset} className="front-wire-list front-wire-list--tick" aria-live="off">
               {visible.map((entry) => (
-                entry.kind === 'news' ? (
-                  <li key={`n-${entry.item.rid}`}>
-                    <a
-                      href={entry.item.url}
-                      className="front-wire-item"
-                      onClick={openNews(entry.newsAt)}
-                      rel="noopener noreferrer"
-                      aria-label={`Read: ${entry.item.title}`}
-                    >
-                      <span className="front-wire-meta">
-                        <span className="front-wire-time">{wireTime(entry.item)}</span>
-                        <span className={`news-category-tag ${entry.item.categoryClass}`}>{entry.item.category}</span>
-                      </span>
-                      <span className="front-wire-title">{entry.item.title}</span>
-                    </a>
-                  </li>
-                ) : (
-                  <li key={`d-${entry.post.id}`}>
-                    <Link
-                      to={`/blog/${entry.post.id}`}
-                      state={{ from: 'front-page' }}
-                      className="front-wire-item front-wire-item--dive"
-                      onClick={openDive(entry.blogAt)}
-                      aria-label={`Read deep dive: ${entry.post.title}`}
-                    >
-                      <span className="front-wire-meta">
-                        <span className="front-wire-time front-wire-time--dive">{shortDate(entry.post.date)}</span>
-                        <span className="news-category-tag tag-purple">Deep Dive</span>
-                      </span>
-                      <span className="front-wire-title">{entry.post.title}</span>
-                    </Link>
-                  </li>
-                )
+                <li key={`n-${entry.item.rid}`}>
+                  <a
+                    href={entry.item.url}
+                    className="front-wire-item"
+                    onClick={openNews(entry.newsAt)}
+                    rel="noopener noreferrer"
+                    aria-label={`Read: ${entry.item.title}`}
+                  >
+                    <span className="front-wire-meta">
+                      <span className="front-wire-time">{wireTime(entry.item)}</span>
+                      <span className={`news-category-tag ${entry.item.categoryClass}`}>{entry.item.category}</span>
+                    </span>
+                    <span className="front-wire-title">{entry.item.title}</span>
+                  </a>
+                </li>
               ))}
             </ol>
 
