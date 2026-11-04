@@ -1,6 +1,5 @@
 import { useParams, useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
-import FrontPage, { FRONT_DESK_COUNT } from '../components/FrontPage';
 import IntelligenceFeed from '../components/IntelligenceFeed';
 import SearchSection from '../components/SearchSection';
 import NewsletterInline from '../components/NewsletterInline';
@@ -9,17 +8,18 @@ import { catFromSlug, segmentPath } from '../lib/feedRoutes';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 
 /*
- * HomePage — compact masthead, then the front page (Deep Dives + The Wire
- * side by side, both above the fold), then the full IntelligenceFeed.
+ * HomePage — compact masthead, then the IntelligenceFeed. The homepage shows
+ * the live news grid only (Deep Dives are suppressed there via hideAnalysis);
+ * the live news feed also streams through the masthead Signal ticker.
  *
  * Multi-page: each feed view is its own URL, so every segment is a real,
  * shareable, indexable page rather than client-side tab state:
- *   /                   → All (front page + Deep Dives + news)
+ *   /                   → All (home — news only)
  *   /news               → News only
- *   /news/topic/:slug   → one category (e.g. /news/topic/open-source)
+ *   /news/topic/:slug   → one category (e.g. /news/topic/open-source), with
+ *                         its Deep Dives
  * The feed's segment chips are plain links between these routes; this page
- * just derives the active segment from the URL. The front page only renders
- * on "All" — segment views go straight to the filtered feed.
+ * just derives the active segment from the URL.
  */
 
 const FEED_META = {
@@ -52,8 +52,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      {segment === 'all' && <FrontPage />}
-      <IntelligenceFeed segment={segment} skipAnalysis={segment === 'all' ? FRONT_DESK_COUNT : 0} />
+      <IntelligenceFeed segment={segment} hideAnalysis={segment === 'all'} />
       <div className="container" id="newsletter"><NewsletterInline source="home" /></div>
       <div className="section-divider" aria-hidden="true" />
       <SearchSection />

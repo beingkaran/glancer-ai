@@ -1,74 +1,82 @@
 /*
- * SignalTicker — the masthead "Signal" strip: a slow, pausable ticker of live AI
- * signals (releases, cost shifts, observability moves). The signature element of
- * the "AI Intelligence Desk" identity. Pure CSS marquee (see .signal-ticker*).
+ * SignalTicker — the masthead "Signal" strip: a slow, pausable ticker of the
+ * LIVE news feed (the newest AI/observability headlines). The signature element
+ * of the "AI Intelligence Desk" identity. Pure CSS marquee (see .signal-ticker*).
+ *
+ * It loads news the same way the feed does — getNews() seeded with STATIC_NEWS so
+ * the strip renders instantly, then swaps in the live feed when it resolves (and
+ * on the shared 'glancer:news-updated' background-refresh event). Each item links
+ * to the in-app reader route (/news/:rid): a plain click navigates there, while
+ * modifier/middle clicks keep the <a href> so the real source opens in a new tab.
  */
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
 
-const SIGNALS = [
-  { b: 'GPT-5.6', t: 'ships 400K context', tag: 'up', tv: '▲ latency −18%', to: '/blog/openai-gpt-56-sol-cerebras-750-tokens-second' },
-  { b: 'Datadog', t: 'LLM Observability GA', tag: 'warn', tv: '◆ pricing shift', to: '/blog/datadog-full-stack-observability-2026' },
-  { b: 'Anthropic', t: 'Claude agents expand tool-calling', to: '/topic/anthropic' },
-  { b: 'Grafana', t: 'adds native trace-to-metric correlation', to: '/blog/distributed-tracing-explained' },
-  { b: 'OpenAI', t: 'agents API', tag: 'up', tv: '▲ tool-calls 2.1×', to: '/topic/ai-agents' },
-  { b: 'Dynatrace', t: 'Davis AI adds root-cause replay', to: '/topic/apm' },
-];
+// Keep the strip lightweight — it lives in the navbar on every front-page paint.
+const TICKER_LIMIT = 18;
 
-function signalLabel({ b, t, tag, tv }) {
-  const extra = tag ? ` ${tv}` : '';
-  return `${b}: ${t}${extra}`;
-}
-
-function SignalItem({ signal }) {
-  const body = (
-    <>
-      <b>{signal.b}</b> {signal.t}
-      {signal.tag && <span className={signal.tag}> {signal.tv}</span>}
-    </>
+function SignalItem({ item, onOpen }) {
+  return (
+    <a
+      href={item.url}
+      className="signal-ticker-item"
+      onClick={onOpen(item)}
+      rel="noopener noreferrer"
+      aria-label={`${item.source}: ${item.title}`}
+    >
+      <b>{item.source}</b> {item.title}
+    </a>
   );
-
-  if (signal.to) {
-    return (
-      <Link
-        to={signal.to}
-        className="signal-ticker-item"
-        aria-label={signalLabel(signal)}
-      >
-        {body}
-      </Link>
-    );
-  }
-
-  if (signal.href) {
-    return (
-      <a
-        href={signal.href}
-        className="signal-ticker-item"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={signalLabel(signal)}
-      >
-        {body}
-      </a>
-    );
-  }
-
-  return <span className="signal-ticker-item">{body}</span>;
 }
 
 export default function SignalTicker() {
-  // Duplicated inline so the marquee reads continuously as it loops.
-  const run = SIGNALS.map((s, i) => <SignalItem key={i} signal={s} />);
+  const navigate = useNavigate();
+  // Seed with the static fallback so the marquee renders before the fetch lands.
+  const [items, setItems] = useState(STATIC_NEWS);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { items: fresh } = await getNews();
+        if (alive && fresh?.length) setItems(fresh);
+      } catch {
+        /* keep static fallback */
+      }
+    })();
+
+    const onUpdate = () => {
+      const cached = getCachedNews();
+      if (alive && cached?.items?.length) setItems(cached.items);
+    };
+    window.addEventListener('glancer:news-updated', onUpdate);
+    return () => {
+      alive = false;
+      window.removeEventListener('glancer:news-updated', onUpdate);
+    };
+  }, []);
+
+  const onOpen = (item) => (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    navigate(`/news/${item.rid}`);
+  };
+
+  const headlines = items.slice(0, TICKER_LIMIT);
+  // Rendered twice (distinct keys) so the marquee reads continuously as it loops.
+  const makeRun = (pass) =>
+    headlines.map((item) => <SignalItem key={`${item.rid}-${pass}`} item={item} onOpen={onOpen} />);
 
   return (
-    <div className="signal-ticker" aria-label="Live AI signal feed">
+    <div className="signal-ticker" aria-label="Live AI news feed">
       <div className="signal-ticker-inner">
         <div className="signal-ticker-label">
           <span className="signal-ticker-pulse" aria-hidden="true" />
           Signal
         </div>
         <div className="signal-ticker-track">
-          <div className="signal-ticker-run">{run}{run}</div>
+          <div className="signal-ticker-run">{makeRun('a')}{makeRun('b')}</div>
         </div>
       </div>
     </div>

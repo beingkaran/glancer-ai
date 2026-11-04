@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, Children } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { segmentPath } from '../lib/feedRoutes';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import { getNews, getCachedNews, STATIC_NEWS } from '../lib/newsFeed';
@@ -61,10 +61,11 @@ function filterBySegment(segment, news, analysis) {
   };
 }
 
-// skipAnalysis: how many of the newest analysis posts to omit — the front
-// page already runs them as its lead package, so the feed picks up from there.
-export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) {
+// hideAnalysis: suppress the Deep Dives (analysis) section entirely — the
+// homepage passes this so the home feed is news-only.
+export default function IntelligenceFeed({ segment = 'all', hideAnalysis = false }) {
   const { user, isAuthed } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState(STATIC_NEWS);
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -152,16 +153,6 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
     return [...frameable, ...blogSlides, ...blocked];
   }, [sortedNews, blogSlides]);
 
-  // Index of each news item within the slideshow, so a card click maps to the
-  // right slide. Derived from carouselItems (NOT sortedNews) because the blocked
-  // sources are relocated to the tail above — indexing the pre-reorder list would
-  // open the wrong story for them.
-  const newsIndex = useMemo(() => {
-    const m = new Map();
-    carouselItems.forEach((it, i) => { if (it.rid != null) m.set(it.rid, i); });
-    return m;
-  }, [carouselItems]);
-
   // Index of each blog within the blogs-only slideshow.
   const blogIndex = useMemo(() => {
     const m = new Map();
@@ -169,11 +160,10 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
     return m;
   }, [analysis]);
 
-  const { news: feedNews, analysis: allFeedAnalysis } = useMemo(
+  const { news: feedNews, analysis: feedAnalysis } = useMemo(
     () => filterBySegment(segment, sortedNews, analysis),
     [segment, sortedNews, analysis],
   );
-  const feedAnalysis = skipAnalysis > 0 ? allFeedAnalysis.slice(skipAnalysis) : allFeedAnalysis;
 
   // Topic categories present in the live news set (shown in the dropdown).
   const present = new Set(sortedNews.map((i) => i.category));
@@ -184,14 +174,15 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
   ];
   const isTopic = !baseSegments.some((s) => s.id === segment);
 
-  const showAnalysis = segment === 'all' || isTopic;
+  const showAnalysis = (segment === 'all' || isTopic) && !hideAnalysis;
   const showNews = segment === 'all' || segment === 'news' || isTopic;
 
+  // A plain news click opens the in-app route reader (/news/:rid); modifier and
+  // middle clicks keep the card's <a href> so the real source opens in a new tab.
   const openNews = (rid) => (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
     e.preventDefault();
-    const idx = newsIndex.get(rid);
-    if (idx != null) setCarousel({ mode: 'news', at: idx });
+    navigate(`/news/${rid}`);
   };
 
   const openBlog = (postId) => (e) => {
@@ -301,7 +292,7 @@ export default function IntelligenceFeed({ segment = 'all', skipAnalysis = 0 }) 
           <FeedSection
             key={`analysis-${segment}`}
             label="Practitioner Analysis"
-            title={skipAnalysis > 0 ? 'More Deep Dives' : 'Deep Dives'}
+            title="Deep Dives"
             count={feedAnalysis.length}
             subtitle="Articles created by tech authors in AI and observability — practitioner guides, comparisons and deep dives."
             className={showNews ? 'feed-section-spaced' : ''}

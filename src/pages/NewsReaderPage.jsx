@@ -1,18 +1,25 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
+import { useNewsFrame } from '../lib/useNewsFrame';
 
 /*
- * NewsReaderPage — a preview page for one story (/news/:id).
+ * NewsReaderPage — the route-based reader for one story (/news/:id). Used by
+ * in-app news clicks and by the Signal ticker, and it shares its framing logic
+ * with the in-carousel reader (NewsReaderFrame) via useNewsFrame.
  *
- * For sources verified NOT to block third-party framing (item.frameable, see
- * src/data/newsFeeds.js + scripts/check-frameable.mjs), this loads the source's
- * own page LIVE in an <iframe> — unmodified, exactly as published. For every
- * other source we never work around their X-Frame-Options/CSP — instead we
- * show a short summary and a link to read it on their site.
+ * It loads the source's own page LIVE in a sandboxed <iframe> — unmodified,
+ * exactly as published. For publishers that block embedding
+ * (X-Frame-Options/CSP) it never works around their headers; instead it falls
+ * back to a short summary and a link to read the story on their site.
  */
 
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
 const BackIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -60,7 +67,9 @@ export default function NewsReaderPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const item = useMemo(() => getCachedNewsItem(id), [id]);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
+  // Shared framing logic (framecheck preflight + 3s escape / 6s blank safety
+  // nets), identical to the in-carousel reader. See src/lib/useNewsFrame.js.
+  const { mode, iframeLoaded, showEscape, onIframeLoad } = useNewsFrame(item);
 
   // Reader URLs are ephemeral (cache-backed RSS ids) and mirror the
   // publisher's content — noindex them so crawl budget goes to real pages.
@@ -71,15 +80,22 @@ export default function NewsReaderPage() {
     robots: 'noindex, follow',
   });
 
-  useEffect(() => { setIframeLoaded(false); }, [item]);
-
-  // Robust back: go to the previous page if there is one, else the news feed.
-  const goBack = () => {
+  // Robust close: go to the previous page if there is one, else the home feed.
+  const goBack = useCallback(() => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
-  };
+  }, [navigate]);
 
-  // Item not in cache (e.g. opened via a stale/direct link).
+  // Esc closes the reader (back to where the reader was opened from).
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') goBack(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [goBack]);
+
+  // Item not in cache (e.g. opened via a stale/direct link). The home feed load
+  // populates the cache, so in-app navigation always resolves; this only catches
+  // cold/shared links.
   if (!item) {
     return (
       <div className="page-section">
@@ -95,12 +111,14 @@ export default function NewsReaderPage() {
     );
   }
 
-  if (item.frameable) {
+  // Live frame (or still checking) — load the source page in a sandboxed iframe,
+  // exactly as the in-carousel reader does.
+  if (mode !== 'blocked') {
     return (
       <div className="page-section reader-page-live">
         <div className="reader-backbar reader-backbar-live">
-          <button className="reader-back-btn" onClick={goBack}>
-            <BackIcon /> Back
+          <button className="reader-back-btn" onClick={goBack} aria-label="Close reader" title="Close">
+            <CloseIcon />
           </button>
           <span className="reader-frame-source">{item.source}</span>
           <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
@@ -113,17 +131,34 @@ export default function NewsReaderPage() {
               <span className="reader-spinner" /> Loading {item.source}…
             </div>
           )}
-          <iframe
-            className="reader-frame-iframe"
-            src={item.url}
-            title={item.title}
-            onLoad={() => setIframeLoaded(true)}
-          />
+          {/* The live source page, unmodified. The sandbox permits scripts/forms/
+              popups so the page is fully interactive, but withholds top-navigation
+              so the site can't frame-bust the reader out from under the user. */}
+          {mode === 'frame' && (
+            <iframe
+              className="reader-frame-iframe"
+              src={item.url}
+              title={item.title}
+              referrerPolicy="no-referrer"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
+              onLoad={onIframeLoad}
+            />
+          )}
+          {/* Manual escape over the live frame, shown after a short grace: the
+              only rescue for a page that painted the browser's grey "content is
+              blocked" error (undetectable from JS). */}
+          {mode === 'frame' && showEscape && !item.internal && (
+            <a className="reader-frame-escape" href={item.url} target="_blank" rel="noopener noreferrer">
+              Not loading? Read on {item.source} <ExtIcon />
+            </a>
+          )}
         </div>
       </div>
     );
   }
 
+  // Blocked — publisher forbids embedding. Respect it: show a short summary and
+  // a link out, never the browser's grey error page.
   const summary = summaryText(item);
 
   return (
@@ -131,8 +166,8 @@ export default function NewsReaderPage() {
       <article className="container" style={{ maxWidth: 760 }}>
         {/* Sticky back bar */}
         <div className="reader-backbar">
-          <button className="reader-back-btn" onClick={goBack}>
-            <BackIcon /> Back
+          <button className="reader-back-btn" onClick={goBack} aria-label="Close reader" title="Close">
+            <CloseIcon />
           </button>
           <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
             Open original <ExtIcon />

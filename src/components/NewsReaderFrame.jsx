@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSwipeDown } from '../lib/useSwipeDown';
+import { useNewsFrame } from '../lib/useNewsFrame';
 
 /*
  * NewsReaderFrame — an in-carousel reader. Opens on top of the slideshow when a
@@ -48,21 +49,9 @@ function summaryParas(item) {
 }
 
 export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  // 'checking' → asking /api/framecheck whether the article allows embedding;
-  // 'frame'    → publisher allows it (or the check was unavailable) — live iframe;
-  // 'blocked'  → publisher forbids framing — show the summary + link-out panel
-  //              instead of the browser's grey "content is blocked" error page.
-  const [mode, setMode] = useState('checking');
-  // After a short grace we surface a manual "Read on source" escape bar over the
-  // live frame. We CANNOT detect from JS when a cross-origin page is blocked by
-  // X-Frame-Options/CSP — the browser paints its own "content is blocked" page
-  // and still fires the iframe's onLoad — so a permanent, obvious way out is the
-  // only reliable rescue for that grey error. Harmless when the page loads fine.
-  const [showEscape, setShowEscape] = useState(false);
-  // Ref mirror of "loaded" so the slow-load timer reads the latest value
-  // without a stale closure.
-  const loadedRef = useRef(false);
+  // Shared live-iframe logic (framecheck preflight + the 3s escape / 6s blank
+  // safety nets). See src/lib/useNewsFrame.js.
+  const { mode, iframeLoaded, showEscape, onIframeLoad } = useNewsFrame(item);
   const swipe = useSwipeDown(onBack);
 
   // Esc returns to the slideshow rather than closing the whole reader.
@@ -71,63 +60,6 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onBack]);
-
-  // Preflight: ask our own edge (/api/framecheck) whether THIS article's
-  // headers allow cross-origin framing. The static per-source `frameable` flag
-  // samples the site root, but article pages can be stricter — and a blocked
-  // iframe still fires onLoad on its error page, so the browser gives us no
-  // reliable signal after the fact. If the check itself is unavailable, fall
-  // back to the optimistic iframe path.
-  //
-  // Keyed on `item.url` (a stable string), NOT the `item` object: the live news
-  // feed revalidates in the background and hands down fresh item objects every
-  // few seconds — see the git history of the old 10s-timer version.
-  useEffect(() => {
-    let alive = true;
-    setIframeLoaded(false);
-    setShowEscape(false);
-    loadedRef.current = false;
-    // Our own pages (Deep Dives at /blog/:id) are same-origin — framing is
-    // always allowed, no preflight needed.
-    if (item.internal || item.url.startsWith('/')) {
-      setMode('frame');
-      return undefined;
-    }
-    setMode('checking');
-    (async () => {
-      try {
-        const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 5000);
-        const res = await fetch(`/api/framecheck?url=${encodeURIComponent(item.url)}`, {
-          signal: ctrl.signal,
-          headers: { accept: 'application/json' },
-        });
-        clearTimeout(t);
-        const ct = res.headers.get('content-type') || '';
-        if (!res.ok || !ct.includes('application/json')) throw new Error('framecheck unavailable');
-        const verdict = await res.json();
-        if (alive) setMode(verdict.frameable === false ? 'blocked' : 'frame');
-      } catch {
-        if (alive) setMode('frame');
-      }
-    })();
-    return () => { alive = false; };
-  }, [item.url, item.internal]);
-
-  // Two safety nets for the live frame, since a publisher's block can slip past
-  // the preflight (some sites send frame headers only to real browsers, not to
-  // our server-side framecheck):
-  //   • 3s → reveal a manual "Read on <source>" escape bar over the frame. This
-  //     is the ONLY rescue for a page that renders the browser's grey "content
-  //     is blocked" error (that error still fires onLoad, so we can't detect it).
-  //   • 6s → if the frame is still genuinely blank (never fired onLoad — a slow
-  //     network or a page that refused silently), fall back to the summary panel.
-  useEffect(() => {
-    if (mode !== 'frame') return undefined;
-    const escapeT = setTimeout(() => setShowEscape(true), 3000);
-    const blankT = setTimeout(() => { if (!loadedRef.current) setMode('blocked'); }, 6000);
-    return () => { clearTimeout(escapeT); clearTimeout(blankT); };
-  }, [mode, item.url]);
 
   return (
     <div className="reader-frame reader-frame-live" role="dialog" aria-modal="true" aria-label={`Reader: ${item.title}`}>
@@ -173,7 +105,7 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
             title={item.title}
             referrerPolicy="no-referrer"
             sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"
-            onLoad={() => { loadedRef.current = true; setIframeLoaded(true); }}
+            onLoad={onIframeLoad}
           />
         )}
 
