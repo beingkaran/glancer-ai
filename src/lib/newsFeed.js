@@ -315,18 +315,29 @@ async function fetchViaApi() {
   }
 }
 
+// Frameable-first ordering: embeddable (frameable) pages come FIRST and
+// restricted (non-embeddable) pages are pushed to the END. A STABLE partition —
+// Array.sort is stable, so equal-`frameable` items keep selectDiverse's existing
+// category-diversity order within each group (no secondary image/date keys). We
+// apply it here, pre-cache (before withRouteIds/saveCache), so the cached array
+// is ordered and every consumer (SignalTicker, News Right Now grid, carousel)
+// inherits it and `rid`s stay stable (assigned over the already-sorted array).
+function orderFrameableFirst(pool) {
+  return [...pool].sort((a, b) => (b.frameable ? 1 : 0) - (a.frameable ? 1 : 0));
+}
+
 async function fetchLiveNews(limit = NEWS_LIMIT) {
   // 1) Edge aggregator (fast, shared, image-rich).
   try {
     const apiItems = await fetchViaApi();
-    if (apiItems?.length) return selectDiverse(apiItems, limit).map(normalize);
+    if (apiItems?.length) return orderFrameableFirst(selectDiverse(apiItems, limit).map(normalize));
   } catch { /* fall through to per-feed fetch */ }
 
   // 2) Fallback: pull each feed straight from the browser (dev / Worker down).
   const results = await runPool(shuffled(FEEDS), fetchFeed, 6);
   const items = results.filter(Boolean).flat();
   if (!items.length) return null;
-  return selectDiverse(items, limit).map(normalize);
+  return orderFrameableFirst(selectDiverse(items, limit).map(normalize));
 }
 
 // ---- cache + public API ---------------------------------------------------
