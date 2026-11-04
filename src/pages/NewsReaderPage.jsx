@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 import { useNewsFrame } from '../lib/useNewsFrame';
+import { openSourcePopup } from '../lib/openPopup';
 
 /*
  * NewsReaderPage — the route-based reader for one story (/news/:id). Used by
@@ -85,6 +86,16 @@ export default function NewsReaderPage() {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
   }, [navigate]);
+
+  // Blocked mode only: open the publisher's real page in a browser popup window
+  // (a top-level context, so no X-Frame-Options issue) instead of a new tab, so
+  // the user stays here on glancerai.com and the reader route never navigates.
+  // If the browser blocks the popup, fall back to a normal new tab so the link
+  // is never dead.
+  const openInPopup = useCallback((e) => {
+    e.preventDefault();
+    if (!openSourcePopup(item?.url)) window.open(item?.url, '_blank', 'noopener,noreferrer');
+  }, [item]);
 
   // Esc closes the reader (back to where the reader was opened from).
   useEffect(() => {
@@ -169,7 +180,7 @@ export default function NewsReaderPage() {
           <button className="reader-back-btn" onClick={goBack} aria-label="Close reader" title="Close">
             <CloseIcon />
           </button>
-          <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
+          <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer" onClick={openInPopup}>
             Open original <ExtIcon />
           </a>
         </div>
@@ -194,7 +205,7 @@ export default function NewsReaderPage() {
           {summary && <p>{summary}</p>}
           <div className="reader-fallback-note">
             <p>This is a short summary. Read the full article on {item.source}:</p>
-            <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }}>
+            <a className="write-cta-btn" href={item.url} target="_blank" rel="noopener noreferrer" style={{ marginTop: 8 }} onClick={openInPopup}>
               Read the full story at {item.source} <ExtIcon />
             </a>
           </div>
@@ -203,7 +214,7 @@ export default function NewsReaderPage() {
         {/* Footer nav */}
         <div className="reader-footer-nav">
           <button className="reader-back-btn" onClick={goBack}><BackIcon /> Back to News</button>
-          <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
+          <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer" onClick={openInPopup}>
             View source: {item.source} <ExtIcon />
           </a>
         </div>

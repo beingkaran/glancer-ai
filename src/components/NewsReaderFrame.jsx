@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSwipeDown } from '../lib/useSwipeDown';
 import { useNewsFrame } from '../lib/useNewsFrame';
+import { openSourcePopup } from '../lib/openPopup';
 
 /*
  * NewsReaderFrame — an in-carousel reader. Opens on top of the slideshow when a
@@ -54,6 +55,15 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
   const { mode, iframeLoaded, showEscape, onIframeLoad } = useNewsFrame(item);
   const swipe = useSwipeDown(onBack);
 
+  // Blocked mode only: open the publisher's real page in a browser popup window
+  // (a top-level context, so no X-Frame-Options issue) instead of a new tab, so
+  // glancerai.com stays open behind the reader. If the browser blocks the popup,
+  // fall back to a normal new tab so the link is never dead.
+  const openInPopup = (e) => {
+    e.preventDefault();
+    if (!openSourcePopup(item.url)) window.open(item.url, '_blank', 'noopener,noreferrer');
+  };
+
   // Esc returns to the slideshow rather than closing the whole reader.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); onBack?.(); } };
@@ -69,11 +79,11 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
         <button type="button" className="reader-frame-back" onClick={onBack} aria-label="Back to slideshow">
           <BackIcon /> Slideshow
         </button>
-        <a className="reader-frame-source-link" href={item.url} target="_blank" rel="noopener noreferrer" title={item.url}>
+        <a className="reader-frame-source-link" href={item.url} target="_blank" rel="noopener noreferrer" title={item.url} onClick={mode === 'blocked' ? openInPopup : undefined}>
           {item.source}
         </a>
         <div className="reader-frame-bar-right">
-          <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open original article">
+          <a className="reader-frame-ext" href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open original article" onClick={mode === 'blocked' ? openInPopup : undefined}>
             Original <ExtIcon />
           </a>
           {onNext && hasNext && (
@@ -136,11 +146,11 @@ export default function NewsReaderFrame({ item, onBack, onNext, hasNext }) {
               {item.source}{item.date ? ` · ${item.date}` : ''}
             </p>
             {summaryParas(item).map((p, i) => <p key={i} className="reader-blocked-text">{p}</p>)}
-            <a className="carousel-btn primary reader-blocked-cta" href={item.url} target="_blank" rel="noopener noreferrer">
+            <a className="carousel-btn primary reader-blocked-cta" href={item.url} target="_blank" rel="noopener noreferrer" onClick={openInPopup}>
               Read on {item.source} <ExtIcon />
             </a>
             <p className="reader-blocked-note">
-              {item.source} doesn't allow reading inside other sites, so this story opens in a new tab.
+              {item.source} doesn't allow reading inside other sites, so this story opens in a separate window.
             </p>
           </div>
         )}
