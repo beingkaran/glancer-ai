@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getCachedNewsItem, displayImage } from '../lib/newsFeed';
+import { getCachedNewsItem, getCachedNews, displayImage } from '../lib/newsFeed';
 import { useDocumentMeta } from '../lib/useDocumentMeta';
 import { useNewsFrame } from '../lib/useNewsFrame';
 import { openSourcePopup } from '../lib/openPopup';
@@ -24,6 +24,11 @@ const CloseIcon = () => (
 const BackIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+const NextIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
 );
 const ExtIcon = () => (
@@ -71,6 +76,25 @@ export default function NewsReaderPage() {
   // Shared framing logic (framecheck preflight + 3s escape / 6s blank safety
   // nets), identical to the in-carousel reader. See src/lib/useNewsFrame.js.
   const { mode, iframeLoaded, showEscape, onIframeLoad } = useNewsFrame(item);
+
+  // Next-story target: find this item in the cached, frameable-first ordered
+  // feed (the same global order the home feed uses) and take the one after it.
+  // null when the item isn't in the cache (cold/shared link) or it's the last
+  // story — in both cases the Next button is hidden.
+  const nextRid = useMemo(() => {
+    const list = getCachedNews()?.items;
+    if (!list?.length) return null;
+    const idx = list.findIndex((it) => it.rid === id);
+    if (idx === -1) return null;
+    return list[idx + 1]?.rid ?? null;
+  }, [id]);
+
+  // Advance to the next story by changing the route — the page re-renders with
+  // the new item and re-runs its framecheck. Keeping it in the URL makes the
+  // position shareable.
+  const goNext = useCallback(() => {
+    if (nextRid) navigate(`/news/${nextRid}`);
+  }, [nextRid, navigate]);
 
   // Reader URLs are ephemeral (cache-backed RSS ids) and mirror the
   // publisher's content — noindex them so crawl budget goes to real pages.
@@ -132,6 +156,11 @@ export default function NewsReaderPage() {
             <CloseIcon />
           </button>
           <span className="reader-frame-source">{item.source}</span>
+          {nextRid && (
+            <button type="button" className="reader-frame-next" onClick={goNext} aria-label="Next story" title="Next story">
+              Next <NextIcon />
+            </button>
+          )}
           <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer">
             Open original <ExtIcon />
           </a>
@@ -180,6 +209,11 @@ export default function NewsReaderPage() {
           <button className="reader-back-btn" onClick={goBack} aria-label="Close reader" title="Close">
             <CloseIcon />
           </button>
+          {nextRid && (
+            <button type="button" className="reader-frame-next" onClick={goNext} aria-label="Next story" title="Next story">
+              Next <NextIcon />
+            </button>
+          )}
           <a className="reader-source-link" href={item.url} target="_blank" rel="noopener noreferrer" onClick={openInPopup}>
             Open original <ExtIcon />
           </a>
