@@ -78,38 +78,55 @@ export const NEWS_FEEDS = [
   { url: 'https://www.therobotreport.com/feed/', source: 'The Robot Report', category: 'Hardware', frameable: false },
 
   // ── Observability, APM & AIOps (AIOps) ───────────────────────────────────
-  // All free, non-gated RSS. Covers OpenTelemetry, the major APM/observability
-  // vendors, and analyst commentary. Unreachable feeds are skipped gracefully.
+  // All free, non-gated RSS. Re-verified 2026-11-10 through the production
+  // edge: each feed fetched via /api/proxy (same UA as the aggregator) and its
+  // four newest ARTICLE pages run through /api/framecheck — stricter than the
+  // site-root sample scripts/check-frameable.mjs takes. `frameable: true` here
+  // means every sampled article allowed third-party framing.
+  //
+  // Embeddable — these open live in the in-app reader, so they sort first.
+  { url: 'https://grafana.com/blog/index.xml', source: 'Grafana', category: 'AIOps', frameable: true },
+  { url: 'https://coralogix.com/feed/', source: 'Coralogix', category: 'AIOps', frameable: true },
+  { url: 'https://sysdig.com/feed/', source: 'Sysdig', category: 'AIOps', frameable: true },
+  { url: 'https://prometheus.io/blog/feed.xml', source: 'Prometheus', category: 'AIOps', frameable: true },
+  { url: 'https://devops.com/feed/', source: 'DevOps.com', category: 'AIOps', frameable: true },
+  { url: 'https://www.logicmonitor.com/feed', source: 'LogicMonitor', category: 'AIOps', frameable: true },
+  { url: 'https://sciencelogic.com/feed', source: 'ScienceLogic', category: 'AIOps', frameable: true },
+  { url: 'https://sreweekly.com/feed/', source: 'SRE Weekly', category: 'AIOps', frameable: true },
+  { url: 'https://blogs.cisco.com/tag/observability/feed', source: 'Cisco · Observability', category: 'AIOps', frameable: true },
+  { url: 'https://blog.oodle.ai/rss/', source: 'Oodle', category: 'AIOps', frameable: true },
+  { url: 'https://techcommunity.microsoft.com/t5/s/gxcuf89792/rss/board?board.id=AzureObservabilityBlog', source: 'Azure Observability', category: 'AIOps', frameable: true },
+  { url: 'https://blog.cloudflare.com/tag/observability/rss/', source: 'Cloudflare · Observability', category: 'AIOps', frameable: true },
+  { url: 'https://www.checklyhq.com/rss.xml', source: 'Checkly', category: 'AIOps', frameable: true },
+  { url: 'https://www.mezmo.com/blog/rss.xml', source: 'Mezmo', category: 'AIOps', frameable: true },
+  { url: 'https://kubernetes.io/feed.xml', source: 'Kubernetes', category: 'AIOps', frameable: true },
+  // Not embeddable (X-Frame-Options / CSP frame-ancestors on the article
+  // pages) — still in the feed; the reader shows a summary + link-out.
   { url: 'https://opentelemetry.io/blog/index.xml', source: 'OpenTelemetry', category: 'AIOps', frameable: false },
   { url: 'https://www.datadoghq.com/blog/index.xml', source: 'Datadog', category: 'AIOps', frameable: false },
-  { url: 'https://grafana.com/blog/index.xml', source: 'Grafana', category: 'AIOps', frameable: false },
   { url: 'https://newrelic.com/blog/feed', source: 'New Relic', category: 'AIOps', frameable: false },
   { url: 'https://www.dynatrace.com/news/feed/', source: 'Dynatrace', category: 'AIOps', frameable: false },
-  { url: 'https://www.elastic.co/blog/feed', source: 'Elastic', category: 'AIOps', frameable: false },
-  { url: 'https://signoz.io/blog/rss.xml', source: 'SigNoz', category: 'AIOps', frameable: false },
-  { url: 'https://victoriametrics.com/blog/index.xml', source: 'VictoriaMetrics', category: 'AIOps', frameable: true },
-  { url: 'https://sysdig.com/feed/', source: 'Sysdig', category: 'AIOps', frameable: true },
+  // Observability Labs, not /blog/feed: the main blog feed isn't date-ordered,
+  // so its first items (all the aggregator reads) were 2023-24 posts.
+  { url: 'https://www.elastic.co/observability-labs/rss/feed.xml', source: 'Elastic Observability Labs', category: 'AIOps', frameable: false },
+  { url: 'https://signoz.io/feed.xml', source: 'SigNoz', category: 'AIOps', frameable: false },
   { url: 'https://logz.io/blog/feed/', source: 'Logz.io', category: 'AIOps', frameable: false },
-  { url: 'https://coralogix.com/blog/feed/', source: 'Coralogix', category: 'AIOps', frameable: true },
-  { url: 'https://www.pagerduty.com/blog/feed/', source: 'PagerDuty', category: 'AIOps', frameable: true },
-  { url: 'https://chronosphere.io/feed/', source: 'Chronosphere', category: 'AIOps', frameable: true },
+  { url: 'https://www.pagerduty.com/feed/', source: 'PagerDuty', category: 'AIOps', frameable: false },
   { url: 'https://blog.sentry.io/feed.xml', source: 'Sentry', category: 'AIOps', frameable: false },
   { url: 'https://thenewstack.io/category/observability/feed/', source: 'The New Stack · Observability', category: 'AIOps', frameable: false },
+  { url: 'https://feed.infoq.com/observability/', source: 'InfoQ · Observability', category: 'AIOps', frameable: false },
   { url: 'https://www.honeycomb.io/feed', source: 'Honeycomb', category: 'AIOps', frameable: false },
-  // ── Analyst commentary (Gartner blog network — free; the research reports
-  //    themselves are gated, but the public blogs carry APM/observability takes)
-  { url: 'https://blogs.gartner.com/feed/', source: 'Gartner Blog Network', category: 'AIOps', frameable: false },
-  // ── AI+observability / APM search + vendor additions (added WITHOUT live
-  //    validation — sandbox network blocks these hosts; limited to stable,
-  //    well-known endpoints. Google News RSS search queries + standard vendor
-  //    feeds. frameable:false is conservative; /api/framecheck decides at read. ──
+  { url: 'https://www.cncf.io/feed/', source: 'CNCF', category: 'AIOps', frameable: false },
+  { url: 'https://aws.amazon.com/blogs/mt/feed/', source: 'AWS Cloud Operations', category: 'AIOps', frameable: false },
+  // Google News RSS search queries — headlines link through news.google.com,
+  // which never frames.
   { url: 'https://news.google.com/rss/search?q=AI%20observability&hl=en-US&gl=US&ceid=US:en', source: 'Google News · AI Observability', category: 'AIOps', frameable: false },
   { url: 'https://news.google.com/rss/search?q=AIOps&hl=en-US&gl=US&ceid=US:en', source: 'Google News · AIOps', category: 'AIOps', frameable: false },
   { url: 'https://news.google.com/rss/search?q=%22application%20performance%20monitoring%22&hl=en-US&gl=US&ceid=US:en', source: 'Google News · APM', category: 'AIOps', frameable: false },
   { url: 'https://news.google.com/rss/search?q=(Datadog%20OR%20Dynatrace%20OR%20%22New%20Relic%22%20OR%20Grafana%20OR%20Splunk)%20observability&hl=en-US&gl=US&ceid=US:en', source: 'Google News · Observability Vendors', category: 'AIOps', frameable: false },
-  { url: 'https://www.cncf.io/feed/', source: 'CNCF', category: 'AIOps', frameable: false },
-  { url: 'https://prometheus.io/blog/feed.xml', source: 'Prometheus', category: 'AIOps', frameable: false },
-  { url: 'https://aws.amazon.com/blogs/mt/feed/', source: 'AWS Cloud Operations', category: 'AIOps', frameable: false },
+  // Dropped 2026-11-10 (no working feed found): VictoriaMetrics (blog feed 404;
+  // the site-wide index.xml leads with undated pages), Chronosphere (feed has
+  // no items), Gartner Blog Network (URL no longer returns a feed).
 
   // ── Policy, safety & society (Policy) ────────────────────────────────────
   { url: 'https://www.brookings.edu/topic/artificial-intelligence/feed/', source: 'Brookings', category: 'Policy', frameable: true },

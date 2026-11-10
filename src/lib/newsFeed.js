@@ -26,7 +26,7 @@ const FEEDS = NEWS_FEEDS;
 // abandons every visitor's old cache on their next load — without it, anyone who
 // saw the previous (broken, emoji-only) feed would keep seeing it from cache for
 // up to CACHE_TTL even after a fix ships.
-const CACHE_KEY = 'glancer_news_cache_v7';
+const CACHE_KEY = 'glancer_news_cache_v8';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour — refresh the live feed hourly
 // Static fallback is cached only briefly so a transient feed outage can't pin
 // the emoji placeholders for an hour; the next visit retries the live feed.
@@ -36,7 +36,7 @@ const FALLBACK_TTL = 20 * 60 * 1000; // 20 minutes
 export const NEWS_LIMIT = 50;
 
 // One-time cleanup of older cache keys so they don't linger.
-try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4', 'glancer_news_cache_v5', 'glancer_news_cache_v6'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
+try { ['glancer_news_cache', 'glancer_news_cache_v2', 'glancer_news_cache_v3', 'glancer_news_cache_v4', 'glancer_news_cache_v5', 'glancer_news_cache_v6', 'glancer_news_cache_v7'].forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
 
 // Restrained, technical card headers — deep desaturated slate/teal/blue/amber,
 // no purple/magenta. Keeps category differentiation without the "AI slop" look.
@@ -246,10 +246,39 @@ async function runPool(items, worker, concurrency = 6) {
   return out;
 }
 
+// How many embeddable stories lead each category, and how recent they must be.
+const FRAMEABLE_LEAD = 3;
+const FRAMEABLE_FRESH_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
+
+// Move up to FRAMEABLE_LEAD recent, embeddable items (one per source) to the
+// front of a date-sorted category bucket. selectDiverse takes from the front, so
+// each category's first picks are stories that open live in the in-app reader.
+// Without this the pick is purely by date, and a beat whose freshest posts are
+// all non-embeddable (observability: Google News + the big vendor blogs) would
+// send no embeddable story to the page at all, leaving nothing for the
+// frameable-first ordering to put up front. The rest of the bucket keeps its
+// date order, so each category still fills its remaining picks by freshness.
+function leadWithFrameable(bucket, now = Date.now()) {
+  const lead = [];
+  const sources = new Set();
+  for (const it of bucket) {
+    if (lead.length >= FRAMEABLE_LEAD) break;
+    if (it._frameable !== true || sources.has(it._source)) continue;
+    const age = now - new Date(it.pubDate).getTime();
+    if (!(age <= FRAMEABLE_FRESH_MS)) continue; // also skips unparseable dates
+    sources.add(it._source);
+    lead.push(it);
+  }
+  if (!lead.length) return bucket;
+  const leading = new Set(lead);
+  return [...lead, ...bucket.filter((it) => !leading.has(it))];
+}
+
 // Pick `limit` items with category diversity. We bucket the (date-sorted) pool
 // by category and round-robin across buckets, so the default "All" view always
 // surfaces several categories — not just whichever publishers happened to post
-// most often — while still preferring the freshest item within each category.
+// most often — while still preferring the freshest item within each category
+// (after up to FRAMEABLE_LEAD embeddable ones, see leadWithFrameable).
 // A per-source cap stops any single outlet from dominating.
 function selectDiverse(items, limit, maxPerSource = 3) {
   const sorted = items
@@ -269,6 +298,8 @@ function selectDiverse(items, limit, maxPerSource = 3) {
     if (!buckets.has(cat)) buckets.set(cat, []);
     buckets.get(cat).push(it);
   }
+
+  for (const [cat, bucket] of buckets) buckets.set(cat, leadWithFrameable(bucket));
 
   const order = [...buckets.keys()];
   const perSource = new Map();

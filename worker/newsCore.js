@@ -133,27 +133,48 @@ function shuffled(arr) {
   return a;
 }
 
+// How many of a build's `maxFeeds` slots the observability/APM beat may take.
+// The AIOps list (33 feeds) no longer fits alongside everything else under the
+// subrequest cap, so it gets a fixed share and the rest of the feed keeps its
+// own. 26 leaves 19 for the other categories (they had 21 before the list grew).
+const AIOPS_SLOTS = 26;
+
+/**
+ * Choose which feeds this build fetches, within `maxFeeds`.
+ *
+ *  1. Every EMBEDDABLE AIOps feed (frameable: true) is always fetched — those
+ *     are the observability stories that open live in the in-app reader, so the
+ *     client can lead the beat with them on every build.
+ *  2. The remaining AIOps slots rotate through a shuffle of the non-embeddable
+ *     AIOps feeds (vendor blogs, Google News searches), so each still gets its
+ *     turn across the hourly rebuilds.
+ *  3. Whatever is left of `maxFeeds` goes to a shuffle of every other category.
+ *
+ * All three groups are shuffled so no source is always first/last. Downstream
+ * selectDiverse still category-balances the display; this only decides what is
+ * fetched.
+ */
+export function pickFeeds(all = NEWS_FEEDS, maxFeeds = 45, aiopsSlots = AIOPS_SLOTS) {
+  const isAiops = (f) => f.category === 'AIOps';
+  const embeddable = shuffled(all.filter((f) => isAiops(f) && f.frameable === true));
+  const restricted = shuffled(all.filter((f) => isAiops(f) && f.frameable !== true));
+  const rest = shuffled(all.filter((f) => !isAiops(f)));
+  const aiops = [...embeddable, ...restricted].slice(0, Math.min(aiopsSlots, maxFeeds));
+  return [...aiops, ...rest].slice(0, maxFeeds);
+}
+
 /**
  * Fetch a batch of feeds in parallel (edge network → fast, no CORS) and return
  * the pooled raw items. Failures are swallowed per-feed (allSettled), so a few
  * dead sources never sink the batch.
  *
  * `maxFeeds` caps how many feeds we hit in a single build so we stay under the
- * Workers free-tier 50-subrequest ceiling. The list is shuffled each build, so
- * across the hourly rebuilds every source still gets its turn.
+ * Workers free-tier 50-subrequest ceiling. pickFeeds (above) decides which ones;
+ * it reshuffles each build, so across the hourly rebuilds every source still
+ * gets its turn.
  */
 export async function buildRawNews({ perFeedTimeout = 6000, maxFeeds = 45 } = {}) {
-  // Guarantee the observability/APM beat is always fetched. The feed list is now
-  // larger than maxFeeds, so a plain shuffled().slice() could randomly drop every
-  // AIOps feed in a given build. Pin the AIOps feeds (category === 'AIOps',
-  // including the Google-News search + vendor feeds) FIRST, then fill the
-  // remaining slots up to maxFeeds with a shuffle of the rest — staying within
-  // the same subrequest cap. Both halves are shuffled so no single source is
-  // always first/last across hourly rebuilds. Downstream selectDiverse still
-  // category-balances the display; this only guarantees the beat is fetched.
-  const aiops = shuffled(NEWS_FEEDS.filter((f) => f.category === 'AIOps'));
-  const rest = shuffled(NEWS_FEEDS.filter((f) => f.category !== 'AIOps'));
-  const feeds = [...aiops, ...rest].slice(0, maxFeeds);
+  const feeds = pickFeeds(NEWS_FEEDS, maxFeeds);
   const settled = await Promise.allSettled(
     feeds.map((f) => fetchOneFeed(f, perFeedTimeout)),
   );
